@@ -1,0 +1,8 @@
+[
+    {
+        "name": "msname",
+        "type": "graphql",        
+        "src": "apigatewayraphql/msname",
+        "preBuildCommands": []
+    }
+]

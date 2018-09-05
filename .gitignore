@@ -1,0 +1,14 @@
+# System Files
+*.DS_Store
+*Thumbs.db
+
+# Builds and distros
+dist/
+playground/
+
+# IDE Files
+.history/
+.vscode/
+
+#SECRETS
+*service-key.json

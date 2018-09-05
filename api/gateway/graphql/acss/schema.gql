@@ -1,0 +1,15 @@
+"Hello world sample, please remove"
+type HelloWorldmsnamecamel{
+  "text"
+  sn: String!  
+}
+
+type Query {
+  "Hello world sample, please remove"
+  getHelloWorldFrommsnamecamel: HelloWorldmsnamecamel
+}
+
+type Subscription {
+  "Hello world sample, please remove"
+  msnamecamelHelloWorldSubscription: HelloWorldmsnamecamel  
+}

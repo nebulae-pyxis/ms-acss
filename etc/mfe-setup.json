@@ -1,0 +1,37 @@
+[
+    {
+        "name": "msname",
+        "src": "frontend/frontendid/msname",
+        "groups": [
+            {
+              "id": "GROUP_NAME",
+              "icon": "location_searching",
+              "translate": {
+                "en": "Group Name",
+                "es": "Nombre de Grupo"
+              },
+              "priority": 1000
+            }
+          ],
+        "contents": [
+            {
+                "groupId": "GROUP_NAME",
+                "id": "msname",
+                "icon": "dashboard",
+                "translate": {
+                    "en": "msname_en",
+                    "es": "msname_es"
+                },
+                "navURL": "/msname",
+                "path": "msname",
+                "loadChildren": "./main/content/msname/msname.module#msnamecamelModule",
+                "priority": 1000,
+                "roles" : ["developer"],
+                "default" : false
+            }            
+        ],
+        "preBuildCommands": [],
+        "environmentVars": {
+        }
+    }
+]

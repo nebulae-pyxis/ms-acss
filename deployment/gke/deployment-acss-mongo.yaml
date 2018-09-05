@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: msshortname-mongo
+spec:
+  ports:
+  - port: 27017
+    name: msshortname-mongo
+  selector:
+    app: msshortname-mongo
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: msshortname-mongo-pv-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 0.5Gi
+---
+apiVersion: apps/v1beta2 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: msshortname-mongo
+spec:
+  selector:
+    matchLabels:
+      app: msshortname-mongo
+  strategy:
+    type: Recreate      
+  template:
+    metadata:
+      labels:
+        app: msshortname-mongo
+    spec:
+      containers:
+      - image: mongo:3.7-jessie
+        name: msshortname-mongo        
+        ports:
+        - containerPort: 27017
+          name: msshortname-mongo
+        volumeMounts:
+        - name: msshortname-mongo-persistent-storage
+          mountPath: /data/db
+      volumes:
+      - name: msshortname-mongo-persistent-storage
+        persistentVolumeClaim:
+          claimName: msshortname-mongo-pv-claim

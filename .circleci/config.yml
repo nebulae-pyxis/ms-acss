@@ -196,7 +196,7 @@ jobs:
             command: |
               kubectl apply -f ~/nebulae/repo/deployment/gke/gcloud-ssd-acss.yaml
               kubectl apply -f ~/nebulae/repo/deployment/gke/deployment-acss-mongo-statefulset.yaml
-              for xi in $(seq 0 30); do kubectl get pod | grep dbevents-0 | grep Running && break; sleep 5; done
+              for xi in $(seq 0 30); do kubectl get pod | grep dbacss-0 | grep Running && break; sleep 5; done
               kubectl exec dbacss-0 -- mongo --host dbacss-0.dbacss --port 27017  --eval "rs.conf()" || \
               kubectl exec dbacss-0 -- mongo --host dbacss-0.dbacss --port 27017  --eval  "rs.initiate({ _id : \"rs0\", members: [{ _id: 0, host: \"dbacss-0.dbacss:27017\" },{ _id: 1, host: \"dbacss-1.dbacss:27017\" },{ _id: 2, host: \"dbacss-2.dbacss:27017\" }]})"
         - run:

@@ -192,10 +192,16 @@ jobs:
               (ls ~/nebulae/api/DOCKERHUB_GENERATED_IMAGE_DIGEST && echo docker image DIGEST to set $(< ~/nebulae/api/DOCKERHUB_GENERATED_IMAGE_DIGEST) ) || echo api not found
               (ls ~/nebulae/api/DOCKERHUB_GENERATED_IMAGE_DIGEST && kubectl set image deployment/api-gateway api-gateway=$(< ~/nebulae/api/DOCKERHUB_GENERATED_IMAGE_DIGEST) ) || echo api not found
         - run:
+            name: Deploy ACSS replicaset persistence 
+            command: |
+              kubectl apply -f ~/nebulae/repo/deployment/gke/gcloud-ssd-acss.yaml
+              kubectl apply -f ~/nebulae/repo/deployment/gke/deployment-acss-mongo-statefulset.yaml
+              kubectl exec dbacss-0 -- mongo --host dbacss-0.dbacss --port 27017  --eval "rs.conf()" || \
+              kubectl exec dbacss-0 -- mongo --host dbacss-0.dbacss --port 27017  --eval  "rs.initiate({ _id : \"rs0\", members: [{ _id: 0, host: \"dbacss-0.dbacss:27017\" },{ _id: 1, host: \"dbacss-1.dbacss:27017\" },{ _id: 2, host: \"dbacss-2.dbacss:27017\" }]})"
+        - run:
             name: Deploy BackEnds 
             command: |
-              kubectl apply -f ~/nebulae/repo/deployment/gke/              
-
+              kubectl apply -f ~/nebulae/repo/deployment/gke/ 
 
 
 workflows: 

@@ -69,7 +69,6 @@ class BusinessDA {
       _id: business._id,
       name: business.generalInfo.name
     };
-    console.log('PERSIST => ', businessData);
     return Rx.Observable.defer(() => collection.insertOne(businessData));
   }
 
@@ -80,7 +79,6 @@ class BusinessDA {
    */
   static updateBusinessGeneralInfo$(id, businessGeneralInfo) {
     const collection = mongoDB.db.collection(CollectionName);
-    console.log('UPDATE => ', id, {name: businessGeneralInfo.name});
     return Rx.Observable.defer(()=>
         collection.findOneAndUpdate(
           { _id: id },

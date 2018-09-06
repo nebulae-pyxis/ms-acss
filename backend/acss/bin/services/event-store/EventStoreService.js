@@ -2,6 +2,7 @@
 const Rx = require("rxjs");
 const eventSourcing = require("../../tools/EventSourcing")();
 const helloWorld = require("../../domain/HelloWorld")();
+const businessEventConsumer = require("../../domain/BusinessEventConsumer")();
 
 /**
  * Singleton instance
@@ -121,7 +122,14 @@ class EventStoreService {
         fn: helloWorld.handleHelloWorld$,
         obj: helloWorld
       },
-
+      BusinessCreated: {
+        fn: businessEventConsumer.handleBusinessCreated$,
+        obj: businessEventConsumer
+      },
+      BusinessGeneralInfoUpdated: {
+        fn: businessEventConsumer.handleBusinessGeneralInfoUpdated$,
+        obj: businessEventConsumer
+      },
     };
   }
 
@@ -136,6 +144,14 @@ class EventStoreService {
         aggregateType: "HelloWorld",
         eventType: "HelloWorldEvent"
       },
+      {
+        aggregateType: "Business",
+        eventType: "BusinessCreated"
+      },
+      {
+        aggregateType: "Business",
+        eventType: "BusinessGeneralInfoUpdated"
+      }
 
     ]
   }

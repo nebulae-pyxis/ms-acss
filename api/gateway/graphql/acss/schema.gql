@@ -1,15 +1,15 @@
 "Hello world sample, please remove"
-type HelloWorldmsnamecamel{
+type HelloWorldACSS{
   "text"
   sn: String!  
 }
 
 type Query {
   "Hello world sample, please remove"
-  getHelloWorldFrommsnamecamel: HelloWorldmsnamecamel
+  getHelloWorldFromACSS: HelloWorldACSS
 }
 
 type Subscription {
   "Hello world sample, please remove"
-  msnamecamelHelloWorldSubscription: HelloWorldmsnamecamel  
+  ACSSHelloWorldSubscription: HelloWorldACSS  
 }

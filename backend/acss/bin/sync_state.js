@@ -23,13 +23,13 @@ const start = () => {
         eventStoreService.stop$(),
         mongoDB.stop$(),
     ).subscribe(
-        (evt) => console.log(`msname (syncing): ${(evt instanceof Object) ? JSON.stringify(evt) : evt}`),
+        (evt) => console.log(`acss (syncing): ${(evt instanceof Object) ? JSON.stringify(evt) : evt}`),
         (error) => {
             console.error('Failed to sync state', error);
             process.exit(1);
         },
         () => {
-            console.log('msname state synced');
+            console.log('acss state synced');
             process.exit(0);
         }
     );

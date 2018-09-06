@@ -1,20 +1,20 @@
 apiVersion: apps/v1beta2 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
 metadata:
-  name: msname
+  name: acss
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: msname
+      app: acss
   template:
     metadata:
       labels:
-        app: msname
+        app: acss
     spec:      
       containers:
-      - image: nebulaeproject_context/msname.backend.backendname:0.0.1
-        name: backendname
+      - image: nebulaepyxis/acss.backend.acss:0.0.1
+        name: acss
         volumeMounts:
         - name: google-application-credentials
           mountPath: "/etc/GOOGLE_APPLICATION_CREDENTIALS"
@@ -37,15 +37,15 @@ spec:
           value: EventStore
         # INTERNAL MONGO DB CONFIG
         - name: MONGODB_URL
-          value: mongodb://msshortname-mongo:27017
+          value: mongodb://acss-mongo:27017
         - name: MONGODB_DB_NAME
-          value: msdbname
+          value: acss
         # JWT CONGIF        
         - name: JWT_PUBLIC_KEY
           value: -----BEGIN PUBLIC KEY-----\n\n-----END PUBLIC KEY-----
-        # API - APIID CONFIG
-        - name: APIID_REPLIES_TOPIC_SUBSCRIPTION
-          value: apiid-replies-topic-mbe-backendname
+        # API - GATEWAY CONFIG
+        - name: GATEWAY_REPLIES_TOPIC_SUBSCRIPTION
+          value: gateway-replies-topic-mbe-acss
         - name: REPLY_TIMEOUT
           value: '2000'
         - name: BROKER_TYPE

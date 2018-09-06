@@ -4,13 +4,13 @@ import { SharedModule } from '../../../core/modules/shared.module';
 import { DatePipe } from '@angular/common';
 import { FuseWidgetModule } from '../../../core/components/widget/widget.module';
 
-import { msnamecamelService } from './msname.service';
-import { msnamecamelComponent } from './msname.component';
+import { ACSSService } from './acss.service';
+import { ACSSComponent } from './acss.component';
 
 const routes: Routes = [
   {
     path: '',
-    component: msnamecamelComponent,
+    component: ACSSComponent,
   }
 ];
 
@@ -21,9 +21,9 @@ const routes: Routes = [
     FuseWidgetModule
   ],
   declarations: [
-    msnamecamelComponent    
+    ACSSComponent    
   ],
-  providers: [ msnamecamelService, DatePipe]
+  providers: [ ACSSService, DatePipe]
 })
 
-export class msnamecamelModule {}
+export class ACSSModule {}

@@ -44,7 +44,7 @@ class HelloWorld {
     .take(120)
     .mergeMap(id =>  HelloWorldDA.getHelloWorld$())    
     .mergeMap(evt => {
-      return broker.send$(MATERIALIZED_VIEW_TOPIC, 'msnamecamelHelloWorldEvent',evt);
+      return broker.send$(MATERIALIZED_VIEW_TOPIC, 'ACSSHelloWorldEvent',evt);
     }).subscribe(
       (evt) => console.log('Gateway GraphQL sample event sent, please remove'),
       (err) => console.error('Gateway GraphQL sample event sent ERROR, please remove'),

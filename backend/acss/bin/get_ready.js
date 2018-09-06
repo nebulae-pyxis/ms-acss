@@ -22,7 +22,7 @@ const start = () => {
             process.exit(1);
         },
         () => {
-            console.log('backendname get-ready');
+            console.log('acss get-ready');
             process.exit(0);
         }
     );

@@ -4,8 +4,8 @@ import gql from "graphql-tag";
 
 //Hello world sample, please remove
 export const getHelloWorld = gql`
-  query getHelloWorldFrommsnamecamel{
-    getHelloWorldFrommsnamecamel{
+  query getHelloWorldFromACSS{
+    getHelloWorldFromACSS{
       sn      
     }
   }
@@ -13,9 +13,9 @@ export const getHelloWorld = gql`
 
 
 //Hello world sample, please remove
-export const msnamecamelHelloWorldSubscription = gql`
+export const ACSSHelloWorldSubscription = gql`
   subscription{
-    msnamecamelHelloWorldSubscription{
+    ACSSHelloWorldSubscription{
       sn
   }
 }`;

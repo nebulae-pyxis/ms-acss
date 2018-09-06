@@ -18,7 +18,7 @@ gitChanged(){
 #   github user email
 #   github user name
 #   github user token
-#   github repo path eg: nebulae-project_context/frontendid
+#   github repo path eg: nebulae-pyxis/emi
 #   github repo branch eg: master
 gitPublishPackageLockChanges(){    
     echo "gitPublishPackageLockChanges"    
@@ -34,9 +34,9 @@ gitPublishPackageLockChanges(){
             git config user.name $2   
 
             # Push quietly to prevent showing the token in log
-            git add frontend/frontendid/package-lock.json            
+            git add frontend/emi/package-lock.json            
             echo 'file added to git'
-            git commit -m 'CircleCI has updated locked npm versions [ci skip]' frontend/frontendid/package-lock.json 
+            git commit -m 'CircleCI has updated locked npm versions [ci skip]' frontend/emi/package-lock.json 
             echo 'file commited to git'
             git push -q https://$3@github.com/$4.git $5
             echo 'file pushed to git'

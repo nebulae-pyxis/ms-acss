@@ -8,7 +8,7 @@ const eventSourcing = require('./tools/EventSourcing')();
 const eventStoreService = require('./services/event-store/EventStoreService')();
 const mongoDB = require('./data/MongoDB').singleton();
 const HelloWorldDA = require('./data/HelloWorldDA');
-const graphQlService = require('./services/apiid/GraphQlService')();
+const graphQlService = require('./services/gateway/GraphQlService')();
 const Rx = require('rxjs');
 
 const start = () => {
@@ -26,7 +26,7 @@ const start = () => {
             console.error('Failed to start', error);
             process.exit(1);
         },
-        () => console.log('msname started')
+        () => console.log('acss started')
     );
 };
 

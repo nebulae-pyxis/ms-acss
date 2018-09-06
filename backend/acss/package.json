@@ -1,10 +1,10 @@
 {
-  "name": "@nebulae-project_context/mbe-backendname",
+  "name": "@nebulae-pyxis/mbe-acss",
   "version": "0.0.1",
-  "description": "BackEnd for the msname Microservice",
+  "description": "BackEnd for the acss Microservice",
   "main": "server.js",
   "bin": {
-    "mbe-backendname": "bin/server.js"
+    "mbe-acss": "bin/server.js"
   },
   "scripts": {
     "start": "node bin/server.js",
@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/git_project/ms-msname.git"
+    "url": "git+https://github.com/nebulae-pyxis/ms-acss.git"
   },
   "keywords": [
     "backend"
@@ -22,9 +22,9 @@
   "author": "sebastian.molano@nebulae.com.co",
   "license": "apache-2.0",
   "bugs": {
-    "url": "https://github.com/git_project/ms-msname/issues"
+    "url": "https://github.com/nebulae-pyxis/ms-acss/issues"
   },
-  "homepage": "https://github.com/git_project/ms-msname#readme",
+  "homepage": "https://github.com/nebulae-pyxis/ms-acss#readme",
   "devDependencies": {
     "chai": "^4.1.2",
     "mocha": "^5.0.5"

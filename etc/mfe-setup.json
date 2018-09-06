@@ -1,7 +1,7 @@
 [
     {
-        "name": "msname",
-        "src": "frontend/frontendid/msname",
+        "name": "acss",
+        "src": "frontend/emi/acss",
         "groups": [
             {
               "id": "GROUP_NAME",
@@ -16,15 +16,15 @@
         "contents": [
             {
                 "groupId": "GROUP_NAME",
-                "id": "msname",
+                "id": "acss",
                 "icon": "dashboard",
                 "translate": {
-                    "en": "msname_en",
-                    "es": "msname_es"
+                    "en": "acss_en",
+                    "es": "acss_es"
                 },
-                "navURL": "/msname",
-                "path": "msname",
-                "loadChildren": "./main/content/msname/msname.module#msnamecamelModule",
+                "navURL": "/acss",
+                "path": "acss",
+                "loadChildren": "./main/content/acss/acss.module#ACSSModule",
                 "priority": 1000,
                 "roles" : ["developer"],
                 "default" : false

@@ -99,7 +99,7 @@ class PubSubBroker {
             Rx.Observable.from(topics)
                 .filter(topicName => Object.keys(this.listeningTopics).indexOf(topicName) === -1)
                 .mergeMap(topicName => {
-                    const subscriptionName = `${topicName}_msname`;
+                    const subscriptionName = `${topicName}_acss`;
 
                     return this.getSubscription$(topicName, subscriptionName)
                         .map(subsription => { 
@@ -126,7 +126,7 @@ class PubSubBroker {
                         observer.next(topicName);
                     },
                     (err) => {
-                        console.error('Failed to obtain apiidReplies subscription', err);
+                        console.error('Failed to obtain gatewayReplies subscription', err);
                         observer.error(err);
                     },
                     () => {

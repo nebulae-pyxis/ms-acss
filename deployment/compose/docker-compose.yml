@@ -70,7 +70,7 @@ services:
      volumes:
        - keycloak_mysql_data:/var/lib/mysql
   keycloak:
-       image: nebulaeproject_context/keycloak:latest
+       image: nebulaepyxis/keycloak:latest
        environment:
          - MYSQL_ADDR=keycloak-mysql
          - MYSQL_PORT_3306_TCP_ADDR=keycloak-mysql

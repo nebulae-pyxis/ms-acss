@@ -36,32 +36,32 @@ jobs:
             gitChanged frontend || source ~/.profile
             gitChanged frontend || npm install -g @nebulae/cli
             gitChanged frontend || npm install -g @angular/cli
-            gitChanged frontend || nebulae register microfrontend --microservice-id=msname --frontend-id=frontendid --setup-file=/home/circleci/nebulae/repo/etc/mfe-setup.json --store-type=GCP_DATASTORE --gcp-service-account-token=/tmp/gcloud-service-key.json            
-            gitChanged frontend || nebulae compose-ui production --shell-type=FUSE2_ANGULAR --shell-repo=https://github.com/git_project/frontendid.git --frontend-id=frontendid --output-dir=/home/circleci/nebulae/frontend/frontendid/ --store-type=GCP_DATASTORE --gcp-service-account-token=/tmp/gcloud-service-key.json
-            gitChanged frontend || ls /home/circleci/nebulae/frontend/frontendid/           
+            gitChanged frontend || nebulae register microfrontend --microservice-id=acss --frontend-id=emi --setup-file=/home/circleci/nebulae/repo/etc/mfe-setup.json --store-type=GCP_DATASTORE --gcp-service-account-token=/tmp/gcloud-service-key.json            
+            gitChanged frontend || nebulae compose-ui production --shell-type=FUSE2_ANGULAR --shell-repo=https://github.com/nebulae-pyxis/emi.git --frontend-id=emi --output-dir=/home/circleci/nebulae/frontend/emi/ --store-type=GCP_DATASTORE --gcp-service-account-token=/tmp/gcloud-service-key.json
+            gitChanged frontend || ls /home/circleci/nebulae/frontend/emi/           
       - run:
           name: Download SHELL Repository
           command: |
             source ~/nebulae/repo/.circleci/scripts/gitChanged.sh
             cd ~/nebulae/repo/
             mkdir -p ~/nebulae/frontend/shell 
-            gitChanged frontend || ( git clone --depth=1 https://github.com/git_project/frontendid ~/nebulae/frontend/shell )      
+            gitChanged frontend || ( git clone --depth=1 https://github.com/nebulae-pyxis/emi ~/nebulae/frontend/shell )      
       - run:
           name: commit & push package-lock.json changes
           command: |
             source ~/nebulae/repo/.circleci/scripts/gitChanged.sh
             cd ~/nebulae/repo/
-            gitChanged frontend || cp /home/circleci/nebulae/frontend/frontendid/package-lock.json ~/nebulae/frontend/shell/frontend/frontendid/package-lock.json                        
-            gitChanged frontend || ( cd ~/nebulae/frontend/shell && gitPublishPackageLockChanges "$GITHUB_USER_EMAIL" "$GITHUB_USER_NAME" "$GITHUB_PERSONAL_ACCESS_TOKEN" "git_project/frontendid" "master" && cd ~/nebulae/repo/)
+            gitChanged frontend || cp /home/circleci/nebulae/frontend/emi/package-lock.json ~/nebulae/frontend/shell/frontend/emi/package-lock.json                        
+            gitChanged frontend || ( cd ~/nebulae/frontend/shell && gitPublishPackageLockChanges "$GITHUB_USER_EMAIL" "$GITHUB_USER_NAME" "$GITHUB_PERSONAL_ACCESS_TOKEN" "nebulae-pyxis/emi" "master" && cd ~/nebulae/repo/)
       - setup_remote_docker
       - run:
           name: Build docker image and push it to hub
           command: |
             source ~/nebulae/repo/.circleci/scripts/gitChanged.sh
             cd ~/nebulae/repo/            
-            gitChanged frontend || ls ~/nebulae/frontend/frontendid/dist/ 
-            gitChanged frontend || export DOCKERHUB_IMAGE=frontendid
-            gitChanged frontend || export FRONTEND_SHELL_PATH=~/nebulae/frontend/frontendid
+            gitChanged frontend || ls ~/nebulae/frontend/emi/dist/ 
+            gitChanged frontend || export DOCKERHUB_IMAGE=emi
+            gitChanged frontend || export FRONTEND_SHELL_PATH=~/nebulae/frontend/emi
             gitChanged frontend || ( cd ~/nebulae/frontend/shell && sh deployment/docker/build-docker-hub.sh && cd ~/nebulae/repo/ )
             gitChanged frontend || echo $DOCKERHUB_NAMESPACE/$DOCKERHUB_IMAGE@$(docker pull $DOCKERHUB_NAMESPACE/$DOCKERHUB_IMAGE:latest | grep sha256 | cut -c 9-) > ~/nebulae/frontend/DOCKERHUB_GENERATED_IMAGE_DIGEST
       - persist_to_workspace:
@@ -89,9 +89,9 @@ jobs:
             gitChanged api || export PATH=~/.npm-global/bin:$PATH
             gitChanged api || source ~/.profile
             gitChanged api || npm install -g @nebulae/cli
-            gitChanged api || nebulae register microapi --microservice-id=msname --api-id=apiid --setup-file=/home/circleci/nebulae/repo/etc/mapi-setup.json --store-type=GCP_DATASTORE --gcp-service-account-token=/tmp/gcloud-service-key.json            
-            gitChanged api || nebulae compose-api production --api-type=NEBULAE_GATEWAY --api-repo=https://github.com/git_project/apiid.git --api-id=apiid --output-dir=/home/circleci/nebulae/api/apiid/ --store-type=GCP_DATASTORE --gcp-service-account-token=/tmp/gcloud-service-key.json      
-            gitChanged api || ls /home/circleci/nebulae/api/apiid/
+            gitChanged api || nebulae register microapi --microservice-id=acss --api-id=gateway --setup-file=/home/circleci/nebulae/repo/etc/mapi-setup.json --store-type=GCP_DATASTORE --gcp-service-account-token=/tmp/gcloud-service-key.json            
+            gitChanged api || nebulae compose-api production --api-type=NEBULAE_GATEWAY --api-repo=https://github.com/nebulae-pyxis/gateway.git --api-id=gateway --output-dir=/home/circleci/nebulae/api/gateway/ --store-type=GCP_DATASTORE --gcp-service-account-token=/tmp/gcloud-service-key.json      
+            gitChanged api || ls /home/circleci/nebulae/api/gateway/
       - setup_remote_docker
       - run:
           name: Build docker image and push it to hub
@@ -99,9 +99,9 @@ jobs:
             source ~/nebulae/repo/.circleci/scripts/gitChanged.sh
             cd ~/nebulae/repo/
             mkdir -p ~/nebulae/api
-            gitChanged api || ( cd  ~/nebulae/api/ && git clone --depth=1 https://github.com/git_project/apiid  ~/nebulae/api/shell )      
+            gitChanged api || ( cd  ~/nebulae/api/ && git clone --depth=1 https://github.com/nebulae-pyxis/gateway  ~/nebulae/api/shell )      
             gitChanged api || ls ~/nebulae/api/shell
-            gitChanged api || export DOCKERHUB_IMAGE=apiid
+            gitChanged api || export DOCKERHUB_IMAGE=gateway
             gitChanged api || export API_SHELL_PATH=/home/circleci/nebulae/api/
             gitChanged api || ( cd ~/nebulae/api/shell && sh ~/nebulae/api/shell/deployment/docker/build-docker-hub.sh  && cd ~/nebulae/repo/ )
             gitChanged api || echo $DOCKERHUB_NAMESPACE/$DOCKERHUB_IMAGE@$(docker pull $DOCKERHUB_NAMESPACE/$DOCKERHUB_IMAGE:latest | grep sha256 | cut -c 9-) > ~/nebulae/api/DOCKERHUB_GENERATED_IMAGE_DIGEST
@@ -146,18 +146,18 @@ jobs:
           at: ~/nebulae
       - setup_remote_docker      
       - run:
-          name: Build docker image for backendname
+          name: Build docker image for acss
           command: |
             source ~/nebulae/repo/.circleci/scripts/gitChanged.sh
             cd ~/nebulae/repo/
             mkdir ~/nebulae/backend
-            cp ~/nebulae/go/mbinit ~/nebulae/repo/backend/backendname/
-            export DOCKERHUB_IMAGE=msname.backend.backendname
+            cp ~/nebulae/go/mbinit ~/nebulae/repo/backend/acss/
+            export DOCKERHUB_IMAGE=acss.backend.acss
             export DOCKERHUB_TAG=0.0.1
-            gitChanged backend/backendname || docker build  -t $DOCKERHUB_NAMESPACE/$DOCKERHUB_IMAGE:$DOCKERHUB_TAG -t $DOCKERHUB_NAMESPACE/$DOCKERHUB_IMAGE:latest ~/nebulae/repo/backend/backendname/
-            gitChanged backend/backendname || docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASS
-            gitChanged backend/backendname || docker push $DOCKERHUB_NAMESPACE/$DOCKERHUB_IMAGE:$DOCKERHUB_TAG
-            gitChanged backend/backendname || docker push $DOCKERHUB_NAMESPACE/$DOCKERHUB_IMAGE:latest      
+            gitChanged backend/acss || docker build  -t $DOCKERHUB_NAMESPACE/$DOCKERHUB_IMAGE:$DOCKERHUB_TAG -t $DOCKERHUB_NAMESPACE/$DOCKERHUB_IMAGE:latest ~/nebulae/repo/backend/acss/
+            gitChanged backend/acss || docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASS
+            gitChanged backend/acss || docker push $DOCKERHUB_NAMESPACE/$DOCKERHUB_IMAGE:$DOCKERHUB_TAG
+            gitChanged backend/acss || docker push $DOCKERHUB_NAMESPACE/$DOCKERHUB_IMAGE:latest      
       - persist_to_workspace:
           root: ~/nebulae/
           paths:
@@ -182,15 +182,15 @@ jobs:
               gcloud --quiet config set compute/zone $GKE_ZONE_PROD
               gcloud --quiet container clusters get-credentials $GKE_CLUSTER
         - run:
-            name: Deploy frontendid FrontEnd
+            name: Deploy emi FrontEnd
             command: |
               (ls ~/nebulae/frontend/DOCKERHUB_GENERATED_IMAGE_DIGEST && echo docker image DIGEST to set $(< ~/nebulae/frontend/DOCKERHUB_GENERATED_IMAGE_DIGEST) ) || echo frontend not found
-              (ls ~/nebulae/frontend/DOCKERHUB_GENERATED_IMAGE_DIGEST && kubectl set image deployment/frontend-frontendid frontend-frontendid=$(< ~/nebulae/frontend/DOCKERHUB_GENERATED_IMAGE_DIGEST) ) || echo frontend not found
+              (ls ~/nebulae/frontend/DOCKERHUB_GENERATED_IMAGE_DIGEST && kubectl set image deployment/frontend-emi frontend-emi=$(< ~/nebulae/frontend/DOCKERHUB_GENERATED_IMAGE_DIGEST) ) || echo frontend not found
         - run:
-            name: Deploy apiid API
+            name: Deploy gateway API
             command: |
               (ls ~/nebulae/api/DOCKERHUB_GENERATED_IMAGE_DIGEST && echo docker image DIGEST to set $(< ~/nebulae/api/DOCKERHUB_GENERATED_IMAGE_DIGEST) ) || echo api not found
-              (ls ~/nebulae/api/DOCKERHUB_GENERATED_IMAGE_DIGEST && kubectl set image deployment/api-apiid api-apiid=$(< ~/nebulae/api/DOCKERHUB_GENERATED_IMAGE_DIGEST) ) || echo api not found
+              (ls ~/nebulae/api/DOCKERHUB_GENERATED_IMAGE_DIGEST && kubectl set image deployment/api-gateway api-gateway=$(< ~/nebulae/api/DOCKERHUB_GENERATED_IMAGE_DIGEST) ) || echo api not found
         - run:
             name: Deploy BackEnds 
             command: |
@@ -203,26 +203,26 @@ workflows:
   build-and-deploy:
     jobs:
       - prepare:
-          context: project_context_uc
+          context: PYXIS
       - build-frontend:
-          context: project_context_uc
+          context: PYXIS
           requires:
             - prepare
       - build-api:
-          context: project_context_uc
+          context: PYXIS
           requires:
             - prepare
       - build-mbinit:
-          context: project_context_uc
+          context: PYXIS
           requires:
             - prepare
       - build-backend:
-          context: project_context_uc
+          context: PYXIS
           requires:
             - prepare
             - build-mbinit      
       - deploy-prod:
-          context: project_context_uc
+          context: PYXIS
           requires:
             - build-frontend
             - build-api

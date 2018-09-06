@@ -1,6 +1,6 @@
 {
-  "id": "project_context",
-  "realm": "DEV_project_context_uc",
+  "id": "pyxis",
+  "realm": "DEV_PYXIS",
   "notBefore": 0,
   "revokeRefreshToken": false,
   "refreshTokenMaxReuse": 1,
@@ -41,7 +41,7 @@
         "scopeParamRequired": true,
         "composite": false,
         "clientRole": false,
-        "containerId": "project_context"
+        "containerId": "pyxis"
       },
       {
         "id": "d9766548-de1a-4f9b-9201-834f66478e8e",
@@ -50,7 +50,7 @@
         "scopeParamRequired": false,
         "composite": false,
         "clientRole": false,
-        "containerId": "project_context"
+        "containerId": "pyxis"
       },
       {
         "id": "c2b57919-f219-4f83-8ac5-a4a025480bda",
@@ -59,7 +59,7 @@
         "scopeParamRequired": false,
         "composite": false,
         "clientRole": false,
-        "containerId": "project_context"
+        "containerId": "pyxis"
       },
       {
         "id": "bdc61a8e-92bb-4a55-8144-970e48c8c7e2",
@@ -67,11 +67,11 @@
         "scopeParamRequired": false,
         "composite": false,
         "clientRole": false,
-        "containerId": "project_context"
+        "containerId": "pyxis"
       }
     ],
     "client": {
-      "frontendid": [],
+      "emi": [],
       "realm-management": [
         {
           "id": "0e2b2eaf-79f7-4aa1-8e1f-31700c72904d",
@@ -358,7 +358,7 @@
       "id": "32558e71-effc-4c22-a98c-b6265b5e6e60",
       "clientId": "account",
       "name": "${client_account}",
-      "baseUrl": "/auth/realms/DEV_project_context/account",
+      "baseUrl": "/auth/realms/DEV_pyxis/account",
       "surrogateAuthRequired": false,
       "enabled": true,
       "clientAuthenticatorType": "client-secret",
@@ -368,7 +368,7 @@
         "view-profile"
       ],
       "redirectUris": [
-        "/auth/realms/DEV_project_context/account/*"
+        "/auth/realms/DEV_pyxis/account/*"
       ],
       "webOrigins": [],
       "notBefore": 0,
@@ -482,13 +482,13 @@
       "id": "85b6af29-c3cd-4613-9f80-3f91a5906394",
       "clientId": "security-admin-console",
       "name": "${client_security-admin-console}",
-      "baseUrl": "/auth/admin/DEV_project_context/console/index.html",
+      "baseUrl": "/auth/admin/DEV_pyxis/console/index.html",
       "surrogateAuthRequired": false,
       "enabled": true,
       "clientAuthenticatorType": "client-secret",
       "secret": "**********",
       "redirectUris": [
-        "/auth/admin/DEV_project_context/console/*"
+        "/auth/admin/DEV_pyxis/console/*"
       ],
       "webOrigins": [],
       "notBefore": 0,
@@ -850,7 +850,7 @@
     },
     {
       "id": "7ef6f79b-fcfb-4ac4-a969-24b98ac0c1f8",
-      "clientId": "frontendid",
+      "clientId": "emi",
       "rootUrl": "http://localhost:4200",
       "adminUrl": "http://localhost:4200",
       "surrogateAuthRequired": false,

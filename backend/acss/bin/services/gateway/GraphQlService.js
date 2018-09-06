@@ -112,7 +112,7 @@ class GraphQlService {
         if (replyTo) {
           return broker.send$(
             replyTo,
-            "apiid.graphql.Query.response",
+            "gateway.graphql.Query.response",
             response,
             { correlationId }
           );
@@ -143,7 +143,7 @@ class GraphQlService {
       //Sample incoming request, please remove
       {
         aggregateType: "HelloWorld",
-        messageType: "apiid.graphql.query.getHelloWorldFrommsnamecamel"
+        messageType: "gateway.graphql.query.getHelloWorldFromACSS"
       }     
     ];
   }
@@ -154,7 +154,7 @@ class GraphQlService {
   generateFunctionMap() {    
     return {
       //Sample incoming request, please remove
-      "apiid.graphql.query.getHelloWorldFrommsnamecamel": {
+      "gateway.graphql.query.getHelloWorldFromACSS": {
         fn: helloWorld.getHelloWorld$,
         obj: helloWorld
       },      

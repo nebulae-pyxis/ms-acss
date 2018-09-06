@@ -8,14 +8,56 @@ services:
       - "1883:1883"
     volumes:
       - broker_mqtt_data:/mosquitto/data            
-  store-mongo:
-    image: mongo
+
+  store-mongo1:
+    image: mongo:4.0-xenial
+    hostname: store-mongo1
+    container_name: store-mongo1
     ports:
-      - "27017:27017"
+      - 27017:27017
+    environment: 
+      - storageEngine=wiredTiger
+    volumes: 
+      - store-mongo_db1:/data/db
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip", "0.0.0.0", "--replSet", "rs0" ]
+
+  store-mongo2:
+    image: mongo:4.0-xenial
+    hostname: store-mongo2
+    container_name: store-mongo2
+    ports:
+      - 27018:27018
+    environment: 
+      - storageEngine=wiredTiger
+    volumes: 
+      - store-mongo_db2:/data/db
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip", "0.0.0.0", "--port", "27018", "--replSet", "rs0" ]
+    depends_on: 
+      - store-mongo1
+
+  store-mongo3:
+    image: mongo:4.0-xenial
+    hostname: store-mongo3
+    container_name: store-mongo3
+    ports:
+      - 27019:27019
     environment: 
         - storageEngine=wiredTiger
     volumes: 
-      - store_mongo_db:/data/db
+      - store-mongo_db3:/data/db
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip", "0.0.0.0", "--port", "27019", "--replSet", "rs0" ]
+    depends_on: 
+      - store-mongo2
+
+  setup-rs:
+    image: setup-rs 
+    build: ./scripts-rs
+    depends_on:
+      - "store-mongo3"
+
   keycloak-mysql:
      image: mysql:5.6
      ports:
@@ -48,7 +90,9 @@ services:
        depends_on: 
          - keycloak-mysql
 volumes: 
-  store_mongo_db:
+  store-mongo_db1:
+  store-mongo_db2:
+  store-mongo_db3:
   broker_mqtt_data:
   keycloak_mysql_data:
   keycloak_data:

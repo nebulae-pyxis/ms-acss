@@ -6,6 +6,8 @@ import { FuseWidgetModule } from '../../../core/components/widget/widget.module'
 
 import { ACSSService } from './acss.service';
 import { ACSSComponent } from './acss.component';
+import { ClearingComponent } from './clearing/clearing.component';
+import { SettlementComponent } from './settlement/settlement.component';
 
 const routes: Routes = [
   {
@@ -21,7 +23,9 @@ const routes: Routes = [
     FuseWidgetModule
   ],
   declarations: [
-    ACSSComponent    
+    ACSSComponent,
+    ClearingComponent,
+    SettlementComponent    
   ],
   providers: [ ACSSService, DatePipe]
 })

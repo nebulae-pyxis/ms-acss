@@ -1,0 +1,67 @@
+<div class="tab-content p-24" fxLayout="column" fusePerfectScrollbar>
+
+  <form name="clearingForm" [formGroup]="clearingForm" fxLayout="row" class="user w-100-p" class="mat-white-bg p-24 mr-24 mb-24">
+    <mat-form-field class="w-50-p">
+      <input matInput name="date" formControlName="date" placeholder="{{'ACSS.DATE' | translate}}" disabled>
+    </mat-form-field>
+
+    <mat-form-field class="w-50-p">
+      <input matInput name="open" formControlName="open" placeholder="{{'ACSS.STATE' | translate}}" disabled>
+    </mat-form-field>
+  </form>
+
+  <div fxLayout="row" fxLayoutAlign="space-between">
+    <div fxLayout="column" fxFlex="49" style="justify-content: space-between">
+        <div fxFlex="80" fxLayoutAlign="start start" class="h2">{{'ACSS.INCOMES' | translate}}</div>
+        <mat-table id="incomes-table" class="item-table" #table [dataSource]="incomesDataSource" class="mat-elevation-z8"
+          fusePerfectScrollbar>
+
+          <!-- Business name Column -->
+          <ng-container cdkColumnDef="businessName">
+            <mat-header-cell *cdkHeaderCellDef>{{'ACSS.BUSINESS' | translate}}</mat-header-cell>
+            <mat-cell *cdkCellDef="let clearing">
+              <p class="text-truncate">{{clearing.businessName}}</p>
+            </mat-cell>
+          </ng-container>
+
+          <!-- Value column -->
+          <ng-container cdkColumnDef="value">
+            <mat-header-cell *cdkHeaderCellDef>{{'ACSS.VALUE' | translate}}</mat-header-cell>
+            <mat-cell *cdkCellDef="let clearing">
+              <p class="text-truncate">{{clearing.value}}</p>
+            </mat-cell>
+          </ng-container>
+
+          <mat-header-row *cdkHeaderRowDef="displayedColumns"></mat-header-row>
+
+        </mat-table>
+    </div>
+    <div fxLayout="column" fxFlex="49" style="justify-content: space-between">
+        <div fxFlex="80" fxLayoutAlign="start start" class="h2">{{'ACSS.OUTCOMES' | translate}}</div>
+        <mat-table id="incomes-table" class="item-table" #table [dataSource]="incomesDataSource" class="mat-elevation-z8"
+          fusePerfectScrollbar>
+
+          <!-- Business name Column -->
+          <ng-container cdkColumnDef="businessName">
+            <mat-header-cell *cdkHeaderCellDef>{{'ACSS.BUSINESS' | translate}}</mat-header-cell>
+            <mat-cell *cdkCellDef="let clearing">
+              <p class="text-truncate">{{clearing.businessName}}</p>
+            </mat-cell>
+          </ng-container>
+
+          <!-- Value column -->
+          <ng-container cdkColumnDef="value">
+            <mat-header-cell *cdkHeaderCellDef>{{'ACSS.VALUE' | translate}}</mat-header-cell>
+            <mat-cell *cdkCellDef="let clearing">
+              <p class="text-truncate">{{clearing.value}}</p>
+            </mat-cell>
+          </ng-container>
+
+          <mat-header-row *cdkHeaderRowDef="displayedColumns"></mat-header-row>
+
+        </mat-table>
+    </div>
+  </div>
+
+
+</div>

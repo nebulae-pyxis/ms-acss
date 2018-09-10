@@ -1,8 +1,16 @@
 const withFilter = require("graphql-subscriptions").withFilter;
+const { CustomError } = require("../../tools/customError");
+const RoleValidator  = require("../../tools/RoleValidator");
 const PubSub = require("graphql-subscriptions").PubSub;
 const pubsub = new PubSub();
 const Rx = require("rxjs");
 const broker = require("../../broker/BrokerFactory")();
+const contextName = "acss";
+
+//Every single error code
+// please use the prefix assigned to this microservice
+const INTERNAL_SERVER_ERROR_CODE = 17001;
+const PERMISSION_DENIED_ERROR_CODE = 17002;
 
 function getResponseFromBackEnd$(response) {
     return Rx.Observable.of(response)
@@ -19,11 +27,30 @@ function getResponseFromBackEnd$(response) {
         });
 }
 
+/**
+ * Handles errors
+ * @param {*} err
+ * @param {*} operationName
+ */
+function handleError$(err, methodName) {
+    return Rx.Observable.of(err).map(err => {
+      const exception = { data: null, result: {} };
+      const isCustomError = err instanceof CustomError;
+      if (!isCustomError) {
+        err = new CustomError(err.name, methodName, INTERNAL_SERVER_ERROR_CODE, err.message);
+      }
+      exception.result = {
+        code: err.code,
+        error: { ...err.getContent() }
+      };
+      return exception;
+    });
+  }
+
 
 module.exports = {
 
     //// QUERY ///////
-
     Query: {
         getHelloWorldFromACSS(root, args, context) {
             return broker
@@ -35,7 +62,49 @@ module.exports = {
                 )
                 .mergeMap(response => getResponseFromBackEnd$(response))
                 .toPromise();
-        }
+        },
+        getACSSBusiness(root, args, context) {
+            return RoleValidator.checkPermissions$(
+              context.authToken.realm_access.roles,
+              contextName,
+              "getACSSBusiness",
+              PERMISSION_DENIED_ERROR_CODE,
+              "Permission denied",
+              ["business-owner"]
+            )
+              .mergeMap(response => {
+                return broker.forwardAndGetReply$(
+                  "Business",
+                  "gateway.graphql.query.getACSSBusiness",
+                  { root, args, jwt: context.encodedToken },
+                  2000
+                );
+              })
+              .catch(err => handleError$(err, "getACSSBusiness"))
+              .mergeMap(response => getResponseFromBackEnd$(response))
+              .toPromise();
+        },
+        getACSSBusinesses(root, args, context) {
+            return RoleValidator.checkPermissions$(
+              context.authToken.realm_access.roles,
+              contextName,
+              "getACSSBusinesses",
+              PERMISSION_DENIED_ERROR_CODE,
+              "Permission denied",
+              ["system-admin", "business-owner"]
+            )
+              .mergeMap(response => {
+                return broker.forwardAndGetReply$(
+                  "Business",
+                  "gateway.graphql.query.getACSSBusinesses",
+                  { root, args, jwt: context.encodedToken },
+                  2000
+                );
+              })
+              .catch(err => handleError$(err, "getACSSBusinesses"))
+              .mergeMap(response => getResponseFromBackEnd$(response))
+              .toPromise();
+          }
     },
 
     //// MUTATIONS ///////

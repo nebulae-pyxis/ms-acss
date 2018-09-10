@@ -20,19 +20,21 @@ class BusinessDA {
     });
   }
 
-  /**
+ /**
    * Gets business by id
    * @param {String} id business ID
    */
   static getBusiness$(id) {
+    console.log('getBusiness$(id) ', id);
     const collection = mongoDB.db.collection(CollectionName);
     return Rx.Observable.defer(() => collection.findOne({ '_id': id }));
   }
 
+
   /**
    * Gets all businesses from the database using a iterator
    */
-  getAllBusinesses$() {
+  static getAllBusinesses$() {
     return Rx.Observable.create(async observer => {
       const collection = mongoDB.db.collection(CollectionName);
       const cursor = collection.find({});
@@ -44,19 +46,6 @@ class BusinessDA {
 
       observer.complete();
     });
-  }
-
-  /**
-   * Extracts the next value from a mongo cursor if available, returns undefined otherwise
-   * @param {*} cursor
-   */
-  async extractNextFromMongoCursor(cursor) {
-    const hasNext = await cursor.hasNext();
-    if (hasNext) {
-      const obj = await cursor.next();
-      return obj;
-    }
-    return undefined;
   }
 
   /**
@@ -90,6 +79,23 @@ class BusinessDA {
         )
     ).map(result => result && result.value ? result.value : undefined);
   }
+
+    /**
+   * Extracts the next value from a mongo cursor if available, returns undefined otherwise
+   * @param {*} cursor
+   */
+  static async extractNextFromMongoCursor(cursor) {
+    const hasNext = await cursor.hasNext();
+    if (hasNext) {
+      const obj = await cursor.next();
+      return obj;
+    }
+    return undefined;
+  }
 }
 
+/**
+ * Returns a BusinessDA
+ * @returns {BusinessDA}
+ */
 module.exports = BusinessDA;

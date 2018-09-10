@@ -1,10 +1,22 @@
+"Business info"
+type Business {
+  "Business id"
+  _id: ID
+  "Business name"
+  name: String
+}
+
 "Hello world sample, please remove"
-type HelloWorldACSS{
+type HelloWorldACSS {
   "text"
   sn: String!  
 }
 
 type Query {
+  "Get business"
+  getACSSBusiness: Business
+  "Get businesses"
+  getACSSBusinesses: [Business]
   "Hello world sample, please remove"
   getHelloWorldFromACSS: HelloWorldACSS
 }

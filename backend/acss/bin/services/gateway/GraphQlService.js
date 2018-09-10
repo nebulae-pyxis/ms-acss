@@ -4,6 +4,7 @@ const helloWorld = require("../../domain/HelloWorld")();
 const broker = require("../../tools/broker/BrokerFactory")();
 const Rx = require("rxjs");
 const jsonwebtoken = require("jsonwebtoken");
+const business = require("../../domain/Business")();
 const jwtPublicKey = process.env.JWT_PUBLIC_KEY.replace(/\\n/g, "\n");
 
 let instance;
@@ -144,6 +145,14 @@ class GraphQlService {
       {
         aggregateType: "HelloWorld",
         messageType: "gateway.graphql.query.getHelloWorldFromACSS"
+      },
+      {
+        aggregateType: "Business",
+        messageType: "gateway.graphql.query.getACSSBusiness"
+      },
+      {
+        aggregateType: "Business",
+        messageType: "gateway.graphql.query.getACSSBusinesses"
       }     
     ];
   }
@@ -157,7 +166,15 @@ class GraphQlService {
       "gateway.graphql.query.getHelloWorldFromACSS": {
         fn: helloWorld.getHelloWorld$,
         obj: helloWorld
-      },      
+      },
+      'gateway.graphql.query.getACSSBusiness': {
+        fn: business.getACSSBusiness$,
+        obj: business
+      },
+      'gateway.graphql.query.getACSSBusinesses': {
+        fn: business.getACSSBusinesses$,
+        obj: business
+      },     
     };
   }
 }

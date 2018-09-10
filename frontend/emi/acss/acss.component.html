@@ -7,8 +7,8 @@
   <!-- CENTER -->
   <div class="center">
 
-    <!-- HEADER -->
-    <div class="header white-fg" fxLayout="column" fxLayoutAlign="center center" fxLayout.gt-xs="row" fxLayoutAlign.gt-xs="space-between center">
+    <!-- HEADER SYSTEM ADMIN -->
+    <div *ngIf="isSystemAdmin" class="header white-fg" fxLayout="column" fxLayoutAlign="center center" fxLayout.gt-xs="row" fxLayoutAlign.gt-xs="space-between center">
 
       <!-- APP TITLE -->
       <div class="logo my-12 m-sm-0" fxLayout="row" fxLayoutAlign="start center">
@@ -17,12 +17,75 @@
       </div>
       <!-- / APP TITLE -->
 
-      
+      <!-- BUSINESS FILTER -->
+      <div fxLayout="column" fxLayout.gt-sm="row">
+        <div  class="search-input-wrapper mx-12 m-md-0" fxFlex="1 0 auto" fxLayout="row" fxLayoutAlign="start center">
+          <label for="search" style="margin-bottom: 10px" class="mr-20">
+            <span class="mat-title">{{'ACSS.BUSINESS' | translate}}</span>
+          </label>
+          <form name="businessForm" [formGroup]="businessForm" fxLayout="row" fxFlex>
+            <mat-form-field class="w-100-p">
+              <mat-select placeholder="{{'ACSS.BUSINESS' | translate}}" [(value)]="selectedBusiness">
+
+                <mat-option *ngFor="let business of businessQuery$ | async" [value]="business">
+                  {{business._id}} - {{business.name}}
+                </mat-option>
+
+              </mat-select>
+              <mat-error *ngIf="businessForm.hasError('required', ['business'])">
+                {{'ACSS.BUSINESS_REQUIRED' | translate}}
+              </mat-error>
+            </mat-form-field>
+          </form>
+        </div>
+      </div>
+      <!-- / BUSINESS FILTER -->
     </div>
-    <!-- / HEADER -->
+    <!-- / HEADER SYSTEM ADMIN-->
+
+
+
+
+    <!-- HEADER BUSINESS-->
+    <div *ngIf="!isSystemAdmin" class="header white-fg" fxLayout="row" fxLayoutAlign="space-between center">
+
+      <!-- APP TITLE -->
+      <div fxLayout="row" fxLayoutAlign="start center">
+
+        <div fxLayout="column" fxLayoutAlign="start start" *fuseIfOnDom>
+
+          <label for="search" style="margin-bottom: 10px" class="mr-20">
+            <span class="mat-title">{{'ACSS.ACSS' | translate}}</span>
+          </label>
+          <div class="subtitle" *ngIf="selectedBusiness">
+            {{selectedBusiness.name}}
+          </div>
+
+          <div class="subtitle secondary-text">
+            <span>{{'ACSS.BUSINESS_DETAIL' | translate}}</span>
+          </div>
+        </div>
+      </div>
+      <!-- / APP TITLE -->
+    </div>
+    <!-- / HEADER BUSINESS-->
 
     <!-- CONTENT CARD -->
     <div class="content-card mat-white-bg">
+
+
+        <mat-tab-group>
+
+            <mat-tab label="{{'ACSS.CLEARING' | translate}}">
+              <app-clearing></app-clearing>
+            </mat-tab>
+
+            <mat-tab label="{{'ACSS.SETTLEMENT' | translate}}">
+
+
+            </mat-tab>
+
+        </mat-tab-group>
 
     </div>
     <!-- / CONTENT CARD -->

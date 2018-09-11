@@ -1,5 +1,5 @@
 export class Clearing {
-  timestamp: number;
+  timestamp: Date;
   lastUpdateTimestamp: number;
   businessId: string;
   input: any;

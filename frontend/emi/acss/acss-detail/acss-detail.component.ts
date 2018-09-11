@@ -1,4 +1,4 @@
-import { ACSSService } from './acss.service';
+import { ACSSDetailService } from './acss-detail.service';
 
 ////////// ANGULAR //////////
 import { Component, OnInit, OnDestroy } from "@angular/core";
@@ -11,17 +11,15 @@ import {
 import { KeycloakService } from 'keycloak-angular';
 
 //////////// i18n ////////////
-import { FuseTranslationLoaderService } from "./../../../core/services/translation-loader.service";
+import { FuseTranslationLoaderService } from "../../../../core/services/translation-loader.service";
 import { TranslateService } from "@ngx-translate/core";
-import { locale as english } from "./i18n/en";
-import { locale as spanish } from "./i18n/es";
+import { locale as english } from "../i18n/en";
+import { locale as spanish } from "../i18n/es";
 
 //////////// ANGULAR MATERIAL ///////////
 import {
-  MatSnackBar,
-  MatTableDataSource
+  MatSnackBar
 } from '@angular/material';
-import { fuseAnimations } from '../../../core/animations';
 
 ////////// RXJS ///////////
 // tslint:disable-next-line:import-blacklist
@@ -33,28 +31,21 @@ import { Observable } from 'rxjs/Observable';
 @Component({
   // tslint:disable-next-line:component-selector
   selector: 'acss',
-  templateUrl: './acss.component.html',
-  styleUrls: ['./acss.component.scss'],
-  animations: fuseAnimations
+  templateUrl: './acss-detail.component.html',
+  styleUrls: ['./acss-detail.component.scss']
 })
-export class ACSSComponent implements OnInit, OnDestroy {
-
+export class ACSSDetailComponent implements OnInit, OnDestroy {
   userRoles: any;
   isSystemAdmin: Boolean = false;
   // Rxjs subscriptions
   subscriptions = [];
-   // Columns to show in the table
-  displayedColumns = ['timestamp', 'lastUpdateTimestamp', 'state', 'projected_balance'];
-  // Table data
-  dataSource = new MatTableDataSource();
   businessForm: FormGroup;
   businessQuery$: Rx.Observable<any>;
   selectedBusiness: any = null;
-  selectedClearing: any = null;
 
   constructor(
     private formBuilder: FormBuilder,
-    private aCSSService: ACSSService,
+    private aCSSDetailService: ACSSDetailService,
     private translationLoader: FuseTranslationLoaderService,
     private translate: TranslateService,
     private snackBar: MatSnackBar,
@@ -66,14 +57,8 @@ export class ACSSComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.checkIfUserIsSystemAdmin();
+    this.businessForm = this.createBusinessForm();
     this.createBusinessObservable();
-    this.createDummy();
-  }
-
-  createDummy(){
-    this.dataSource.data = [
-      {_id: 1, timestamp: 1536705058916, lastUpdateTimestamp: 1536705058916, state: 'CLOSE', projectedBalance: 200.000}
-    ];
   }
 
   /**
@@ -93,9 +78,9 @@ export class ACSSComponent implements OnInit, OnDestroy {
    * get the business which the user belongs
    */
   getBusiness$(){
-    this.subscriptions.push(this.aCSSService.getACSSBusiness$()
+    this.subscriptions.push(this.aCSSDetailService.getACSSBusiness$()
     .pipe(
-      map(res => res.data.getACSSBusiness)
+      map((res: any) => res.data.getACSSBusiness)
     ).subscribe(business => {
       this.selectedBusiness = business;
     }));
@@ -105,8 +90,8 @@ export class ACSSComponent implements OnInit, OnDestroy {
    * Creates an observable of business
    */
   createBusinessObservable(){
-    this.businessQuery$ = this.aCSSService.getACSSBusinesses$().pipe(
-      mergeMap(res => {
+    this.businessQuery$ = this.aCSSDetailService.getACSSBusinesses$().pipe(
+      mergeMap((res: any) => {
         return Rx.Observable.from(res.data.getACSSBusinesses);
       }),
       map((business: any) => {
@@ -126,14 +111,6 @@ export class ACSSComponent implements OnInit, OnDestroy {
     return this.formBuilder.group({
       business: new FormControl(null, Validators.required)
     });
-  }
-
-  /**
-   * Receives the selected clearing
-   * @param clearing selected clearing
-   */
-  selectClearingRow(clearing){
-    this.selectedClearing = clearing;
   }
 
 

@@ -8,17 +8,11 @@ import { ACSSService } from './acss.service';
 import { ACSSComponent } from './acss.component';
 import { ClearingComponent } from './clearing/clearing.component';
 import { SettlementComponent } from './settlement/settlement.component';
-import { ACSSDetailComponent } from './acss-detail/acss-detail.component';
-import { ACSSDetailService } from './acss-detail/acss-detail.service';
 
 const routes: Routes = [
   {
     path: '',
     component: ACSSComponent,
-  },
-  {
-    path: 'acss-detail/:id',
-    component: ACSSDetailComponent,
   }
 ];
 
@@ -30,11 +24,10 @@ const routes: Routes = [
   ],
   declarations: [
     ACSSComponent,
-    ACSSDetailComponent,
     ClearingComponent,
-    SettlementComponent
+    SettlementComponent    
   ],
-  providers: [ ACSSService, ACSSDetailService, DatePipe]
+  providers: [ ACSSService, DatePipe]
 })
 
 export class ACSSModule {}

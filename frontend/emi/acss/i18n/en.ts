@@ -11,7 +11,18 @@ export const locale = {
       BUSINESS: 'Business',
       VALUE: 'Value',
       INCOMES: 'Incomes',
-      OUTCOMES: 'Outcomes'
+      OUTCOMES: 'Outcomes',
+      OPEN: 'OPEN',
+      CLOSE: 'CLOSE',
+      GENERAL_INCOME_OUTCOME: 'General',
+      PARTIAL_SETTLEMENT: 'Partial settlement',
+      CUMULATED_TRANSACTIONS: 'Cumulated transactions',
+      FROM: 'From',
+      TO: 'To',
+      PROJECTED_BALANCE: 'Projected balance',
+      TIMESTAMP: 'Creation date',
+      LAST_UPDATE_TIMESTAMP: 'Last update',
+      CLEARING_LIST: 'Clearing'
     },
     ERRORS: {
       17001: 'Internal server error',

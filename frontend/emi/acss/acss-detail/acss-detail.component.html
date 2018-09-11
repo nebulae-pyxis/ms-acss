@@ -1,0 +1,58 @@
+<div id="user" class="page-layout carded fullwidth" fusePerfectScrollbar>
+
+  <!-- TOP BACKGROUND -->
+  <div class="top-bg mat-accent-bg"></div>
+  <!-- / TOP BACKGROUND -->
+
+  <!-- CENTER -->
+  <div class="center">
+
+    <!-- HEADER BUSINESS-->
+    <div class="header white-fg" fxLayout="row" fxLayoutAlign="space-between center">
+
+      <!-- APP TITLE -->
+      <div fxLayout="row" fxLayoutAlign="start center">
+
+          <button class="mr-0 mr-sm-16" mat-icon-button [routerLink]="'/acss'">
+            <mat-icon>arrow_back</mat-icon>
+          </button>
+
+        <div fxLayout="column" fxLayoutAlign="start start" *fuseIfOnDom>
+
+          <label for="search" style="margin-bottom: 10px" class="mr-20">
+            <span class="mat-title">{{'ACSS.ACSS' | translate}}</span>
+          </label>
+          <div class="subtitle" *ngIf="selectedBusiness">
+            {{selectedBusiness.name}}
+          </div>
+
+          <div class="subtitle secondary-text">
+            <span>{{'ACSS.ACSS_DETAIL' | translate}}</span>
+          </div>
+        </div>
+      </div>
+      <!-- / APP TITLE -->
+    </div>
+    <!-- / HEADER BUSINESS-->
+
+    <!-- CONTENT CARD -->
+    <div class="content-card mat-white-bg">
+
+
+        <mat-tab-group>
+
+            <mat-tab label="{{'ACSS.CLEARING' | translate}}">
+              <app-clearing></app-clearing>
+            </mat-tab>
+
+            <mat-tab label="{{'ACSS.SETTLEMENT' | translate}}">
+
+            </mat-tab>
+
+        </mat-tab-group>
+
+    </div>
+    <!-- / CONTENT CARD -->
+  </div>
+  <!-- / CENTER -->
+</div>

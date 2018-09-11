@@ -18,8 +18,7 @@ import { locale as spanish } from "./i18n/es";
 
 //////////// ANGULAR MATERIAL ///////////
 import {
-  MatSnackBar,
-  MatTableDataSource
+  MatSnackBar
 } from '@angular/material';
 import { fuseAnimations } from '../../../core/animations';
 
@@ -38,19 +37,16 @@ import { Observable } from 'rxjs/Observable';
   animations: fuseAnimations
 })
 export class ACSSComponent implements OnInit, OnDestroy {
-
   userRoles: any;
   isSystemAdmin: Boolean = false;
   // Rxjs subscriptions
   subscriptions = [];
-   // Columns to show in the table
-  displayedColumns = ['timestamp', 'lastUpdateTimestamp', 'state', 'projected_balance'];
-  // Table data
-  dataSource = new MatTableDataSource();
   businessForm: FormGroup;
   businessQuery$: Rx.Observable<any>;
+  helloWorld: String = 'Hello World static';
+  helloWorldLabelQuery$: Rx.Observable<any>;
+  helloWorldLabelSubscription$: Rx.Observable<any>;
   selectedBusiness: any = null;
-  selectedClearing: any = null;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -66,14 +62,10 @@ export class ACSSComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.checkIfUserIsSystemAdmin();
+    this.businessForm = this.createBusinessForm();
     this.createBusinessObservable();
-    this.createDummy();
-  }
-
-  createDummy(){
-    this.dataSource.data = [
-      {_id: 1, timestamp: 1536705058916, lastUpdateTimestamp: 1536705058916, state: 'CLOSE', projectedBalance: 200.000}
-    ];
+    this.helloWorldLabelQuery$ = this.aCSSService.getHelloWorld$();
+    this.helloWorldLabelSubscription$ = this.aCSSService.getEventSourcingMonitorHelloWorldSubscription$();
   }
 
   /**
@@ -126,14 +118,6 @@ export class ACSSComponent implements OnInit, OnDestroy {
     return this.formBuilder.group({
       business: new FormControl(null, Validators.required)
     });
-  }
-
-  /**
-   * Receives the selected clearing
-   * @param clearing selected clearing
-   */
-  selectClearingRow(clearing){
-    this.selectedClearing = clearing;
   }
 
 

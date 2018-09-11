@@ -8,18 +8,19 @@
   <div class="center">
 
     <!-- HEADER SYSTEM ADMIN -->
-    <div *ngIf="isSystemAdmin" class="header white-fg" fxLayout="column" fxLayoutAlign="center center" fxLayout.gt-xs="row" fxLayoutAlign.gt-xs="space-between center">
+    <div *ngIf="isSystemAdmin" class="header white-fg" fxLayout="column" fxLayoutAlign="center center" fxLayout.gt-xs="row"
+      fxLayoutAlign.gt-xs="space-between center">
 
       <!-- APP TITLE -->
       <div class="logo my-12 m-sm-0" fxLayout="row" fxLayoutAlign="start center">
         <mat-icon class="logo-icon mr-16" *fuseIfOnDom [@animate]="{value:'*',params:{delay:'50ms',scale:'0.2'}}">user</mat-icon>
-        <span class="logo-text h1" *fuseIfOnDom [@animate]="{value:'*',params:{delay:'100ms',x:'-25px'}}">{{'ACSS.ACSS' | translate}}</span>
+        <span class="logo-text h1" *fuseIfOnDom [@animate]="{value:'*',params:{delay:'100ms',x:'-25px'}}">{{'ACSS.ACSS'
+          | translate}}</span>
       </div>
       <!-- / APP TITLE -->
-
       <!-- BUSINESS FILTER -->
       <div fxLayout="column" fxLayout.gt-sm="row">
-        <div  class="search-input-wrapper mx-12 m-md-0" fxFlex="1 0 auto" fxLayout="row" fxLayoutAlign="start center">
+        <div class="search-input-wrapper mx-12 m-md-0" fxFlex="1 0 auto" fxLayout="row" fxLayoutAlign="start center">
           <label for="search" style="margin-bottom: 10px" class="mr-20">
             <span class="mat-title">{{'ACSS.BUSINESS' | translate}}</span>
           </label>
@@ -44,8 +45,6 @@
     <!-- / HEADER SYSTEM ADMIN-->
 
 
-
-
     <!-- HEADER BUSINESS-->
     <div *ngIf="!isSystemAdmin" class="header white-fg" fxLayout="row" fxLayoutAlign="space-between center">
 
@@ -62,7 +61,7 @@
           </div>
 
           <div class="subtitle secondary-text">
-            <span>{{'ACSS.BUSINESS_DETAIL' | translate}}</span>
+            <span>{{'ACSS.CLEARING_LIST' | translate}}</span>
           </div>
         </div>
       </div>
@@ -71,23 +70,61 @@
     <!-- / HEADER BUSINESS-->
 
     <!-- CONTENT CARD -->
+
     <div class="content-card mat-white-bg">
 
+      <div fxLayout="column" style="width: 100%; justify-content: space-between" fxLayout.gt-sm="row">
+        <div fxLayout="column" fxFlex="100" fxFlex.gt-sm="100" fxFlex.gt-md="100">
+          <mat-table id="user-table" class="item-table" #table [dataSource]="dataSource">
 
-        <mat-tab-group>
+            <!-- Date Column -->
+            <ng-container cdkColumnDef="timestamp">
+              <mat-header-cell *cdkHeaderCellDef>{{'ACSS.TIMESTAMP' | translate}}</mat-header-cell>
+              <mat-cell *cdkCellDef="let clearing">
+                <p class="text-truncate">{{clearing.timestamp | date: 'd/MM/y HH:mm'}}</p>
+              </mat-cell>
+            </ng-container>
 
-            <mat-tab label="{{'ACSS.CLEARING' | translate}}">
-              <app-clearing></app-clearing>
-            </mat-tab>
+            <!-- Username Column -->
+            <ng-container cdkColumnDef="lastUpdateTimestamp">
+              <mat-header-cell *cdkHeaderCellDef>{{'ACSS.LAST_UPDATE_TIMESTAMP' | translate}}</mat-header-cell>
+              <mat-cell *cdkCellDef="let clearing">
+                <p class="text-truncate">{{clearing.lastUpdateTimestamp | date: 'd/MM/y HH:mm'}}</p>
+              </mat-cell>
+            </ng-container>
 
-            <mat-tab label="{{'ACSS.SETTLEMENT' | translate}}">
+            <!-- Fullname Column -->
+            <ng-container cdkColumnDef="state">
+              <mat-header-cell *cdkHeaderCellDef>{{'ACSS.STATE' | translate}}</mat-header-cell>
+              <mat-cell *cdkCellDef="let clearing">
+                <p class="text-truncate">{{clearing.state}}</p>
+              </mat-cell>
+            </ng-container>
 
+            <!-- Fullname Column -->
+            <ng-container cdkColumnDef="projected_balance">
+              <mat-header-cell *cdkHeaderCellDef>{{'ACSS.PROJECTED_BALANCE' | translate}}</mat-header-cell>
+              <mat-cell *cdkCellDef="let clearing">
+                <p class="text-truncate">{{clearing.projected_balance}}</p>
+              </mat-cell>
+            </ng-container>
 
-            </mat-tab>
+            <mat-header-row *cdkHeaderRowDef="displayedColumns"></mat-header-row>
 
-        </mat-tab-group>
+            <mat-row *cdkRowDef="let clearing; columns: displayedColumns;" class="product"
+              (click)="selectClearingRow(clearing)"
+              [ngClass]="{'highlight': selectedClearing && selectedClearing._id == selectedClearing._id}"
+              matRipple [routerLink]="'acss-detail/'+clearing._id">
+            </mat-row>
 
+          </mat-table>
+
+          <mat-paginator #paginator [length]="1000" [pageIndex]="0" [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]">
+          </mat-paginator>
+        </div>
+      </div>
     </div>
+
     <!-- / CONTENT CARD -->
   </div>
   <!-- / CENTER -->

@@ -1,67 +1,245 @@
 <div class="tab-content p-24" fxLayout="column" fusePerfectScrollbar>
 
-  <form name="clearingForm" [formGroup]="clearingForm" fxLayout="row" class="user w-100-p" class="mat-white-bg p-24 mr-24 mb-24">
-    <mat-form-field class="w-50-p">
-      <input matInput name="date" formControlName="date" placeholder="{{'ACSS.DATE' | translate}}" disabled>
-    </mat-form-field>
+  <form fxLayout="row" class="user w-100-p">
 
-    <mat-form-field class="w-50-p">
-      <input matInput name="open" formControlName="open" placeholder="{{'ACSS.STATE' | translate}}" disabled>
-    </mat-form-field>
-  </form>
+    <div fxLayout="row" fxFlex="100">
+      <div fxLayout="row" fxLayoutAlign="start center" fxFlex="32">
+          <span class="h1 title">{{'ACSS.DATE' | translate}}:</span>
+          <span>&nbsp;&nbsp;</span>
+          <div class="h2 secondary-text">
+              <span>{{convertMillisToDate(clearing.timestamp) | date: 'd/MM/y HH:mm'}}</span>
+              <span> </span>
+          </div>
+      </div>
 
-  <div fxLayout="row" fxLayoutAlign="space-between">
-    <div fxLayout="column" fxFlex="49" style="justify-content: space-between">
-        <div fxFlex="80" fxLayoutAlign="start start" class="h2">{{'ACSS.INCOMES' | translate}}</div>
-        <mat-table id="incomes-table" class="item-table" #table [dataSource]="incomesDataSource" class="mat-elevation-z8"
-          fusePerfectScrollbar>
-
-          <!-- Business name Column -->
-          <ng-container cdkColumnDef="businessName">
-            <mat-header-cell *cdkHeaderCellDef>{{'ACSS.BUSINESS' | translate}}</mat-header-cell>
-            <mat-cell *cdkCellDef="let clearing">
-              <p class="text-truncate">{{clearing.businessName}}</p>
-            </mat-cell>
-          </ng-container>
-
-          <!-- Value column -->
-          <ng-container cdkColumnDef="value">
-            <mat-header-cell *cdkHeaderCellDef>{{'ACSS.VALUE' | translate}}</mat-header-cell>
-            <mat-cell *cdkCellDef="let clearing">
-              <p class="text-truncate">{{clearing.value}}</p>
-            </mat-cell>
-          </ng-container>
-
-          <mat-header-row *cdkHeaderRowDef="displayedColumns"></mat-header-row>
-
-        </mat-table>
-    </div>
-    <div fxLayout="column" fxFlex="49" style="justify-content: space-between">
-        <div fxFlex="80" fxLayoutAlign="start start" class="h2">{{'ACSS.OUTCOMES' | translate}}</div>
-        <mat-table id="incomes-table" class="item-table" #table [dataSource]="incomesDataSource" class="mat-elevation-z8"
-          fusePerfectScrollbar>
-
-          <!-- Business name Column -->
-          <ng-container cdkColumnDef="businessName">
-            <mat-header-cell *cdkHeaderCellDef>{{'ACSS.BUSINESS' | translate}}</mat-header-cell>
-            <mat-cell *cdkCellDef="let clearing">
-              <p class="text-truncate">{{clearing.businessName}}</p>
-            </mat-cell>
-          </ng-container>
-
-          <!-- Value column -->
-          <ng-container cdkColumnDef="value">
-            <mat-header-cell *cdkHeaderCellDef>{{'ACSS.VALUE' | translate}}</mat-header-cell>
-            <mat-cell *cdkCellDef="let clearing">
-              <p class="text-truncate">{{clearing.value}}</p>
-            </mat-cell>
-          </ng-container>
-
-          <mat-header-row *cdkHeaderRowDef="displayedColumns"></mat-header-row>
-
-        </mat-table>
-    </div>
+      <div fxLayout="row" fxLayoutAlign="start center" fxFlex="32">
+          <span class="h1 title">{{'ACSS.STATE' | translate}}:</span>
+          <span>&nbsp;&nbsp;</span>
+          <div class="h2 secondary-text">
+              <span class="value" *ngIf="clearing.open">{{'ACSS.OPEN' | translate}}</span>
+              <span class="value" *ngIf="!clearing.open">{{'ACSS.CLOSE' | translate}}</span>
+          </div>
+      </div>
+      <div fxLayout="row" fxLayoutAlign="start center" fxFlex="49">
+          <span class="h1 title">{{'ACSS.PROJECTED_BALANCE' | translate}}:</span>
+          <span>&nbsp;&nbsp;</span>
+          <div class="h2 secondary-text">
+              <span class="value">{{'200000' | currency}}</span>
+          </div>
+      </div>
   </div>
 
+  </form>
+
+  <mat-accordion multi="true">
+
+    <mat-expansion-panel [expanded]="true">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+
+          <div class="h2">{{'ACSS.GENERAL_INCOME_OUTCOME' | translate}}</div>
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <!-- Incomes and Outcomes -->
+
+      <div fxLayout="row" fxLayoutAlign="space-between">
+        <div fxLayout="column" fxFlex="49">
+          <div fxLayoutAlign="start start" class="h3">{{'ACSS.INCOMES' | translate}}</div>
+          <mat-table id="incomes-table" class="item-table" #table [dataSource]="incomesDataSource" class="mat-elevation-z8"
+            fusePerfectScrollbar>
+
+            <!-- Business name Column -->
+            <ng-container cdkColumnDef="businessName">
+              <mat-header-cell *cdkHeaderCellDef>{{'ACSS.BUSINESS' | translate}}</mat-header-cell>
+              <mat-cell *cdkCellDef="let clearing">
+                <p class="text-truncate">{{clearing.businessName}}</p>
+              </mat-cell>
+            </ng-container>
+
+            <!-- Value column -->
+            <ng-container cdkColumnDef="value">
+              <mat-header-cell *cdkHeaderCellDef>{{'ACSS.VALUE' | translate}}</mat-header-cell>
+              <mat-cell *cdkCellDef="let clearing">
+                <p class="text-truncate">{{clearing.value | currency}}</p>
+              </mat-cell>
+            </ng-container>
+
+            <mat-header-row *cdkHeaderRowDef="displayedColumns"></mat-header-row>
+            <mat-row *cdkRowDef="let clearing; columns: displayedColumns;" class="item" matRipple>
+            </mat-row>
+          </mat-table>
+          <mat-paginator #paginator [length]="1000" [pageIndex]="0" [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]">
+          </mat-paginator>
+        </div>
+        <div fxLayout="column" fxFlex="49" style="justify-content: space-between">
+          <div fxLayoutAlign="start start" class="h3">{{'ACSS.OUTCOMES' | translate}}</div>
+          <mat-table id="incomes-table" class="item-table" #table [dataSource]="outcomesDataSource" class="mat-elevation-z8"
+            fusePerfectScrollbar>
+
+            <!-- Business name Column -->
+            <ng-container cdkColumnDef="businessName">
+              <mat-header-cell *cdkHeaderCellDef>{{'ACSS.BUSINESS' | translate}}</mat-header-cell>
+              <mat-cell *cdkCellDef="let clearing">
+                <p class="text-truncate">{{clearing.businessName}}</p>
+              </mat-cell>
+            </ng-container>
+
+            <!-- Value column -->
+            <ng-container cdkColumnDef="value">
+              <mat-header-cell *cdkHeaderCellDef>{{'ACSS.VALUE' | translate}}</mat-header-cell>
+              <mat-cell *cdkCellDef="let clearing">
+                <p class="text-truncate">{{clearing.value | currency}}</p>
+              </mat-cell>
+            </ng-container>
+
+            <mat-header-row *cdkHeaderRowDef="displayedColumns"></mat-header-row>
+            <mat-row *cdkRowDef="let clearing; columns: displayedColumns;" class="item" matRipple>
+            </mat-row>
+
+          </mat-table>
+          <mat-paginator #paginator [length]="1000" [pageIndex]="0" [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]">
+          </mat-paginator>
+        </div>
+      </div>
+      <!-- / Incomes and Outcomes -->
+
+    </mat-expansion-panel>
+
+    <mat-expansion-panel [expanded]="true">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <div class="h2">{{'ACSS.PARTIAL_SETTLEMENT' | translate}}</div>
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <!-- Partial settlement - Incomes and Outcomes -->
+      <div fxLayout="row" fxLayoutAlign="space-between">
+        <div fxLayout="column" fxFlex="49">
+          <div fxLayoutAlign="start start" class="h3">{{'ACSS.INCOMES' | translate}}</div>
+          <mat-table id="partial-settlement-incomes-table" class="item-table" #table [dataSource]="partialSettlementIncomesDataSource"
+            class="mat-elevation-z8" fusePerfectScrollbar>
+
+            <!-- Business name Column -->
+            <ng-container cdkColumnDef="businessName">
+              <mat-header-cell *cdkHeaderCellDef>{{'ACSS.BUSINESS' | translate}}</mat-header-cell>
+              <mat-cell *cdkCellDef="let clearing">
+                <p class="text-truncate">{{clearing.businessName}}</p>
+              </mat-cell>
+            </ng-container>
+
+            <!-- Value column -->
+            <ng-container cdkColumnDef="value">
+              <mat-header-cell *cdkHeaderCellDef>{{'ACSS.VALUE' | translate}}</mat-header-cell>
+              <mat-cell *cdkCellDef="let clearing">
+                <p class="text-truncate">{{clearing.value | currency}}</p>
+              </mat-cell>
+            </ng-container>
+
+            <mat-header-row *cdkHeaderRowDef="displayedColumns"></mat-header-row>
+            <mat-row *cdkRowDef="let clearing; columns: displayedColumns;" class="item" matRipple>
+            </mat-row>
+          </mat-table>
+          <mat-paginator #paginator [length]="1000" [pageIndex]="0" [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]">
+          </mat-paginator>
+        </div>
+        <div fxLayout="column" fxFlex="49" style="justify-content: space-between">
+          <div fxLayoutAlign="start start" class="h3">{{'ACSS.OUTCOMES' | translate}}</div>
+          <mat-table id="partial-settlement-outcomes-table" class="item-table" #table [dataSource]="partialSettlementOutcomesDataSource"
+            class="mat-elevation-z8" fusePerfectScrollbar>
+
+            <!-- Business name Column -->
+            <ng-container cdkColumnDef="businessName">
+              <mat-header-cell *cdkHeaderCellDef>{{'ACSS.BUSINESS' | translate}}</mat-header-cell>
+              <mat-cell *cdkCellDef="let clearing">
+                <p class="text-truncate">{{clearing.businessName}}</p>
+              </mat-cell>
+            </ng-container>
+
+            <!-- Value column -->
+            <ng-container cdkColumnDef="value">
+              <mat-header-cell *cdkHeaderCellDef>{{'ACSS.VALUE' | translate}}</mat-header-cell>
+              <mat-cell *cdkCellDef="let clearing">
+                <p class="text-truncate">{{clearing.value | currency}}</p>
+              </mat-cell>
+            </ng-container>
+
+            <mat-header-row *cdkHeaderRowDef="displayedColumns"></mat-header-row>
+            <mat-row *cdkRowDef="let clearing; columns: displayedColumns;" class="item" matRipple>
+            </mat-row>
+
+          </mat-table>
+          <mat-paginator #paginator [length]="1000" [pageIndex]="0" [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]">
+          </mat-paginator>
+        </div>
+      </div>
+
+      <!-- / Partial settlement - Incomes and Outcomes -->
+
+    </mat-expansion-panel>
+
+
+    <mat-expansion-panel [expanded]="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <div class="h2">{{'ACSS.CUMULATED_TRANSACTIONS' | translate}}</div>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <mat-table id="cumulated-transactions-table" class="item-table" #table [dataSource]="cumulatedTransactionsDataSource"
+        class="mat-elevation-z8" fusePerfectScrollbar>
+
+        <!-- Date Column -->
+        <ng-container cdkColumnDef="date">
+          <mat-header-cell *cdkHeaderCellDef>{{'ACSS.DATE' | translate}}</mat-header-cell>
+          <mat-cell *cdkCellDef="let cumulatedTransaction">
+            <p class="text-truncate">{{convertMillisToDate(cumulatedTransaction.date) | date:"d/M/yyyy, HH:mm"}}</p>
+          </mat-cell>
+        </ng-container>
+
+        <!-- from column -->
+        <ng-container cdkColumnDef="from">
+          <mat-header-cell *cdkHeaderCellDef>{{'ACSS.FROM' | translate}}</mat-header-cell>
+          <mat-cell *cdkCellDef="let cumulatedTransaction">
+            <p class="text-truncate">{{cumulatedTransaction.from}}</p>
+          </mat-cell>
+        </ng-container>
+
+        <!-- To column -->
+        <ng-container cdkColumnDef="to">
+            <mat-header-cell *cdkHeaderCellDef>{{'ACSS.TO' | translate}}</mat-header-cell>
+            <mat-cell *cdkCellDef="let cumulatedTransaction">
+              <p class="text-truncate">{{cumulatedTransaction.to}}</p>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Value column -->
+        <ng-container cdkColumnDef="value">
+            <mat-header-cell *cdkHeaderCellDef>{{'ACSS.VALUE' | translate}}</mat-header-cell>
+            <mat-cell *cdkCellDef="let cumulatedTransaction">
+              <p class="text-truncate">
+                  {{cumulatedTransaction.value | currency}}
+                  <mat-icon class="red-fg mr-4" *ngIf="cumulatedTransaction.value < 0">arrow_downward</mat-icon>
+                  <mat-icon class="green-fg mr-4" *ngIf="cumulatedTransaction.value > 0">arrow_upward</mat-icon>
+              </p>
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *cdkHeaderRowDef="displayedColumnsCumulatedTransactions"></mat-header-row>
+
+        <mat-row *cdkRowDef="let cumulatedTransactions; columns: displayedColumnsCumulatedTransactions;"
+            (click)="selectCumulatedTransactionRow(cumulatedTransactions)"
+            class="product"
+            [ngClass]="{'highlight': selectedCumulatedTransaction && selectedCumulatedTransaction._id == cumulatedTransactions._id}"
+              matRipple>
+        </mat-row>
+
+      </mat-table>
+      <mat-paginator #paginator [length]="1000" [pageIndex]="0" [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]">
+      </mat-paginator>
+
+    </mat-expansion-panel>
+
+  </mat-accordion>
 
 </div>

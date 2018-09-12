@@ -3,6 +3,7 @@ const Rx = require("rxjs");
 const eventSourcing = require("../../tools/EventSourcing")();
 const helloWorld = require("../../domain/HelloWorld")();
 const businessEventConsumer = require("../../domain/BusinessEventConsumer")();
+const transactionAccumulatedEventConsumer = require("../../domain/TransactionAccumulatedEventConsumer")();
 
 /**
  * Singleton instance
@@ -129,6 +130,10 @@ class EventStoreService {
       BusinessGeneralInfoUpdated: {
         fn: businessEventConsumer.handleBusinessGeneralInfoUpdated$,
         obj: businessEventConsumer
+      },
+      ClearingTransactionAccumulated: {
+        fn: transactionAccumulatedEventConsumer.handleTransactionAccumulatedEvent$,
+        obj: transactionAccumulatedEventConsumer
       },
     };
   }

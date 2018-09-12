@@ -36,13 +36,14 @@ class MongoDB {
    * an executes each one on Mongo in a transactional environment.
    * If an error ocurs the transaction will be aborted and all of the operations will be ignored.
    *
-   * Note: Mongo transactions only work with Mongo Replicaset
+   * Note: Mongo transactions only work with Mongo Replicaset and operations 
+   * such as creating or dropping a collections or an index are not allowed.
    *
    * @param collectionVsOperationAndCommand array of collections vs operations
    * @param collectionVsOperationAndCommand.collection Collection name where the operation will be applied
    * @param collectionVsOperationAndCommand.operation indicates which operation will be executed (E.g insert, updateOne, ...)
    * @param collectionVsOperationAndCommand.operationArgs Array that indicates the values that will be passed as arguments of the operation to execute.
-   * @param [collectionVsOperationAndCommand.operationOps] indicates the options that will be passed as arguments of the operation to execute.
+   * @param {collectionVsOperationAndCommand.operationOps} [collectionVsOperationAndCommand.operationOps] - indicates the options that will be passed as arguments of the operation to execute.
    * 
    * @example
    * const collectionVsOperationAndCommand = [
@@ -65,7 +66,10 @@ class MongoDB {
     return (
       Rx.Observable.defer(() => Rx.Observable.of(this.client.startSession()))
         //Starts Mongo transaction
-        .do(session => session.startTransaction())
+        .mergeMap(session => {
+          session.startTransaction(); 
+          return Rx.Observable.of(session);
+        }) 
         .mergeMap(session => {
           return (
             Rx.Observable.of(session)
@@ -74,6 +78,7 @@ class MongoDB {
                 return (
                   Rx.Observable.from(collectionVsOperationAndCommand)
                     .concatMap(data => {
+                      //To execute all of the operations into a transactionsal environment, we must pass the session to each operation
                       data.operationOps =
                         data.operationOps == null
                           ? { session }
@@ -85,12 +90,6 @@ class MongoDB {
                           data.operationOps
                         );
                     })
-                    // .map(res => {
-                    //   return {
-                    //       n: res.n,
-                    //       ok: res.ok
-                    //   };
-                    // })
                     .toArray()
                 );
               })

@@ -5,6 +5,7 @@ const broker = require("../../tools/broker/BrokerFactory")();
 const Rx = require("rxjs");
 const jsonwebtoken = require("jsonwebtoken");
 const business = require("../../domain/Business")();
+const clearing = require("../../domain/Clearing")();
 const jwtPublicKey = process.env.JWT_PUBLIC_KEY.replace(/\\n/g, "\n");
 
 let instance;
@@ -153,6 +154,10 @@ class GraphQlService {
       {
         aggregateType: "Business",
         messageType: "gateway.graphql.query.getACSSBusinesses"
+      },
+      {
+        aggregateType: "Clearing",
+        messageType: "gateway.graphql.query.getClearingsFromBusiness"
       }     
     ];
   }
@@ -174,6 +179,10 @@ class GraphQlService {
       'gateway.graphql.query.getACSSBusinesses': {
         fn: business.getACSSBusinesses$,
         obj: business
+      }, 
+      'gateway.graphql.query.getClearingsFromBusiness': {
+        fn: clearing.getClearingsFromBusiness$,
+        obj: clearing
       },     
     };
   }

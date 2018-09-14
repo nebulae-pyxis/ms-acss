@@ -1,9 +1,8 @@
 "use strict";
 const Rx = require("rxjs");
 const eventSourcing = require("../../tools/EventSourcing")();
-const helloWorld = require("../../domain/HelloWorld")();
 const businessEventConsumer = require("../../domain/BusinessEventConsumer")();
-const transactionAccumulatedEventConsumer = require("../../domain/TransactionAccumulatedEventConsumer")();
+const accumulatedTransactionEventConsumer = require("../../domain/AccumulatedTransactionEventConsumer")();
 
 /**
  * Singleton instance
@@ -117,12 +116,6 @@ class EventStoreService {
 
   generateFunctionMap() {
     return {
-
-      //Sample for handling event-sourcing events, please remove
-      HelloWorldEvent: {
-        fn: helloWorld.handleHelloWorld$,
-        obj: helloWorld
-      },
       BusinessCreated: {
         fn: businessEventConsumer.handleBusinessCreated$,
         obj: businessEventConsumer
@@ -132,8 +125,8 @@ class EventStoreService {
         obj: businessEventConsumer
       },
       ClearingTransactionAccumulated: {
-        fn: transactionAccumulatedEventConsumer.handleTransactionAccumulatedEvent$,
-        obj: transactionAccumulatedEventConsumer
+        fn: accumulatedTransactionEventConsumer.handleTransactionAccumulatedEvent$,
+        obj: accumulatedTransactionEventConsumer
       },
     };
   }
@@ -145,10 +138,6 @@ class EventStoreService {
     return [
 
       //Sample for assoc events and aggregates, please remove
-      {
-        aggregateType: "HelloWorld",
-        eventType: "HelloWorldEvent"
-      },
       {
         aggregateType: "Business",
         eventType: "BusinessCreated"

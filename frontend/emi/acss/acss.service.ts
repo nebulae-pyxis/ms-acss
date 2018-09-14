@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { GatewayService } from '../../../api/gateway.service';
 import {
-  getHelloWorld,
+  getClearingById,
+  getAllClearingsFromBusiness,
   ACSSHelloWorldSubscription
 } from './gql/acss';
 import {
@@ -47,19 +48,42 @@ export class ACSSService {
       });
   }
 
-  /**
-   * Hello World sample, please remove
-   */
-  getHelloWorld$() {
+
+/**
+ * Gets the clearings associated with a business
+ * @param page page number of the clearing
+ * @param count Max amount of rows to be return
+ * @param businessId Business id filter
+ */
+  getClearingsFromBusiness$(page, count, businessId) {
     return this.gateway.apollo
-      .watchQuery<any>({
-        query: getHelloWorld,
-        fetchPolicy: "network-only"
-      })
-      .valueChanges.map(
-        resp => resp.data.getHelloWorldFromACSS.sn
-      );
+      .query<any>({
+        query: getAllClearingsFromBusiness,
+        variables: {
+          page: page,
+          count: count,
+          businessId: businessId
+        },
+        fetchPolicy: "network-only",
+        errorPolicy: 'all'
+      });
   }
+
+/**
+ * Gets the clearing by its id
+ * @param clearingId Clearing id filter
+ */
+getClearingById$(clearingId) {
+  return this.gateway.apollo
+    .query<any>({
+      query: getClearingById,
+      variables: {
+        id: clearingId
+      },
+      fetchPolicy: "network-only",
+      errorPolicy: 'all'
+    });
+}
 
   /**
   * Hello World subscription sample, please remove

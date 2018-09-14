@@ -1,6 +1,5 @@
 "use strict";
 
-const helloWorld = require("../../domain/HelloWorld")();
 const broker = require("../../tools/broker/BrokerFactory")();
 const Rx = require("rxjs");
 const jsonwebtoken = require("jsonwebtoken");
@@ -142,11 +141,6 @@ class GraphQlService {
   getSubscriptionDescriptors() {
     console.log("GraphQl Service starting ...");
     return [
-      //Sample incoming request, please remove
-      {
-        aggregateType: "HelloWorld",
-        messageType: "gateway.graphql.query.getHelloWorldFromACSS"
-      },
       {
         aggregateType: "Business",
         messageType: "gateway.graphql.query.getACSSBusiness"
@@ -157,7 +151,11 @@ class GraphQlService {
       },
       {
         aggregateType: "Clearing",
-        messageType: "gateway.graphql.query.getClearingsFromBusiness"
+        messageType: "gateway.graphql.query.getAllClearingsFromBusiness"
+      },
+      {
+        aggregateType: "Clearing",
+        messageType: "gateway.graphql.query.getClearingById"
       }     
     ];
   }
@@ -167,11 +165,6 @@ class GraphQlService {
    */
   generateFunctionMap() {    
     return {
-      //Sample incoming request, please remove
-      "gateway.graphql.query.getHelloWorldFromACSS": {
-        fn: helloWorld.getHelloWorld$,
-        obj: helloWorld
-      },
       'gateway.graphql.query.getACSSBusiness': {
         fn: business.getACSSBusiness$,
         obj: business
@@ -180,8 +173,12 @@ class GraphQlService {
         fn: business.getACSSBusinesses$,
         obj: business
       }, 
-      'gateway.graphql.query.getClearingsFromBusiness': {
+      'gateway.graphql.query.getAllClearingsFromBusiness': {
         fn: clearing.getClearingsFromBusiness$,
+        obj: clearing
+      },    
+      'gateway.graphql.query.getClearingById': {
+        fn: clearing.getClearingById$,
         obj: clearing
       },     
     };

@@ -52,17 +52,6 @@ module.exports = {
 
     //// QUERY ///////
     Query: {
-        getHelloWorldFromACSS(root, args, context) {
-            return broker
-                .forwardAndGetReply$(
-                    "HelloWorld",
-                    "gateway.graphql.query.getHelloWorldFromACSS",
-                    { root, args, jwt: context.encodedToken },
-                    2000
-                )
-                .mergeMap(response => getResponseFromBackEnd$(response))
-                .toPromise();
-        },
         getACSSBusiness(root, args, context) {
             return RoleValidator.checkPermissions$(
               context.authToken.realm_access.roles,
@@ -104,7 +93,47 @@ module.exports = {
               .catch(err => handleError$(err, "getACSSBusinesses"))
               .mergeMap(response => getResponseFromBackEnd$(response))
               .toPromise();
-          }
+        },
+        getAllClearingsFromBusiness(root, args, context) {
+            return RoleValidator.checkPermissions$(
+              context.authToken.realm_access.roles,
+              contextName,
+              "getAllClearingsFromBusiness",
+              PERMISSION_DENIED_ERROR_CODE,
+              "Permission denied",
+              ["system-admin", "business-owner"]
+            ).mergeMap(response => {
+                return broker.forwardAndGetReply$(
+                  "Clearing",
+                  "gateway.graphql.query.getAllClearingsFromBusiness",
+                  { root, args, jwt: context.encodedToken },
+                  2000
+                );
+              })
+              .catch(err => handleError$(err, "getAllClearingsFromBusiness"))
+              .mergeMap(response => getResponseFromBackEnd$(response))
+              .toPromise();
+        },
+        getClearingById(root, args, context) {
+            return RoleValidator.checkPermissions$(
+              context.authToken.realm_access.roles,
+              contextName,
+              "getClearingById",
+              PERMISSION_DENIED_ERROR_CODE,
+              "Permission denied",
+              ["system-admin", "business-owner"]
+            ).mergeMap(response => {
+                return broker.forwardAndGetReply$(
+                  "Clearing",
+                  "gateway.graphql.query.getClearingById",
+                  { root, args, jwt: context.encodedToken },
+                  2000
+                );
+              })
+              .catch(err => handleError$(err, "getClearingById"))
+              .mergeMap(response => getResponseFromBackEnd$(response))
+              .toPromise();
+        }
     },
 
     //// MUTATIONS ///////

@@ -77,7 +77,7 @@
         <div fxLayout="column" fxFlex="100" fxFlex.gt-sm="100" fxFlex.gt-md="100">
           <mat-table id="user-table" class="item-table" #table [dataSource]="dataSource">
 
-            <!-- Date Column -->
+            <!-- Timestamp Column -->
             <ng-container cdkColumnDef="timestamp">
               <mat-header-cell *cdkHeaderCellDef>{{'ACSS.TIMESTAMP' | translate}}</mat-header-cell>
               <mat-cell *cdkCellDef="let clearing">
@@ -85,7 +85,7 @@
               </mat-cell>
             </ng-container>
 
-            <!-- Username Column -->
+            <!-- LastupdateTimestamp Column -->
             <ng-container cdkColumnDef="lastUpdateTimestamp">
               <mat-header-cell *cdkHeaderCellDef>{{'ACSS.LAST_UPDATE_TIMESTAMP' | translate}}</mat-header-cell>
               <mat-cell *cdkCellDef="let clearing">
@@ -93,15 +93,16 @@
               </mat-cell>
             </ng-container>
 
-            <!-- Fullname Column -->
-            <ng-container cdkColumnDef="state">
-              <mat-header-cell *cdkHeaderCellDef>{{'ACSS.STATE' | translate}}</mat-header-cell>
-              <mat-cell *cdkCellDef="let clearing">
-                <p class="text-truncate">{{clearing.state}}</p>
+            <!-- Open Column -->
+            <ng-container cdkColumnDef="open">
+              <mat-header-cell *cdkHeaderCellDef fxHide fxShow.gt-xs>{{'ACSS.OPEN' | translate}}</mat-header-cell>
+              <mat-cell *cdkCellDef="let clearing" fxHide fxShow.gt-xs>
+                <mat-icon *ngIf="clearing.open" class="active-icon mat-green-600-bg s-16">check</mat-icon>
+                <mat-icon *ngIf="!clearing.open" class="active-icon mat-red-500-bg s-16">close</mat-icon>
               </mat-cell>
             </ng-container>
 
-            <!-- Fullname Column -->
+            <!-- projected balance Column -->
             <ng-container cdkColumnDef="projected_balance">
               <mat-header-cell *cdkHeaderCellDef>{{'ACSS.PROJECTED_BALANCE' | translate}}</mat-header-cell>
               <mat-cell *cdkCellDef="let clearing">

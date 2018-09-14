@@ -4,7 +4,7 @@ import {
 } from '@angular/material';
 
 ////////// ANGULAR //////////
-import { Component, OnInit, OnDestroy } from "@angular/core";
+import { Component, OnInit, OnDestroy, Input } from "@angular/core";
 import {
   FormBuilder,
   FormGroup,
@@ -28,6 +28,8 @@ import { Clearing } from './entities/clearing';
 })
 export class ClearingComponent implements OnInit {
 
+  @Input() clearing: Clearing;
+
   // Incomes Table data
   incomesDataSource = new MatTableDataSource();
 
@@ -48,8 +50,6 @@ export class ClearingComponent implements OnInit {
 
   // Columns to show in the cumulated transactions table
   displayedColumnsCumulatedTransactions = ['date', 'from', 'to', 'value'];
-
-  clearing: Clearing;
 
   selectedCumulatedTransaction: any = null;
 

@@ -26,22 +26,48 @@ class Clearing {
    * Gets the clearings of a business
    *
    * @param args args
-   * @param args.businessId Id if the business
+   * @param args.businessId Id of the business (This values is taken into account if the user that perform the request has the role system-admin)
    */
   getClearingsFromBusiness$({ args }, authToken) {
+    console.log('getClearingsFormBusiness -> ', args);
     return RoleValidator.checkPermissions$(
       authToken.realm_access.roles,
-      "BusinessManagement",
-      "changeBusinessState$()",
-      BUSINESS_PERMISSION_DENIED_ERROR_CODE,
-      "Permission denied",
+      "ACSS",
+      "getClearingsFromBusiness$()",
+      PERMISSION_DENIED_ERROR_CODE.code,
+      PERMISSION_DENIED_ERROR_CODE.description,
       ["system-admin", "business-owner"]
     )
-      .mergeMap(val =>
-        ClearingDA.getClearingsFromBusiness$(
-          args.businessId ? args.businessId : authToken.businessId
-        )
-      )
+      .mergeMap(val =>{
+        args.businessId = authToken.realm_access.roles.includes("system-admin") ? args.businessId: null;
+        return ClearingDA.getAllClearingsFromBusiness$(args.page, args.count, args.businessId ? args.businessId : authToken.businessId);
+      })
+      .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
+      .catch(err => {
+        return this.handleError$(err);
+      });
+  }
+
+    /**
+   * Gets the clearing by id
+   *
+   * @param args args
+   * @param args.id Id of the clearing
+   */
+  getClearingById$({ args }, authToken) {
+    console.log('Clearing backedn');
+    return RoleValidator.checkPermissions$(
+      authToken.realm_access.roles,
+      "ACSS",
+      "getClearingsById$()",
+      PERMISSION_DENIED_ERROR_CODE.code,
+      PERMISSION_DENIED_ERROR_CODE.description,
+      ["system-admin", "business-owner"]
+    )
+      .mergeMap(role => {
+        console.log('Role', role);
+        return ClearingDA.getClearingByClearingId$(args.id);
+      })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
       .catch(err => {
         return this.handleError$(err);
@@ -51,6 +77,7 @@ class Clearing {
   //#region  mappers for API responses
 
   handleError$(err) {
+    console.log('Handle error => ', err);
     return Rx.Observable.of(err).map(err => {
       const exception = { data: null, result: {} };
       const isCustomError = err instanceof CustomError;

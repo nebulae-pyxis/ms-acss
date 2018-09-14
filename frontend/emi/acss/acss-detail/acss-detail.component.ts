@@ -2,6 +2,7 @@ import { ACSSDetailService } from './acss-detail.service';
 
 ////////// ANGULAR //////////
 import { Component, OnInit, OnDestroy } from "@angular/core";
+import { Router, ActivatedRoute } from "@angular/router";
 import {
   FormBuilder,
   FormGroup,
@@ -25,8 +26,6 @@ import {
 // tslint:disable-next-line:import-blacklist
 import * as Rx from "rxjs/Rx";
 import { map, mergeMap, toArray } from "rxjs/operators";
-import { Subscription } from 'rxjs/Subscription';
-import { Observable } from 'rxjs/Observable';
 
 @Component({
   // tslint:disable-next-line:component-selector
@@ -42,6 +41,7 @@ export class ACSSDetailComponent implements OnInit, OnDestroy {
   businessForm: FormGroup;
   businessQuery$: Rx.Observable<any>;
   selectedBusiness: any = null;
+  selectedClearing = null; 
 
   constructor(
     private formBuilder: FormBuilder,
@@ -50,6 +50,8 @@ export class ACSSDetailComponent implements OnInit, OnDestroy {
     private translate: TranslateService,
     private snackBar: MatSnackBar,
     private keycloakService: KeycloakService,
+    private router: Router,
+    private activatedRouter: ActivatedRoute
   ) {
     this.translationLoader.loadTranslations(english, spanish);
   }
@@ -58,7 +60,16 @@ export class ACSSDetailComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.checkIfUserIsSystemAdmin();
     this.businessForm = this.createBusinessForm();
-    this.createBusinessObservable();
+  }
+
+  findClearing() {
+    this.activatedRouter.params
+      .pipe(
+        mergeMap(params => this.aCSSDetailService.getClearingById$(params.id))
+      )
+      .subscribe(clearingData => {
+        this.selectedClearing = clearingData;
+      });
   }
 
   /**

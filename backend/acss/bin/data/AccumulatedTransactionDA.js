@@ -6,7 +6,7 @@ const Rx = require("rxjs");
 const CollectionName = "AccumulatedTransactions";
 const { CustomError } = require("../tools/customError");
 
-class ClearingDA {
+class AccumulatedTransactionDA {
   static start$(mongoDbInstance) {
     return Rx.Observable.create(observer => {
       if (mongoDbInstance) {
@@ -89,7 +89,7 @@ class ClearingDA {
 }
 
 /**
- * Returns a ClearingDA
- * @returns {ClearingDA}
+ * Returns a AccumulatedTransactionDA
+ * @returns {AccumulatedTransactionDA}
  */
-module.exports = ClearingDA;
+module.exports = AccumulatedTransactionDA;

@@ -2,8 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { GatewayService } from '../../../../api/gateway.service';
 import {
-  getHelloWorld,
-  ACSSHelloWorldSubscription
+  getClearingById
 } from '../gql/acss';
 import {
   getACSSBusiness,
@@ -47,29 +46,21 @@ export class ACSSDetailService {
       });
   }
 
-  /**
-   * Hello World sample, please remove
-   */
-  getHelloWorld$() {
-    return this.gateway.apollo
-      .watchQuery<any>({
-        query: getHelloWorld,
-        fetchPolicy: 'network-only'
-      })
-      .valueChanges.map(
-        resp => resp.data.getHelloWorldFromACSS.sn
-      );
-  }
 
   /**
-  * Hello World subscription sample, please remove
-  */
- getEventSourcingMonitorHelloWorldSubscription$(): Observable<any> {
+ * Gets the clearing by its id
+ * @param clearingId Clearing id filter
+ */
+getClearingById$(clearingId) {
   return this.gateway.apollo
-    .subscribe({
-      query: ACSSHelloWorldSubscription
-    })
-    .map(resp => resp.data.EventSourcingMonitorHelloWorldSubscription.sn);
+    .query<any>({
+      query: getClearingById,
+      variables: {
+        id: clearingId
+      },
+      fetchPolicy: "network-only",
+      errorPolicy: 'all'
+    });
 }
 
 }

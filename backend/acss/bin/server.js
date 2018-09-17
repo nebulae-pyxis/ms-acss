@@ -7,7 +7,7 @@ if (process.env.NODE_ENV !== 'production') {
 const eventSourcing = require('./tools/EventSourcing')();
 const eventStoreService = require('./services/event-store/EventStoreService')();
 const mongoDB = require('./data/MongoDB').singleton();
-const HelloWorldDA = require('./data/HelloWorldDA');
+const ClearingDA = require('./data/ClearingDA');
 const BusinessDA = require('./data/BusinessDA');
 const graphQlService = require('./services/gateway/GraphQlService')();
 const Rx = require('rxjs');
@@ -17,8 +17,8 @@ const start = () => {
         eventSourcing.eventStore.start$(),
         eventStoreService.start$(),
         mongoDB.start$(),
-        HelloWorldDA.start$(),
         BusinessDA.start$(),
+        ClearingDA.start$(),
         graphQlService.start$()
     ).subscribe(
         (evt) => {

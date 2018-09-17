@@ -6,6 +6,36 @@ type Business {
   name: String
 }
 
+"Clearing info"
+type Clearing {
+  "Clearing id"
+  _id: ID
+  "Clearing creation timestmap"
+  timestamp: BigInt
+  "Last update timestmap"
+  lastUpdateTimestamp: BigInt
+  businessId: String!
+  businessName: String
+  input: [Movement]
+  output: [Movement]
+  partialSettlement: PartialSettlement
+  accumulatedTransactionIds: [Int]!
+  open: Boolean
+}
+
+"Money movement"
+type Movement {
+  businessId: String!
+  businessName: String
+  amount: Int!
+}
+
+"Partial settlement"
+type PartialSettlement {
+  input: [Movement]
+  output: [Movement]
+}
+
 "Hello world sample, please remove"
 type HelloWorldACSS {
   "text"
@@ -17,8 +47,10 @@ type Query {
   getACSSBusiness: Business
   "Get businesses"
   getACSSBusinesses: [Business]
-  "Hello world sample, please remove"
-  getHelloWorldFromACSS: HelloWorldACSS
+  "Gets the clearings from a business. the value businessId is taken into account if and only if the user has the role system-admin, If a business is not specified, this will return the clearings associated with the business of the user that is performing the request "
+  getAllClearingsFromBusiness(page: Int!, count: Int!, businessId: String): [Clearing]
+  "Gets the clearing with the indicated ID"
+  getClearingById(id: ID!): Clearing
 }
 
 type Subscription {

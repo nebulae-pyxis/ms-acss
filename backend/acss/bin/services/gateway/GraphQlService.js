@@ -1,10 +1,10 @@
 "use strict";
 
-const helloWorld = require("../../domain/HelloWorld")();
 const broker = require("../../tools/broker/BrokerFactory")();
 const Rx = require("rxjs");
 const jsonwebtoken = require("jsonwebtoken");
 const business = require("../../domain/Business")();
+const clearing = require("../../domain/Clearing")();
 const jwtPublicKey = process.env.JWT_PUBLIC_KEY.replace(/\\n/g, "\n");
 
 let instance;
@@ -141,11 +141,6 @@ class GraphQlService {
   getSubscriptionDescriptors() {
     console.log("GraphQl Service starting ...");
     return [
-      //Sample incoming request, please remove
-      {
-        aggregateType: "HelloWorld",
-        messageType: "gateway.graphql.query.getHelloWorldFromACSS"
-      },
       {
         aggregateType: "Business",
         messageType: "gateway.graphql.query.getACSSBusiness"
@@ -153,6 +148,14 @@ class GraphQlService {
       {
         aggregateType: "Business",
         messageType: "gateway.graphql.query.getACSSBusinesses"
+      },
+      {
+        aggregateType: "Clearing",
+        messageType: "gateway.graphql.query.getAllClearingsFromBusiness"
+      },
+      {
+        aggregateType: "Clearing",
+        messageType: "gateway.graphql.query.getClearingById"
       }     
     ];
   }
@@ -162,11 +165,6 @@ class GraphQlService {
    */
   generateFunctionMap() {    
     return {
-      //Sample incoming request, please remove
-      "gateway.graphql.query.getHelloWorldFromACSS": {
-        fn: helloWorld.getHelloWorld$,
-        obj: helloWorld
-      },
       'gateway.graphql.query.getACSSBusiness': {
         fn: business.getACSSBusiness$,
         obj: business
@@ -174,6 +172,14 @@ class GraphQlService {
       'gateway.graphql.query.getACSSBusinesses': {
         fn: business.getACSSBusinesses$,
         obj: business
+      }, 
+      'gateway.graphql.query.getAllClearingsFromBusiness': {
+        fn: clearing.getClearingsFromBusiness$,
+        obj: clearing
+      },    
+      'gateway.graphql.query.getClearingById': {
+        fn: clearing.getClearingById$,
+        obj: clearing
       },     
     };
   }

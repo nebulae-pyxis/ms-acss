@@ -4,7 +4,7 @@ const Rx = require('rxjs');
 const uuidv4 = require('uuid/v4');
 
 //LIBS FOR TESTING
-const MqttBroker = require('../../../bin/crosscutting/broker/MqttBroker');
+const MqttBroker = require('../../../bin/tools/broker/MqttBroker');
 
 //GLOABAL VARS to use between tests
 let mqttBroker = {};
@@ -88,7 +88,7 @@ describe('MQTT BROKER', function () {
                     .switchMap(() => mqttBroker.send$( 'TestMqttBroker', 'Event', { event: 'yai' }))
             ).subscribe(
                 ([event, sentEventId]) => {
-                    assert.deepEqual(event, { event: 'yai' });
+                    assert.deepEqual(event.data, { event: 'yai' });
                 },
                 error => {
                     return done(new Error(error));

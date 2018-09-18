@@ -147,12 +147,12 @@ class MongoDB {
    */
   createCollections$() {
     return Rx.Observable.concat(
-      MongoDB.createCollection$('AccumulatedTransactions'),
-      MongoDB.createCollection$('Transactions'),
-      MongoDB.createCollection$('TransactionsCursor'),
-      MongoDB.createCollection$('Clearing'),
-      MongoDB.createCollection$('ClosedClearing'),
-      MongoDB.createCollection$('Business'),
+      this.createCollection$('AccumulatedTransactions'),
+      this.createCollection$('Transactions'),
+      this.createCollection$('TransactionsCursor'),
+      this.createCollection$('Clearing'),
+      this.createCollection$('ClosedClearing'),
+      this.createCollection$('Business'),
     );
   }
 

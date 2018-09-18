@@ -9,60 +9,7 @@
 
     <!-- CONTENT CARD -->
 
-    <div class="content-card mat-white-bg">
 
-      <div fxLayout="column" style="width: 100%; justify-content: space-between" fxLayout.gt-sm="row">
-        <div fxLayout="column" fxFlex="100" fxFlex.gt-sm="100" fxFlex.gt-md="100">
-          <mat-table id="transactions-table" class="item-table" #table [dataSource]="dataSource">
-
-            <!-- Timestamp Column -->
-            <ng-container cdkColumnDef="fromBu">
-              <mat-header-cell *cdkHeaderCellDef>{{'ACSS.FROM' | translate}}</mat-header-cell>
-              <mat-cell *cdkCellDef="let transaction">
-                <p class="text-truncate">{{transaction.timestamp | date: 'd/MM/y HH:mm'}}</p>
-              </mat-cell>
-            </ng-container>
-
-            <!-- LastupdateTimestamp Column -->
-            <ng-container cdkColumnDef="lastUpdateTimestamp">
-              <mat-header-cell *cdkHeaderCellDef>{{'ACSS.LAST_UPDATE_TIMESTAMP' | translate}}</mat-header-cell>
-              <mat-cell *cdkCellDef="let transaction">
-                <p class="text-truncate">{{transaction.lastUpdateTimestamp | date: 'd/MM/y HH:mm'}}</p>
-              </mat-cell>
-            </ng-container>
-
-            <!-- Open Column -->
-            <ng-container cdkColumnDef="open">
-              <mat-header-cell *cdkHeaderCellDef fxHide fxShow.gt-xs>{{'ACSS.OPEN' | translate}}</mat-header-cell>
-              <mat-cell *cdkCellDef="let transaction" fxHide fxShow.gt-xs>
-                <mat-icon *ngIf="transaction.open" class="active-icon mat-green-600-bg s-16">check</mat-icon>
-                <mat-icon *ngIf="!transaction.open" class="active-icon mat-red-500-bg s-16">close</mat-icon>
-              </mat-cell>
-            </ng-container>
-
-            <!-- projected balance Column -->
-            <ng-container cdkColumnDef="projected_balance">
-              <mat-header-cell *cdkHeaderCellDef>{{'ACSS.PROJECTED_BALANCE' | translate}}</mat-header-cell>
-              <mat-cell *cdkCellDef="let transaction">
-                <p class="text-truncate">{{transaction.projected_balance}}</p>
-              </mat-cell>
-            </ng-container>
-
-            <mat-header-row *cdkHeaderRowDef="displayedColumns"></mat-header-row>
-
-            <mat-row *cdkRowDef="let transaction; columns: displayedColumns;" class="product"
-              (click)="selecttransactionRow(transaction)"
-              [ngClass]="{'highlight': selectedtransaction && selectedtransaction._id == selectedtransaction._id}"
-              matRipple [routerLink]="'acss-detail/'+transaction._id">
-            </mat-row>
-
-          </mat-table>
-
-          <mat-paginator #paginator [length]="1000" [pageIndex]="0" [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]">
-          </mat-paginator>
-        </div>
-      </div>
-    </div>
 
     <!-- / CONTENT CARD -->
   </div>

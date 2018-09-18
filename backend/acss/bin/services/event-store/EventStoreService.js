@@ -3,6 +3,7 @@ const Rx = require("rxjs");
 const eventSourcing = require("../../tools/EventSourcing")();
 const businessEventConsumer = require("../../domain/BusinessEventConsumer")();
 const accumulatedTransactionEventConsumer = require("../../domain/AccumulatedTransactionEventConsumer")();
+const clearingJobTriggeredEventHandler = require("../../domain/ClearingJobTriggeredEventHandler")();
 
 /**
  * Singleton instance
@@ -128,6 +129,10 @@ class EventStoreService {
         fn: accumulatedTransactionEventConsumer.handleTransactionAccumulatedEvent$,
         obj: accumulatedTransactionEventConsumer
       },
+      ClearingJobTriggered: {
+        fn: clearingJobTriggeredEventHandler.handleClearingJobTriggeredEvent$,
+        obj: clearingJobTriggeredEventHandler
+      },
     };
   }
 
@@ -145,6 +150,14 @@ class EventStoreService {
       {
         aggregateType: "Business",
         eventType: "BusinessGeneralInfoUpdated"
+      },
+      {
+        aggregateType: "ClearingTransaction",
+        eventType: "ClearingTransactionAccumulated"
+      },
+      {
+        aggregateType: "Cronjob",
+        eventType: "ClearingJobTriggered"
       }
 
     ]

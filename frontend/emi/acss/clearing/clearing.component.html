@@ -7,7 +7,7 @@
           <span class="h1 title">{{'ACSS.DATE' | translate}}:</span>
           <span>&nbsp;&nbsp;</span>
           <div class="h2 secondary-text">
-              <span>{{clearing.timestamp | date: 'd/MM/y HH:mm'}}</span>
+              <span>{{convertMillisToDate(clearing.timestamp) | date: 'd/MM/y HH:mm'}}</span>
               <span> </span>
           </div>
       </div>
@@ -61,7 +61,7 @@
             <ng-container cdkColumnDef="value">
               <mat-header-cell *cdkHeaderCellDef>{{'ACSS.VALUE' | translate}}</mat-header-cell>
               <mat-cell *cdkCellDef="let clearing">
-                <p class="text-truncate">{{clearing.value | currency}}</p>
+                <p class="text-truncate">{{clearing.amount | currency}}</p>
               </mat-cell>
             </ng-container>
 
@@ -69,7 +69,7 @@
             <mat-row *cdkRowDef="let clearing; columns: displayedColumns;" class="item" matRipple>
             </mat-row>
           </mat-table>
-          <mat-paginator #paginator [length]="1000" [pageIndex]="0" [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]">
+          <mat-paginator #paginatorIncomes [length]="incomesResultsLength" [pageIndex]="0" [pageSize]="5" [pageSizeOptions]="[5, 10, 25, 100]">
           </mat-paginator>
         </div>
         <div fxLayout="column" fxFlex="49" style="justify-content: space-between">
@@ -89,7 +89,7 @@
             <ng-container cdkColumnDef="value">
               <mat-header-cell *cdkHeaderCellDef>{{'ACSS.VALUE' | translate}}</mat-header-cell>
               <mat-cell *cdkCellDef="let clearing">
-                <p class="text-truncate">{{clearing.value | currency}}</p>
+                <p class="text-truncate">{{clearing.amount | currency}}</p>
               </mat-cell>
             </ng-container>
 
@@ -98,7 +98,7 @@
             </mat-row>
 
           </mat-table>
-          <mat-paginator #paginator [length]="1000" [pageIndex]="0" [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]">
+          <mat-paginator #paginatorOutcomes [length]="outcomesResultsLength" [pageIndex]="0" [pageSize]="5" [pageSizeOptions]="[5, 10, 25, 100]">
           </mat-paginator>
         </div>
       </div>
@@ -132,7 +132,7 @@
             <ng-container cdkColumnDef="value">
               <mat-header-cell *cdkHeaderCellDef>{{'ACSS.VALUE' | translate}}</mat-header-cell>
               <mat-cell *cdkCellDef="let clearing">
-                <p class="text-truncate">{{clearing.value | currency}}</p>
+                <p class="text-truncate">{{clearing.amount | currency}}</p>
               </mat-cell>
             </ng-container>
 
@@ -140,7 +140,7 @@
             <mat-row *cdkRowDef="let clearing; columns: displayedColumns;" class="item" matRipple>
             </mat-row>
           </mat-table>
-          <mat-paginator #paginator [length]="1000" [pageIndex]="0" [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]">
+          <mat-paginator #paginatorPartialSettlementIncomes [length]="partialSettlementIncomesResultsLength" [pageIndex]="0" [pageSize]="5" [pageSizeOptions]="[5, 10, 25, 100]">
           </mat-paginator>
         </div>
         <div fxLayout="column" fxFlex="49" style="justify-content: space-between">
@@ -160,7 +160,7 @@
             <ng-container cdkColumnDef="value">
               <mat-header-cell *cdkHeaderCellDef>{{'ACSS.VALUE' | translate}}</mat-header-cell>
               <mat-cell *cdkCellDef="let clearing">
-                <p class="text-truncate">{{clearing.value | currency}}</p>
+                <p class="text-truncate">{{clearing.amount | currency}}</p>
               </mat-cell>
             </ng-container>
 
@@ -169,7 +169,7 @@
             </mat-row>
 
           </mat-table>
-          <mat-paginator #paginator [length]="1000" [pageIndex]="0" [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]">
+          <mat-paginator #paginatorPartialSettlementOutcomes [length]="partialSettlementOutcomesResultsLength" [pageIndex]="0" [pageSize]="5" [pageSizeOptions]="[5, 10, 25, 100]">
           </mat-paginator>
         </div>
       </div>
@@ -182,60 +182,60 @@
     <mat-expansion-panel [expanded]="true">
         <mat-expansion-panel-header>
           <mat-panel-title>
-            <div class="h2">{{'ACSS.CUMULATED_TRANSACTIONS' | translate}}</div>
+            <div class="h2">{{'ACSS.ACCUMULATED_TRANSACTIONS' | translate}}</div>
           </mat-panel-title>
         </mat-expansion-panel-header>
 
-        <mat-table id="cumulated-transactions-table" class="item-table" #table [dataSource]="cumulatedTransactionsDataSource"
+        <mat-table id="cumulated-transactions-table" class="item-table" #table [dataSource]="accumulatedTransactionsDataSource"
         class="mat-elevation-z8" fusePerfectScrollbar>
 
         <!-- Date Column -->
         <ng-container cdkColumnDef="date">
           <mat-header-cell *cdkHeaderCellDef>{{'ACSS.DATE' | translate}}</mat-header-cell>
-          <mat-cell *cdkCellDef="let cumulatedTransaction">
-            <p class="text-truncate">{{convertMillisToDate(cumulatedTransaction.date) | date:"d/M/yyyy, HH:mm"}}</p>
+          <mat-cell *cdkCellDef="let accumulatedTransaction">
+            <p class="text-truncate">{{convertMillisToDate(accumulatedTransaction.timestamp) | date:"d/M/yyyy, HH:mm"}}</p>
           </mat-cell>
         </ng-container>
 
         <!-- from column -->
         <ng-container cdkColumnDef="from">
           <mat-header-cell *cdkHeaderCellDef>{{'ACSS.FROM' | translate}}</mat-header-cell>
-          <mat-cell *cdkCellDef="let cumulatedTransaction">
-            <p class="text-truncate">{{cumulatedTransaction.from}}</p>
+          <mat-cell *cdkCellDef="let accumulatedTransaction">
+            <p class="text-truncate">{{accumulatedTransaction.fromBusinessName}}</p>
           </mat-cell>
         </ng-container>
 
         <!-- To column -->
         <ng-container cdkColumnDef="to">
             <mat-header-cell *cdkHeaderCellDef>{{'ACSS.TO' | translate}}</mat-header-cell>
-            <mat-cell *cdkCellDef="let cumulatedTransaction">
-              <p class="text-truncate">{{cumulatedTransaction.to}}</p>
+            <mat-cell *cdkCellDef="let accumulatedTransaction">
+              <p class="text-truncate">{{accumulatedTransaction.toBusinessName}}</p>
             </mat-cell>
         </ng-container>
 
         <!-- Value column -->
         <ng-container cdkColumnDef="value">
             <mat-header-cell *cdkHeaderCellDef>{{'ACSS.VALUE' | translate}}</mat-header-cell>
-            <mat-cell *cdkCellDef="let cumulatedTransaction">
+            <mat-cell *cdkCellDef="let accumulatedTransaction">
               <p class="text-truncate">
-                  {{cumulatedTransaction.value | currency}}
-                  <mat-icon class="red-fg mr-4" *ngIf="cumulatedTransaction.value < 0">arrow_downward</mat-icon>
-                  <mat-icon class="green-fg mr-4" *ngIf="cumulatedTransaction.value > 0">arrow_upward</mat-icon>
+                  {{accumulatedTransaction.amount | currency}}
+                  <mat-icon class="red-fg mr-4" *ngIf="accumulatedTransaction.amount < 0">arrow_downward</mat-icon>
+                  <mat-icon class="green-fg mr-4" *ngIf="accumulatedTransaction.amount > 0">arrow_upward</mat-icon>
               </p>
             </mat-cell>
         </ng-container>
 
-        <mat-header-row *cdkHeaderRowDef="displayedColumnsCumulatedTransactions"></mat-header-row>
+        <mat-header-row *cdkHeaderRowDef="displayedColumnsAccumulatedTransactions"></mat-header-row>
 
-        <mat-row *cdkRowDef="let cumulatedTransactions; columns: displayedColumnsCumulatedTransactions;"
-            (click)="selectCumulatedTransactionRow(cumulatedTransactions)"
+        <mat-row *cdkRowDef="let accumulatedTransaction; columns: displayedColumnsAccumulatedTransactions;"
+            (click)="selectAccumulatedTransactionRow(accumulatedTransaction)"
             class="product"
-            [ngClass]="{'highlight': selectedCumulatedTransaction && selectedCumulatedTransaction._id == cumulatedTransactions._id}"
+            [ngClass]="{'highlight': selectedAccumulatedTransaction && selectedAccumulatedTransaction._id == accumulatedTransactions._id}"
               matRipple>
         </mat-row>
 
       </mat-table>
-      <mat-paginator #paginator [length]="1000" [pageIndex]="0" [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]">
+      <mat-paginator #paginatorAccumulatedTxs [length]="clearing.accumulatedTransactionIds.length" [pageIndex]="0" [pageSize]="5" [pageSizeOptions]="[5, 10, 25, 100]">
       </mat-paginator>
 
     </mat-expansion-panel>

@@ -1,10 +1,23 @@
+////////// RXJS ///////////
+// tslint:disable-next-line:import-blacklist
+import * as Rx from "rxjs/Rx";
+import { map, mergeMap, toArray, filter, tap, startWith } from "rxjs/operators";
+import { Subscription } from 'rxjs/Subscription';
+
+import { Output } from '@angular/core';
 //////////// ANGULAR MATERIAL ///////////
 import {
+  MatPaginator,
+  MatSort,
+  Sort,
   MatTableDataSource,
-} from '@angular/material';
+  MatDialog,
+  MatSnackBar
+} from "@angular/material";
+import { fuseAnimations } from '../../../../core/animations';
 
 ////////// ANGULAR //////////
-import { Component, OnInit, OnDestroy, Input } from "@angular/core";
+import { Component, OnInit, OnDestroy, Input, ViewChild, ElementRef } from "@angular/core";
 import {
   FormBuilder,
   FormGroup,
@@ -18,7 +31,7 @@ import { TranslateService } from "@ngx-translate/core";
 import { locale as english } from "../i18n/en";
 import { locale as spanish } from "../i18n/es";
 
-
+import { ClearingService } from './clearing.service';
 import { Clearing } from './entities/clearing';
 
 @Component({
@@ -26,108 +39,120 @@ import { Clearing } from './entities/clearing';
   templateUrl: './clearing.component.html',
   styleUrls: ['./clearing.component.scss']
 })
-export class ClearingComponent implements OnInit {
+export class ClearingComponent implements OnInit, OnDestroy {
 
   @Input() clearing: Clearing;
 
+  // Rxjs subscriptions
+  subscriptions = [];
+
   // Incomes Table data
-  incomesDataSource = new MatTableDataSource();
+  incomesDataSource = new MatTableDataSource<Element>();
+
+  // Incomes table length
+  incomesResultsLength = 0;
 
   // Outcomes Table data
-  outcomesDataSource = new MatTableDataSource();
+  outcomesDataSource = new MatTableDataSource<Element>();
+
+  // Outcomes table length
+  outcomesResultsLength = 0;
 
   // Partial settlement - Incomes Table data
-  partialSettlementIncomesDataSource = new MatTableDataSource();
+  partialSettlementIncomesDataSource = new MatTableDataSource<Element>();
+
+  // partial settlement Incomes table length
+  partialSettlementIncomesResultsLength = 0;
 
   // Partial settlement - Outcomes Table data
-  partialSettlementOutcomesDataSource = new MatTableDataSource();
+  partialSettlementOutcomesDataSource = new MatTableDataSource<Element>();
+
+  // partial settlement Outcomes table length
+  partialSettlementOutcomesResultsLength = 0;
 
   // Cumulated transactions table
-  cumulatedTransactionsDataSource = new MatTableDataSource();
+  accumulatedTransactionsDataSource = new MatTableDataSource();
 
   // Columns to show in the table
   displayedColumns = ['businessName', 'value'];
 
-  // Columns to show in the cumulated transactions table
-  displayedColumnsCumulatedTransactions = ['date', 'from', 'to', 'value'];
+  // Columns to show in the acccumulated transactions table
+  displayedColumnsAccumulatedTransactions = ['date', 'from', 'to', 'value'];
 
-  selectedCumulatedTransaction: any = null;
+  selectedaccumulatedTransaction: any = null;
+
+    // Table values
+    @ViewChild('paginatorAccumulatedTxs') paginatorAccumulatedTxs: MatPaginator;
+    @ViewChild('paginatorIncomes') paginatorIncomes: MatPaginator;
+    @ViewChild('paginatorOutcomes') paginatorOutcomes: MatPaginator;
+    @ViewChild('paginatorPartialSettlementIncomes') paginatorPartialSettlementIncomes: MatPaginator;
+    @ViewChild('paginatorPartialSettlementOutcomes') paginatorPartialSettlementOutcomes: MatPaginator;
+    @ViewChild('filter') filter: ElementRef;
+    @ViewChild(MatSort) sort: MatSort;
+    tableSize: number;
+    page = 0;
+    count = 10;
+    filterText = '';
+    sortColumn = null;
+    sortOrder = null;
+    itemPerPage = '';
 
   constructor(private formBuilder: FormBuilder,
     private translationLoader: FuseTranslationLoaderService,
     private translate: TranslateService,
+    private clearingService: ClearingService,
+    private snackBar: MatSnackBar
   ) {
     this.translationLoader.loadTranslations(english, spanish);
   }
 
   ngOnInit() {
-    this.createDummy();
-    this.clearing = new Clearing();
-    this.clearing.timestamp = new Date();
-    this.clearing.open = false;
-    this.clearing.input = {
-      nebula: {
-        amount: 200.000
-      }
-    };
-    this.clearing.output = {
-      nebula: {
-        amount: 200.000
-      }
-    };
+    this.refreshTables();
   }
 
-  createDummy(){
-    this.incomesDataSource.data = [
-      {businessId: 123, businessName: 'Negocio1', value: 200000},
-      {businessId: 12, businessName: 'Negocio2', value: 15000},
-      {businessId: 23, businessName: 'Negocio3', value: 34000},
-      {businessId: 123, businessName: 'Negocio1', value: 200000},
-      {businessId: 12, businessName: 'Negocio2', value: 15000}
-    ];
+  /**
+   * Refresh the tables
+   */
+  refreshTables(){
+    //this.incomesDataSource.data = this.clearing.input;
+    this.incomesDataSource = new MatTableDataSource<Element>(this.clearing.input);
+    // this.incomesDataSource.paginator = this.paginatorIncomes;
+    this.incomesResultsLength = this.clearing.input.length;
 
-    this.outcomesDataSource.data = [
-      {businessId: 123, businessName: 'Negocio1', value: 200000},
-      {businessId: 12, businessName: 'Negocio2', value: 15000},
-      {businessId: 23, businessName: 'Negocio3', value: 34000},
-      {businessId: 1, businessName: 'Negocio4', value: 125000},
-      {businessId: 12, businessName: 'Negocio5', value: 15000},
-    ];
+    this.outcomesDataSource.data = this.clearing.output;
+    // this.outcomesDataSource.paginator = this.paginatorOutcomes;
+    this.outcomesResultsLength = this.clearing.output.length;
 
-    this.partialSettlementIncomesDataSource.data = [
-      {businessId: 123, businessName: 'Negocio1', value: 200000},
-      {businessId: 12, businessName: 'Negocio2', value: 15000},
-      {businessId: 23, businessName: 'Negocio3', value: 34000},
-      {businessId: 1, businessName: 'Negocio4', value: 125000},
-    ];
+    this.partialSettlementIncomesDataSource.data = this.clearing.partialSettlement.input;
+    //this.partialSettlementIncomesDataSource.paginator = this.paginatorPartialSettlementIncomes;
+    this.partialSettlementIncomesResultsLength = this.clearing.partialSettlement.input.length;
 
-    this.partialSettlementOutcomesDataSource.data = [
-      {businessId: 123, businessName: 'Negocio1', value: 200000},
-      {businessId: 12, businessName: 'Negocio2', value: 15000},
-      {businessId: 23, businessName: 'Negocio3', value: 34000},
-      {businessId: 1, businessName: 'Negocio4', value: 125000},
-    ];
+    this.partialSettlementOutcomesDataSource.data = this.clearing.partialSettlement.output;
+    //this.partialSettlementOutcomesDataSource.paginator = this.paginatorPartialSettlementOutcomes;
+    this.partialSettlementOutcomesResultsLength = this.clearing.partialSettlement.output.length;
 
-    this.cumulatedTransactionsDataSource.data = [
-      {_id: '1', date: 1536680334509, from: 'Negocio1', to: 'Negocio2', value: -30000, txIds: {
-        'AFCC': [1, 2, 3]
-      }},
-      {_id: '2', date: 1536680334510, from: 'Negocio2', to: 'Negocio1', value: 10000, txIds: {
-        'AFCC': [3]
-      }},
-      {_id: '3', date: 1536680334513, from: 'NegocioT', to: 'NegocioA', value: 25000, txIds: {
-        'AFCC': [32]
-      }}
-    ];
+    const accumulatedTxSubscription = this.paginatorAccumulatedTxs.page
+      .startWith({pageIndex: 0, pageSize: 10})
+      .pipe(
+        mergeMap(paginatorData => {
+          console.log('Paginator changed ', paginatorData);
+          return this.clearingService.getAccumulatedTransactionsByIds$(paginatorData.pageIndex, paginatorData.pageSize, this.clearing.accumulatedTransactionIds);
+        }),
+        mergeMap(resp => this.graphQlAlarmsErrorHandler$(resp)),
+        filter((resp: any) => !resp.errors || resp.errors.length === 0),        
+      ).subscribe(model => {
+        this.accumulatedTransactionsDataSource.data = model.data.getAccumulatedTransactionsByIds;
+      });
+      this.subscriptions.push(accumulatedTxSubscription);
   }
 
   /**
    * Receives the selected cumulated transaction
    * @param cumulatedTransaction selected cumulated transaction
    */
-  selectCumulatedTransactionRow(cumulatedTransaction){
-    this.selectedCumulatedTransaction = cumulatedTransaction;
-    console.log('selectedcumulatedTransactions1 => ', this.selectCumulatedTransactionRow);
+  selectAccumulatedTransactionRow(accumulatedTransaction){
+    this.selectedaccumulatedTransaction = accumulatedTransaction;
+    console.log('selectedcumulatedTransactions1 => ', this.selectedaccumulatedTransaction);
   }
 
   /**
@@ -136,6 +161,83 @@ export class ClearingComponent implements OnInit {
    */
   convertMillisToDate(millis){
     return new Date(millis);
+  }
+
+  calculateBalance(accumulatedTx){
+    accumulatedTx.input
+  }
+
+     /**
+   * Handles the Graphql errors and show a message to the user
+   * @param response
+   */
+  graphQlAlarmsErrorHandler$(response){
+    return Rx.Observable.of(JSON.parse(JSON.stringify(response)))
+    .pipe(
+      tap((resp: any) => {
+        this.showSnackBarError(resp);
+        return resp;
+      })
+    );
+  }
+
+    /**
+   * Shows an error snackbar
+   * @param response
+   */
+  showSnackBarError(response){
+    if (response.errors){
+
+      if (Array.isArray(response.errors)) {
+        response.errors.forEach(error => {
+          if (Array.isArray(error)) {
+            error.forEach(errorDetail => {
+              this.showMessageSnackbar('ERRORS.' + errorDetail.message.code);
+            });
+          }else{
+            response.errors.forEach(err => {
+              this.showMessageSnackbar('ERRORS.' + err.message.code);
+            });
+          }
+        });
+      }
+    }
+  }
+
+    /**
+   * Shows a message snackbar on the bottom of the page
+   * @param messageKey Key of the message to i18n
+   * @param detailMessageKey Key of the detail message to i18n
+   */
+  showMessageSnackbar(messageKey, detailMessageKey?){
+    let translationData = [];
+    if (messageKey){
+      translationData.push(messageKey);
+    }
+
+    if (detailMessageKey){
+      translationData.push(detailMessageKey);
+    }
+
+    this.translate.get(translationData)
+    .subscribe(data => {
+      this.snackBar.open(
+        messageKey ? data[messageKey]: '',
+        detailMessageKey ? data[detailMessageKey]: '',
+        {
+          duration: 2000
+        }
+      );
+    });
+  }
+
+
+  ngOnDestroy() {
+    if (this.subscriptions) {
+      this.subscriptions.forEach(sub => {
+        sub.unsubscribe();
+      });
+    }
   }
 
 }

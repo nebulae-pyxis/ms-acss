@@ -22,7 +22,7 @@ class ClearingDA {
   }
 
   /**
-   * gets all the clearing of a business
+   * gets all the clearings of a business
    *
    * @param {int} page Indicates the page number which will be returned
    * @param {int} count Indicates the amount of rows that will be returned
@@ -90,19 +90,6 @@ class ClearingDA {
         console.log('-------------------> ', clearing);
         clearing.partialSettlement = clearing.partialSettlement || {};
         clearing.open = open;
-        // const clearingData = {
-        //   _id: clearing.id,
-        //   timestamp: clearing.timestamp,
-        //   lastUpdateTimestamp: clearing.lastUpdateTimestamp,
-        //   businessId: clearing.businessId,
-        //   input: [],
-        //   output: [],
-        //   partialSettlement: {
-        //     input: [],
-        //     output: []
-        //   },
-        //   open: open
-        // };
 
         clearing.input = this.transformMovements(clearing.input);
         clearing.output = this.transformMovements(clearing.output);

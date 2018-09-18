@@ -16,7 +16,7 @@ export const locale = {
       CLOSE: 'CLOSE',
       GENERAL_INCOME_OUTCOME: 'General',
       PARTIAL_SETTLEMENT: 'Partial settlement',
-      CUMULATED_TRANSACTIONS: 'Cumulated transactions',
+      ACCUMULATED_TRANSACTIONS: 'Accumulated transactions',
       FROM: 'From',
       TO: 'To',
       PROJECTED_BALANCE: 'Projected balance',

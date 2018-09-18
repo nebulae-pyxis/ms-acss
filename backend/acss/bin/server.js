@@ -9,6 +9,7 @@ const eventStoreService = require('./services/event-store/EventStoreService')();
 const mongoDB = require('./data/MongoDB').singleton();
 const ClearingDA = require('./data/ClearingDA');
 const BusinessDA = require('./data/BusinessDA');
+const AccumulatedTransactionDA = require('./data/AccumulatedTransactionDA');
 const graphQlService = require('./services/gateway/GraphQlService')();
 const Rx = require('rxjs');
 
@@ -19,6 +20,7 @@ const start = () => {
         mongoDB.start$(),
         BusinessDA.start$(),
         ClearingDA.start$(),
+        AccumulatedTransactionDA.start$(),
         graphQlService.start$()
     ).subscribe(
         (evt) => {

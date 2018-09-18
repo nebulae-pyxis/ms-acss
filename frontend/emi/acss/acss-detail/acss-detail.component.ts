@@ -60,16 +60,18 @@ export class ACSSDetailComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.checkIfUserIsSystemAdmin();
     this.businessForm = this.createBusinessForm();
+    this.findClearing();
   }
 
   findClearing() {
-    this.activatedRouter.params
+    this.subscriptions.push(this.activatedRouter.params
       .pipe(
         mergeMap(params => this.aCSSDetailService.getClearingById$(params.id))
       )
       .subscribe(clearingData => {
-        this.selectedClearing = clearingData;
-      });
+        console.log('selectedClearing => ', clearingData);
+        this.selectedClearing = clearingData.data.getClearingById;
+      }));
   }
 
   /**

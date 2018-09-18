@@ -16,7 +16,7 @@ export const locale = {
       CLOSE: 'Cerrado',
       GENERAL_INCOME_OUTCOME: 'General',
       PARTIAL_SETTLEMENT: 'Liquidaciones parciales',
-      CUMULATED_TRANSACTIONS: 'Transacciones acumuladas',
+      ACCUMULATED_TRANSACTIONS: 'Transacciones acumuladas',
       FROM: 'Desde',
       TO: 'Hacia',
       PROJECTED_BALANCE: 'Saldo proyectado',

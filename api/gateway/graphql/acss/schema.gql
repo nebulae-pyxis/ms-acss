@@ -6,6 +6,49 @@ type Business {
   name: String
 }
 
+type Channel {
+  "Channel Id"
+  id: String
+  "Version software"
+  v: String
+  "Version configuration"
+  c: String
+}
+
+type Event {
+  "Event Id"
+  id: String!
+  "Event type"
+  type: String!
+  "Event user"
+  user: String!
+}
+
+"Accumulated transaction info"
+type AccumulatedTransaction {
+  "Accumulated transaction id"
+  _id: ID!
+  "From business"
+  fromBu: String!
+  fromBusinessName: String
+  "To business"
+  toBu: String!
+  toBusinessName: String
+  "Timestamp"
+  timestamp: BigInt
+  "Ids of the involved transactions"
+  transactionIds: [GroupedTransactions]!
+  "Amount"
+  amount: BigInt!
+}
+
+type GroupedTransactions {
+  "Transaction type"
+  type: String!
+  "Transactions ids"
+  ids: [String]
+}
+
 "Clearing info"
 type Clearing {
   "Clearing id"
@@ -51,6 +94,8 @@ type Query {
   getAllClearingsFromBusiness(page: Int!, count: Int!, businessId: String): [Clearing]
   "Gets the clearing with the indicated ID"
   getClearingById(id: ID!): Clearing
+  "Gets the accumulated transactions by ids"
+  getAccumulatedTransactionsByIds(page: Int!, count: Int!, ids: [ID!]): [AccumulatedTransaction]
 }
 
 type Subscription {

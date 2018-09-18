@@ -2,7 +2,6 @@
 
 const Rx = require("rxjs");
 const MongoClient = require("mongodb").MongoClient;
-const CollectionName = "Business";
 let instance = null;
 
 class MongoDB {
@@ -142,13 +141,28 @@ class MongoDB {
     });
   }
 
+
+  /**
+   * Ensure collection creation
+   */
+  createCollections$() {
+    return Rx.Observable.concat(
+      MongoDB.createCollection$('AccumulatedTransactions'),
+      MongoDB.createCollection$('Transactions'),
+      MongoDB.createCollection$('TransactionsCursor'),
+      MongoDB.createCollection$('Clearing'),
+      MongoDB.createCollection$('ClosedClearing'),
+      MongoDB.createCollection$('Business'),
+    );
+  }
+
   /**
    * Ensure collection creation
    */
   createCollection$(collectionName) {
     return Rx.Observable.create(async observer => {
       await this.db.createCollection(collectionName);
-      observer.next("collection created");
+      observer.next(`collection ${this.dbName}.${collectionName} created`);
       observer.complete();
     });
   }

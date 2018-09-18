@@ -12,7 +12,8 @@ const start = () => {
         // initializing needed resources
         mongoDB.start$(),
         // executing maintenance tasks
-        mongoDB.createIndexes$(),
+        mongoDB.createCollections$(),
+        mongoDB.createIndexes$(),        
         // stoping resources
         mongoDB.stop$(),
     ).subscribe(

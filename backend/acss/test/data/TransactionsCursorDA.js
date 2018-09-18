@@ -174,6 +174,17 @@ describe('TransactionsDA', function () {
     */
 
     describe('de-prepare test DB', function () {
+        it('delete mongoDB', function (done) {
+            mongo.dropDB$()
+                .subscribe(
+                    (evt) => console.log(`${evt}`),
+                    (error) => {
+                        console.error(`Mongo DropDB failed: ${error}`);
+                        return done(error);
+                    },
+                    () => { return done(); }
+                );
+        });
         it('stop mongo', function (done) {
             mongo.stop$()
                 .subscribe(

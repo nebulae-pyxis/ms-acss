@@ -26,9 +26,7 @@ import { locale as spanish } from "./i18n/es";
 import {
   MatPaginator,
   MatSort,
-  Sort,
   MatTableDataSource,
-  MatDialog,
   MatSnackBar
 } from "@angular/material";
 import { fuseAnimations } from '../../../core/animations';
@@ -37,8 +35,6 @@ import { fuseAnimations } from '../../../core/animations';
 // tslint:disable-next-line:import-blacklist
 import * as Rx from "rxjs/Rx";
 import { map, mergeMap, toArray, filter, tap } from "rxjs/operators";
-import { Subscription } from 'rxjs/Subscription';
-import { Observable } from 'rxjs/Observable';
 
 @Component({
   // tslint:disable-next-line:component-selector
@@ -88,8 +84,6 @@ export class ACSSComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.checkIfUserIsSystemAdmin();
-    // this.createBusinessObservable();
-    // this.createDummy();
   }
 
   /**
@@ -109,11 +103,6 @@ export class ACSSComponent implements OnInit, OnDestroy {
       }));
   }
 
-  createDummy(){
-    this.dataSource.data = [
-      {_id: 1, timestamp: 1536705058916, lastUpdateTimestamp: 1536705058916, state: 'CLOSE', projectedBalance: 200.000}
-    ];
-  }
 
   /**
    * Checks if the user is system admin
@@ -174,6 +163,30 @@ export class ACSSComponent implements OnInit, OnDestroy {
    */
   selectClearingRow(clearing){
     this.selectedClearing = clearing;
+  }
+
+    /**
+   * Calculates the projected balance according to the clearing info
+   * @param clearing Clearing info
+   */
+  calculateProjectedBalance(clearing){
+    const inputs = clearing.input.reduce((inputA,inputB) => {
+      return inputA.amount || 0 + inputB.amount || 0;
+    }, 0);
+
+    const outputs = clearing.output.reduce((outputA,outputB) => {
+      return outputA.amount || 0 + outputB.amount || 0;
+    }, 0);
+
+    const partialSettlementOutputs = clearing.partialSettlement.input.reduce((outputA,outputB) => {
+      return outputA.amount + outputB.amount;
+    }, 0);
+
+    const partialSettlementInputs = clearing.partialSettlement.input.reduce((inputA,inputB) => {
+      return inputA.amount + inputB.amount;
+    }, 0);
+
+    return (inputs + partialSettlementInputs) - (outputs + partialSettlementOutputs);
   }
 
 

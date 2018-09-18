@@ -68,15 +68,52 @@ type Clearing {
 
 "Money movement"
 type Movement {
+  "Business ID involved in the movement"
   businessId: String!
+  "Business name involved in the movement"
   businessName: String
+  "Movement amount"
   amount: Int!
+}
+
+"Money movement"
+type SettlementMovement {
+  "Business ID involved in the movement"
+  businessId: String!
+  "Business name involved in the movement"
+  businessName: String
+  "Movement amount"
+  amount: Int!
+  "Settlement ID"
+  settlementId: String!
 }
 
 "Partial settlement"
 type PartialSettlement {
-  input: [Movement]
-  output: [Movement]
+  input: [SettlementMovement]
+  output: [SettlementMovement]
+}
+
+"Transaction info"
+type Transaction {
+  "Transaction id"
+  _id: ID!
+  "Transaction amount"
+  amount: BigInt!
+  "From business"
+  fromBu: String!
+  fromBusinessName: String
+  "To business"
+  toBu: String!
+  toBusinessName: String
+  "Timestamp"
+  timestamp: BigInt
+  "Transaction type"
+  type: String!
+  "Channel"
+  channel: Channel!
+  "Event"
+  evt: Event!
 }
 
 "Hello world sample, please remove"
@@ -96,6 +133,8 @@ type Query {
   getClearingById(id: ID!): Clearing
   "Gets the accumulated transactions by ids"
   getAccumulatedTransactionsByIds(page: Int!, count: Int!, ids: [ID!]): [AccumulatedTransaction]
+  "Gets transactions by ids"
+  getTransactionsByIds(page: Int!, count: Int!, filterType: String, ids: [ID!]): [Transaction]
 }
 
 type Subscription {

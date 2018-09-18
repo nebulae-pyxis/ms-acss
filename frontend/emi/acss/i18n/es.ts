@@ -20,9 +20,13 @@ export const locale = {
       FROM: 'Desde',
       TO: 'Hacia',
       PROJECTED_BALANCE: 'Saldo proyectado',
-      TIMESTAMP: 'Fecha creación',
       LAST_UPDATE_TIMESTAMP: 'última actualización',
-      CLEARING_LIST: 'Compensaciones'
+      CLEARING_LIST: 'Compensaciones',
+      TYPE: 'Tipo',
+      AMOUNT: 'Valor',
+      TIMESTAMP: 'Fecha',
+      TRANSACTIONS: 'Transacciones',
+      ACCUMULATED_TRANSACTION_DETAIL: 'Detalle de transacciones acumuladas'
     },
     ERRORS: {
       17001: 'Error interno de servidor',

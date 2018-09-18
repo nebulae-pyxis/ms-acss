@@ -94,6 +94,31 @@ export const getAccumulatedTransactionsByIds = gql`
   }
 `;
 
+export const getTransactionsByIds = gql`
+  query getTransactionsByIds($page: Int!, $count: Int!, $filterType: String, $ids: [ID!]){
+    getTransactionsByIds(page: $page, count: $count, filterType: $filterType, ids: $ids){
+      _id
+      amount
+      fromBu
+      fromBusinessName
+      toBu
+      toBusinessName
+      timestamp
+      type
+      channel{
+        id
+        v
+        c
+      }
+      evt{
+        id
+        type
+        user
+      }
+    }
+  }
+`;
+
 
 //Hello world sample, please remove
 export const ACSSHelloWorldSubscription = gql`

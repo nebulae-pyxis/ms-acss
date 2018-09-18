@@ -3,6 +3,7 @@
 const Rx = require("rxjs");
 const ClearingDA = require("../data/ClearingDA");
 const AccumulatedTransactionDA = require("../data/AccumulatedTransactionDA");
+const TransactionDA = require("../data/TransactionsDA");
 const broker = require("../tools/broker/BrokerFactory")();
 const eventSourcing = require("../tools/EventSourcing")();
 const RoleValidator = require("../tools/RoleValidator");
@@ -82,7 +83,6 @@ class Clearing {
    * @param args.ids Ids of the accumulated transactions
    */
   getAccumulatedTransactionsByIds$({ args }, authToken) {
-    console.log('getAccumulatedTransactionsByIds backend');
     return RoleValidator.checkPermissions$(
       authToken.realm_access.roles,
       "ACSS",
@@ -93,6 +93,31 @@ class Clearing {
     )
       .mergeMap(role => {
         return AccumulatedTransactionDA.getAccumulatedTransactionsByIds$(args.page, args.count, args.ids)
+      })
+      .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
+      .catch(err => {
+        return this.handleError$(err);
+      });
+  }
+
+  /**
+   * Gets the transactions by ids
+   *
+   * @param args args
+   * @param args.ids Ids of the transactions
+   */
+  getTransactionsByIds$({ args }, authToken) {
+    console.log('getTransactionsByIds backend');
+    return RoleValidator.checkPermissions$(
+      authToken.realm_access.roles,
+      "ACSS",
+      "getTransactionsByIds$()",
+      PERMISSION_DENIED_ERROR_CODE.code,
+      PERMISSION_DENIED_ERROR_CODE.description,
+      ["system-admin", "business-owner"]
+    )
+      .mergeMap(role => {
+        return TransactionDA.getTransactionsByIds$(args.page, args.count, args.ids)
       })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
       .catch(err => {

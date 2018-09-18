@@ -21,6 +21,10 @@ const routes: Routes = [
   {
     path: 'acss-detail/:id',
     component: ACSSDetailComponent,
+  },
+  {
+    path: 'acss-detail/:id/accumulated-transaction-detail/:accumulatedTransactionId',
+    component: TransactionsComponent,
   }
 ];
 

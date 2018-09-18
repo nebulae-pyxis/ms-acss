@@ -7,9 +7,92 @@
   <!-- CENTER -->
   <div class="center">
 
+    <!-- HEADER -->
+    <div class="header white-fg" fxLayout="row" fxLayoutAlign="space-between center">
+
+        <!-- APP TITLE -->
+        <div fxLayout="row" fxLayoutAlign="start center">
+  
+          <button class="mr-0 mr-sm-16" mat-icon-button [routerLink]="'../../'">
+            <mat-icon>arrow_back</mat-icon>
+          </button>
+  
+          <div fxLayout="column" fxLayoutAlign="start start" *fuseIfOnDom>
+  
+            <div class="h2">
+              {{'ACSS.TRANSACTIONS' | translate}}
+            </div>
+  
+            <div class="subtitle secondary-text">
+              <span>{{'ACSS.ACCUMULATED_TRANSACTION_DETAIL' | translate}}</span>
+            </div>
+          </div>
+        </div>
+        <!-- / APP TITLE -->
+      </div>
+      <!-- / HEADER -->
+
     <!-- CONTENT CARD -->
 
+    
+    <div class="content-card mat-white-bg">
 
+      <div fxLayout="column" style="width: 100%; justify-content: space-between" fxLayout.gt-sm="row">
+        <div fxLayout="column" fxFlex="100" fxFlex.gt-sm="100" fxFlex.gt-md="100">
+          <mat-table id="transactions-table" class="item-table" #table [dataSource]="dataSource">
+
+            <!-- Timestamp Column -->
+            <ng-container cdkColumnDef="timestamp">
+              <mat-header-cell *cdkHeaderCellDef>{{'ACSS.TIMESTAMP' | translate}}</mat-header-cell>
+              <mat-cell *cdkCellDef="let transaction">
+                <p class="text-truncate">{{transaction.timestamp | date: 'd/MM/y HH:mm'}}</p>
+              </mat-cell>
+            </ng-container>
+
+            <!-- From Column -->
+            <ng-container cdkColumnDef="from">
+              <mat-header-cell *cdkHeaderCellDef>{{'ACSS.FROM' | translate}}</mat-header-cell>
+              <mat-cell *cdkCellDef="let transaction">
+                <p class="text-truncate">{{transaction.fromBusinessName}}</p>
+              </mat-cell>
+            </ng-container>
+
+            <!-- To Column -->
+            <ng-container cdkColumnDef="to">
+              <mat-header-cell *cdkHeaderCellDef>{{'ACSS.TO' | translate}}</mat-header-cell>
+              <mat-cell *cdkCellDef="let transaction">
+                <p class="text-truncate">{{transaction.toBusinessName}}</p>
+              </mat-cell>
+            </ng-container>
+
+            <!-- Type Column -->
+            <ng-container cdkColumnDef="type">
+              <mat-header-cell *cdkHeaderCellDef>{{'ACSS.TYPE' | translate}}</mat-header-cell>
+              <mat-cell *cdkCellDef="let transaction">
+                <p class="text-truncate">{{transaction.type}}</p>
+              </mat-cell>
+            </ng-container>
+
+            <!-- Amount Column -->
+            <ng-container cdkColumnDef="amount">
+              <mat-header-cell *cdkHeaderCellDef>{{'ACSS.AMOUNT' | translate}}</mat-header-cell>
+              <mat-cell *cdkCellDef="let transaction">
+                <p class="text-truncate">{{transaction.amount | currency}}</p>
+              </mat-cell>
+            </ng-container>
+
+            <mat-header-row *cdkHeaderRowDef="displayedColumns"></mat-header-row>
+
+            <mat-row *cdkRowDef="let transaction; columns: displayedColumns;" class="product" [ngClass]="{'highlight': selectedtransaction && selectedtransaction._id == selectedtransaction._id}">
+            </mat-row>
+
+          </mat-table>
+
+          <mat-paginator #paginator [length]="tableSize" [pageIndex]="0" [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]">
+          </mat-paginator>
+        </div>
+      </div>
+    </div>
 
     <!-- / CONTENT CARD -->
   </div>

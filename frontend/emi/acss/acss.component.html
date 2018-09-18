@@ -75,7 +75,7 @@
 
       <div fxLayout="column" style="width: 100%; justify-content: space-between" fxLayout.gt-sm="row">
         <div fxLayout="column" fxFlex="100" fxFlex.gt-sm="100" fxFlex.gt-md="100">
-          <mat-table id="user-table" class="item-table" #table [dataSource]="dataSource">
+          <mat-table id="item-table" class="item-table" #table [dataSource]="dataSource">
 
             <!-- Timestamp Column -->
             <ng-container cdkColumnDef="timestamp">
@@ -106,13 +106,13 @@
             <ng-container cdkColumnDef="projected_balance">
               <mat-header-cell *cdkHeaderCellDef>{{'ACSS.PROJECTED_BALANCE' | translate}}</mat-header-cell>
               <mat-cell *cdkCellDef="let clearing">
-                <p class="text-truncate">{{clearing.projected_balance}}</p>
+                <p class="text-truncate">{{calculateProjectedBalance(clearing) | currency}}</p>
               </mat-cell>
             </ng-container>
 
             <mat-header-row *cdkHeaderRowDef="displayedColumns"></mat-header-row>
 
-            <mat-row *cdkRowDef="let clearing; columns: displayedColumns;" class="product"
+            <mat-row *cdkRowDef="let clearing; columns: displayedColumns;"
               (click)="selectClearingRow(clearing)"
               [ngClass]="{'highlight': selectedClearing && selectedClearing._id == selectedClearing._id}"
               matRipple [routerLink]="'acss-detail/'+clearing._id">

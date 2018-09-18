@@ -153,6 +153,7 @@ export class ClearingComponent implements OnInit, OnDestroy {
   selectAccumulatedTransactionRow(accumulatedTransaction){
     this.selectedaccumulatedTransaction = accumulatedTransaction;
     console.log('selectedcumulatedTransactions1 => ', this.selectedaccumulatedTransaction);
+    
   }
 
   /**
@@ -163,8 +164,28 @@ export class ClearingComponent implements OnInit, OnDestroy {
     return new Date(millis);
   }
 
-  calculateBalance(accumulatedTx){
-    accumulatedTx.input
+  /**
+   * Calculates the projected balance according to the clearing info
+   * @param clearing Clearing info
+   */
+  calculateProjectedBalance(clearing){
+    const inputs = clearing.input.reduce((inputA,inputB) => {
+      return inputA.amount || 0 + inputB.amount || 0;
+    }, 0);
+
+    const outputs = clearing.output.reduce((outputA,outputB) => {
+      return outputA.amount || 0 + outputB.amount || 0;
+    }, 0);
+
+    const partialSettlementOutputs = clearing.partialSettlement.input.reduce((outputA,outputB) => {
+      return outputA.amount + outputB.amount;
+    }, 0);
+
+    const partialSettlementInputs = clearing.partialSettlement.input.reduce((inputA,inputB) => {
+      return inputA.amount + inputB.amount;
+    }, 0);
+
+    return (inputs + partialSettlementInputs) - (outputs + partialSettlementOutputs);
   }
 
      /**

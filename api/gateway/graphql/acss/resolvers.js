@@ -154,6 +154,26 @@ module.exports = {
               .mergeMap(response => getResponseFromBackEnd$(response))
               .toPromise();
         },
+        getTransactionsByIds(root, args, context) {
+            return RoleValidator.checkPermissions$(
+              context.authToken.realm_access.roles,
+              contextName,
+              "getTransactionsByIds",
+              PERMISSION_DENIED_ERROR_CODE,
+              "Permission denied",
+              ["system-admin", "business-owner"]
+            ).mergeMap(response => {
+                return broker.forwardAndGetReply$(
+                  "Clearing",
+                  "gateway.graphql.query.getTransactionsByIds",
+                  { root, args, jwt: context.encodedToken },
+                  2000
+                );
+              })
+              .catch(err => handleError$(err, "getTransactionsByIds"))
+              .mergeMap(response => getResponseFromBackEnd$(response))
+              .toPromise();
+        },
     },
 
     //// MUTATIONS ///////

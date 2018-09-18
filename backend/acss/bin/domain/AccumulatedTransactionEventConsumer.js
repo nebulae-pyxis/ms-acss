@@ -52,13 +52,14 @@ class TransactionAccumulatedEventConsumer {
           collection: "Clearing",
           operation: "updateOne",
           operationArgs: [
-            { businessId: businessId },
+            { businessId: businessId, open: true },
             {
               $set: { lastUpdateTimestamp: timestamp },
               $push: { accumulatedTransactions: accumulatedTx._id },
               $setOnInsert: {
                 timestamp: timestamp,
-                businessId: businessId
+                businessId: businessId,
+                open: true
               }
             },
             { $upsert: true }

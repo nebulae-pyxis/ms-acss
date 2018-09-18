@@ -1,1 +1,32 @@
-@import "src/app/core/scss/fuse";
+@import 'src/app/core/scss/fuse';
+
+:host {
+  .mat-header-cell {
+    color: #444444;
+    font-size: 15px;
+  }
+
+  .mat-header-row {
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 9999;
+  }
+
+  .item-table {
+    flex: 1 1 auto;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    overflow: auto;
+
+    .mat-header-row {
+        min-height: 64px;
+    }
+
+    .mat-row {
+      position: relative;
+      cursor: pointer;
+      height: 52px;
+      padding: 0 12px !important;
+    }
+  }
+}

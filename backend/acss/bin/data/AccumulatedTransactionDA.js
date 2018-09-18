@@ -50,13 +50,11 @@ class AccumulatedTransactionDA {
   }
 
   /**
-   * gets all the business registered on the system.
+   * gets all the accumulated transactions by its id
    *
    * @param {int} page Indicates the page number which will be returned
    * @param {int} count Indicates the amount of rows that will be returned
-   * @param {filter} filter filter to apply to the query.
-   * @param {sortColumn} sortColumn Indicates what column will be used to sort the data
-   * @param {order} order Indicates if the info will be asc or desc
+   * @param {[String]]} ids accumulated transaction ids to query.
    */
   static getAccumulatedTransactionsByIds$(page, count, ids) {
     const collection = mongoDB.db.collection(CollectionName);

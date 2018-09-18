@@ -4,6 +4,8 @@ let mongoDB = undefined;
 const Rx = require("rxjs");
 const CollectionName = "Transactions";
 const MongoDB = require('./MongoDB').MongoDB;
+const ObjectID = require('mongodb').ObjectID;
+const BusinessDA = require("./BusinessDA");
 const { CustomError } = require("../tools/customError");
 
 class TransactionsDA {
@@ -50,6 +52,45 @@ class TransactionsDA {
     return Rx.Observable.defer(() => collection.insertMany(transactions))
     .pluck('ops')
     .map(ops => ops.map(o=>o._id));
+  }
+
+    /**
+   * gets all the transactions by its id
+   *
+   * @param {int} page Indicates the page number which will be returned
+   * @param {int} count Indicates the amount of rows that will be returned
+   * @param {[String]]} ids transaction ids to query.
+   */
+  static getTransactionsByIds$(page, count, ids) {
+    console.log('getTransactionsByIds )=> ', ids);
+    const collection = mongoDB.db.collection(CollectionName);
+    return Rx.Observable.defer(() =>
+      collection
+        .find({ _id: { $in: ids.map(id => new ObjectID.createFromHexString(id) ) } })
+        .sort({ timestamp: -1 })
+        .skip(count * page)
+        .limit(count)
+        .toArray()
+    )
+      .mergeMap(transactions => {
+        const buNamesMap$ = Rx.Observable.from(transactions)
+          .mergeMap(tx => Rx.Observable.from([tx.fromBu, tx.toBu]))
+          .distinct()
+          .mergeMap(buId => BusinessDA.getBusinessByIds$([buId]).map(business => { return { id: business._id, name: business.name } }))
+          .reduce((acc, val) => {
+            acc[val.id] = val.name;
+            return acc;
+          }, {});
+
+        return Rx.Observable.combineLatest(
+          buNamesMap$,
+          Rx.Observable.from(transactions)
+        )
+          .map(([cache, tx]) => {
+            return { ...tx, fromBusinessName: cache[tx.fromBu], toBusinessName: cache[tx.toBu] };
+          })
+      })
+      .toArray();
   }
 
 

@@ -89,6 +89,7 @@ class EventStoreService {
   */
   syncState$() {
     return Rx.Observable.from(this.aggregateEventsArray)
+      .filter(aev => aev.aggregateType !== "Cronjob")
       .concatMap(params => this.subscribeEventRetrieval$(params))
   }
 

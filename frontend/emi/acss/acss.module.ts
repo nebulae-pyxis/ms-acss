@@ -10,6 +10,8 @@ import { ClearingComponent } from './clearing/clearing.component';
 import { SettlementComponent } from './settlement/settlement.component';
 import { ACSSDetailComponent } from './acss-detail/acss-detail.component';
 import { ACSSDetailService } from './acss-detail/acss-detail.service';
+import { ClearingService } from './clearing/clearing.service';
+import { TransactionsComponent } from './transactions/transactions.component';
 
 const routes: Routes = [
   {
@@ -32,9 +34,10 @@ const routes: Routes = [
     ACSSComponent,
     ACSSDetailComponent,
     ClearingComponent,
-    SettlementComponent
+    SettlementComponent,
+    TransactionsComponent
   ],
-  providers: [ ACSSService, ACSSDetailService, DatePipe]
+  providers: [ ACSSService, ACSSDetailService, ClearingService, DatePipe]
 })
 
 export class ACSSModule {}

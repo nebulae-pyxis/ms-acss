@@ -6,8 +6,8 @@ export class Clearing {
   businessName: string;
   input: any;
   output: any;
-  cumulatedTransactions: number[];
+  accumulatedTransactionIds: number[];
   partialSettlement: any;
   open: boolean;
-  
+
 }

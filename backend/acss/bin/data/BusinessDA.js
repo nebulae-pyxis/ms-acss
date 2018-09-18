@@ -35,7 +35,6 @@ class BusinessDA {
    * @param {String[]} ids Ids of the business to recover.
    */
   static getBusinessByIds$(ids) {
-    console.log('businessIds => ', ids);
     return Rx.Observable.create(async observer => {
       const collection = mongoDB.db.collection(CollectionName);
     const cursor = collection.find({ '_id': {$in: ids} });

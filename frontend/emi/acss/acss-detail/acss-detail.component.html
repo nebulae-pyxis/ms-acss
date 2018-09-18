@@ -25,10 +25,6 @@
           <div class="subtitle" *ngIf="selectedBusiness">
             {{selectedBusiness.name}}
           </div>
-
-          <div class="subtitle secondary-text">
-            <span>{{'ACSS.ACSS_DETAIL' | translate}}</span>
-          </div>
         </div>
       </div>
       <!-- / APP TITLE -->
@@ -42,7 +38,7 @@
         <mat-tab-group>
 
             <mat-tab label="{{'ACSS.CLEARING' | translate}}">
-              <app-clearing></app-clearing>
+              <app-clearing *ngIf="selectedClearing" [clearing]="selectedClearing"></app-clearing>
             </mat-tab>
 
             <mat-tab label="{{'ACSS.SETTLEMENT' | translate}}">

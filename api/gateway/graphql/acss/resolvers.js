@@ -133,7 +133,27 @@ module.exports = {
               .catch(err => handleError$(err, "getClearingById"))
               .mergeMap(response => getResponseFromBackEnd$(response))
               .toPromise();
-        }
+        },
+        getAccumulatedTransactionsByIds(root, args, context) {
+            return RoleValidator.checkPermissions$(
+              context.authToken.realm_access.roles,
+              contextName,
+              "getAccumulatedTransactionsByIds",
+              PERMISSION_DENIED_ERROR_CODE,
+              "Permission denied",
+              ["system-admin", "business-owner"]
+            ).mergeMap(response => {
+                return broker.forwardAndGetReply$(
+                  "Clearing",
+                  "gateway.graphql.query.getAccumulatedTransactionsByIds",
+                  { root, args, jwt: context.encodedToken },
+                  2000
+                );
+              })
+              .catch(err => handleError$(err, "getAccumulatedTransactionsByIds"))
+              .mergeMap(response => getResponseFromBackEnd$(response))
+              .toPromise();
+        },
     },
 
     //// MUTATIONS ///////

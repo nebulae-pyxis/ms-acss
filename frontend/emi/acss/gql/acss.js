@@ -39,7 +39,6 @@ export const getAllClearingsFromBusiness = gql`
   }
 `;
 
-
 export const getClearingById = gql`
   query getClearingById($id: ID!){
     getClearingById(id: $id){
@@ -72,6 +71,25 @@ export const getClearingById = gql`
       }
       accumulatedTransactionIds
       open
+    }
+  }
+`;
+
+
+export const getAccumulatedTransactionsByIds = gql`
+  query getAccumulatedTransactionsByIds($page: Int!, $count: Int!, $ids: [ID!]){
+    getAccumulatedTransactionsByIds(page: $page, count: $count, ids: $ids){
+      _id
+      fromBu
+      fromBusinessName
+      toBu
+      toBusinessName
+      timestamp
+      transactionIds{
+        type
+        ids
+      }
+      amount
     }
   }
 `;

@@ -156,6 +156,10 @@ class GraphQlService {
       {
         aggregateType: "Clearing",
         messageType: "gateway.graphql.query.getClearingById"
+      },
+      {
+        aggregateType: "Clearing",
+        messageType: "gateway.graphql.query.getAccumulatedTransactionsByIds"
       }     
     ];
   }
@@ -180,7 +184,11 @@ class GraphQlService {
       'gateway.graphql.query.getClearingById': {
         fn: clearing.getClearingById$,
         obj: clearing
-      },     
+      },
+      'gateway.graphql.query.getAccumulatedTransactionsByIds': {
+        fn: clearing.getAccumulatedTransactionsByIds$,
+        obj: clearing
+      },
     };
   }
 }

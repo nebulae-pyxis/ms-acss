@@ -7,6 +7,7 @@ const CollectionName = "AccumulatedTransactions";
 const { CustomError } = require("../tools/customError");
 
 class AccumulatedTransactionDA {
+
   static start$(mongoDbInstance) {
     return Rx.Observable.create(observer => {
       if (mongoDbInstance) {
@@ -18,6 +19,23 @@ class AccumulatedTransactionDA {
       }
       observer.complete();
     });
+  }
+
+
+  /**
+   * takes an array of accumulated transactions and creates a single insert statement
+   * @param {Array} accumulatedTransactions 
+   * @returns {Rx.Observable} insert statement
+   */
+  static generateAccumulatedTransactionsStatement$(accumulatedTransactions) {
+    return Rx.Observable.of(accumulatedTransactions)
+      .map(ats => {
+        return {
+          collection: CollectionName,
+          operation: "insertMany",
+          operationArgs: [ats]
+        };
+      });
   }
 
   /**
@@ -53,23 +71,23 @@ class AccumulatedTransactionDA {
       .mergeMap(accumulatedTransactions => {
 
         const buNamesMap$ = Rx.Observable.from(accumulatedTransactions)
-               .mergeMap( at => Rx.Observable.from([at.fromBu,at.toBu]))
-               .distinct()
-               .mergeMap(buId => BusinessDA.getBusinessByIds$([buId]).map(business => {return {id: business._id, name: business.name}}))
-               .reduce( (acc,val) => {
-                  acc[val.id] = val.name;
-                  return acc;
-                }, {});
+          .mergeMap(at => Rx.Observable.from([at.fromBu, at.toBu]))
+          .distinct()
+          .mergeMap(buId => BusinessDA.getBusinessByIds$([buId]).map(business => { return { id: business._id, name: business.name } }))
+          .reduce((acc, val) => {
+            acc[val.id] = val.name;
+            return acc;
+          }, {});
 
         return Rx.Observable.combineLatest(
           buNamesMap$,
           Rx.Observable.from(accumulatedTransactions)
         )
-        .map( ([cache,at])  => {
-          const txIds = Object.keys(at.transactionIds).map(key => ({ type: key, ids: at.transactionIds[key] }));
-          at.transactionIds = txIds;
-          return {...at, fromBusinessName: cache[at.fromBu], toBusinessName: cache[at.toBu]};
-        })
+          .map(([cache, at]) => {
+            const txIds = Object.keys(at.transactionIds).map(key => ({ type: key, ids: at.transactionIds[key] }));
+            at.transactionIds = txIds;
+            return { ...at, fromBusinessName: cache[at.fromBu], toBusinessName: cache[at.toBu] };
+          })
       })
       .toArray();
   }

@@ -3,6 +3,8 @@ const broker = require('../tools/broker/BrokerFactory')();
 const MATERIALIZED_VIEW_TOPIC = "materialized-view-updates";
 const TransactionsCursorDA = require('../data/TransactionsCursorDA');
 const TransactionsDA = require('../data/TransactionsDA');
+const AccumulatedTransactionDA = require('../data/AccumulatedTransactionDA');
+const mongoDB = require('../data/MongoDB').singleton();
 
 let instance;
 
@@ -17,16 +19,19 @@ class ClearingJobTriggeredEventHandler {
      * @param {ClearingJobTriggeredEvent} clearingJobTriggeredEvent 
      */
     handleClearingJobTriggeredEvent$(clearingJobTriggeredEvent) {
-        // return TransactionsCursorDA.getCursor$()
-        //     .map(cursor => TransactionsDA.getTransactions$(cursor, Date.now() - 5000))
-        //     .mergeMap(transactions$ => this.accumulateTransactions$(transactions$))
-        //     .map(at => TransactionsDA.createInsert)
-        //     .toArray()
-        //     .map(ats => {
-        //         return {
-
-        //         };
-        //     })
+        const cursorLimitTimestamp = Date.now() - 5000;
+        return TransactionsCursorDA.getCursor$()
+            .map(cursor => TransactionsDA.getTransactions$(cursor, cursorLimitTimestamp))
+            .mergeMap(transactions$ => this.accumulateTransactions$(transactions$))
+            .mergeMap(accumulatedTransactions => {
+                const newCursor = { ...cursor };
+                newCursor.timestamp = cursorLimitTimestamp;
+                return Rx.Observable.forkJoin(
+                    AccumulatedTransactionDA.generateAccumulatedTransactionsStatement$(accumulatedTransactions),
+                    TransactionsCursorDA.generateSetCursorStatement$(newCursor)
+                );
+            }).mergeMap( statements =>  mongoDB.applyAll$(statements))
+            .map(([txs, txResult]) => `Clearing job trigger handling: ok:${txResult.ok}`);
     }
 
     /**
@@ -55,7 +60,7 @@ class ClearingJobTriggeredEventHandler {
                         toBu: group$.key.split('-')[1],
                         amount: 0,
                         timestamp: Date.now(),
-                        transactionIds: {}
+                        transactionIds: {},
                     })
             ).map(at => {
                 if (at.amount < 0) {

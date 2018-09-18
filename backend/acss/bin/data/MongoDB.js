@@ -67,9 +67,9 @@ class MongoDB {
       Rx.Observable.defer(() => Rx.Observable.of(this.client.startSession()))
         //Starts Mongo transaction
         .mergeMap(session => {
-          session.startTransaction(); 
+          session.startTransaction();
           return Rx.Observable.of(session);
-        }) 
+        })
         .mergeMap(session => {
           return (
             Rx.Observable.of(session)
@@ -85,19 +85,21 @@ class MongoDB {
                           : { ...data.operationOps, session };
                       return this.db
                         .collection(data.collection)
-                        [data.operation](
-                          ...data.operationArgs,
-                          data.operationOps
-                        );
+                      [data.operation](
+                        ...data.operationArgs,
+                        data.operationOps
+                      );
                     })
                     .toArray()
                 );
               })
               //Commits Mongo transaction
-              .mergeMap(txs => session.commitTransaction())
-              //Ends Mongo session
-              .mergeMap(txResult =>
-                Rx.Observable.bindNodeCallback(session.endSession)
+              .mergeMap(
+                txs => Rx.Observable.defer(() => session.commitTransaction())
+                  .mergeMap(txResult =>
+                    //Ends Mongo session
+                    Rx.Observable.bindCallback(session.endSession.bind(session))().mapTo([txs, txResult])
+                  )
               )
               //If an error ocurred, the transaction is aborted
               .catch(err => {
@@ -140,20 +142,31 @@ class MongoDB {
     });
   }
 
+  /**
+   * Ensure collection creation
+   */
+  createCollection$(collectionName) {
+    return Rx.Observable.create(async observer => {
+      await this.db.createCollection(collectionName);
+      observer.next("collection created");
+      observer.complete();
+    });
+  }
 
-    /**
-     * extracts every item in the mongo cursor, one by one
-     * @param {*} cursor 
-     */
-    static extractAllFromMongoCursor$(cursor) {
-      return Rx.Observable.create(async observer => {
-          let obj = await MongoDB.extractNextFromMongoCursor(cursor);
-          while (obj) {
-              observer.next(obj);
-              obj = await MongoDB.extractNextFromMongoCursor(cursor);
-          }
-          observer.complete();
-      });
+
+  /**
+   * extracts every item in the mongo cursor, one by one
+   * @param {*} cursor 
+   */
+  static extractAllFromMongoCursor$(cursor) {
+    return Rx.Observable.create(async observer => {
+      let obj = await MongoDB.extractNextFromMongoCursor(cursor);
+      while (obj) {
+        observer.next(obj);
+        obj = await MongoDB.extractNextFromMongoCursor(cursor);
+      }
+      observer.complete();
+    });
   }
 
   /**
@@ -161,12 +174,12 @@ class MongoDB {
    * @param {*} cursor 
    */
   static async extractNextFromMongoCursor(cursor) {
-      const hasNext = await cursor.hasNext();
-      if (hasNext) {
-          const obj = await cursor.next();
-          return obj;
-      }
-      return undefined;
+    const hasNext = await cursor.hasNext();
+    if (hasNext) {
+      const obj = await cursor.next();
+      return obj;
+    }
+    return undefined;
   }
 
 }

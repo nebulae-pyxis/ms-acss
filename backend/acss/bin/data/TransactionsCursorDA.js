@@ -28,9 +28,9 @@ class TransactionsCursorDA {
    */
   static getCursor$() {
     const collection = mongoDB.db.collection(CollectionName);
-    return Rx.Observable.defer(() => collection.findOne({_id:'current'}))
-    .do(x => console.log(JSON.stringify(x)))
-    ;
+    return Rx.Observable.defer(() => collection.findOne({ _id: 'current' }))
+      .do(x => console.log(JSON.stringify(x)))
+      ;
   }
 
   /**
@@ -57,6 +57,28 @@ class TransactionsCursorDA {
         };
       });
   }
+
+  /**
+   * generates the statement to update current cursor
+   * @param {*} cursor
+   * @returns {Rx.Observable} Rx.Observable resolves to statement
+   */
+  static generateSetCursorStatement$(cursor) {
+
+    return Rx.Observable.of(cursor)
+      .map(cursor => {
+        return {
+          collection: CollectionName,
+          operation: "updateOne",
+          operationArgs: [
+            { _id: 'current' },
+            { $set: { ...cursor } }            
+          ],
+          operationOps: { upsert: true },
+        };
+      });
+  }
+
 
 }
 

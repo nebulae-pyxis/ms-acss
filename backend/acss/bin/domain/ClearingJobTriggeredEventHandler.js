@@ -21,16 +21,18 @@ class ClearingJobTriggeredEventHandler {
     handleClearingJobTriggeredEvent$(clearingJobTriggeredEvent) {
         const cursorLimitTimestamp = Date.now() - 5000;
         return TransactionsCursorDA.getCursor$()
-            .map(cursor => TransactionsDA.getTransactions$(cursor, cursorLimitTimestamp))
-            .mergeMap(transactions$ => this.accumulateTransactions$(transactions$))
-            .mergeMap(accumulatedTransactions => {
+            .mergeMap(cursor =>
+                TransactionsDA.getTransactions$(cursor, cursorLimitTimestamp)
+                    .mergeMap(transactions$ => this.accumulateTransactions$(transactions$))
+                    .map(accumulatedTransactions => { return { accumulatedTransactions, cursor };})
+            ).mergeMap(({ accumulatedTransactions, cursor }) => {
                 const newCursor = { ...cursor };
                 newCursor.timestamp = cursorLimitTimestamp;
                 return Rx.Observable.forkJoin(
                     AccumulatedTransactionDA.generateAccumulatedTransactionsStatement$(accumulatedTransactions),
                     TransactionsCursorDA.generateSetCursorStatement$(newCursor)
                 );
-            }).mergeMap( statements =>  mongoDB.applyAll$(statements))
+            }).mergeMap(statements => mongoDB.applyAll$(statements))
             .map(([txs, txResult]) => `Clearing job trigger handling: ok:${txResult.ok}`);
     }
 

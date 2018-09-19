@@ -21,6 +21,15 @@ class ClearingDA {
     });
   }
 
+  static get openClearingCollectionName() {
+    return OpenClearingCollectionName;
+  }
+
+  static get closedClearingCollectionName() {
+    return ClosedClearingCollectionName;
+  }
+
+
   /**
    * gets all the clearings of a business
    *
@@ -83,7 +92,7 @@ class ClearingDA {
         .toArray();
     })
       .mergeMap(clearings => {
-        console.log('clearings ==> ',clearings ); 
+        console.log('clearings ==> ', clearings);
         return Rx.Observable.from(clearings);
       })
       .map(clearing => {
@@ -118,7 +127,7 @@ class ClearingDA {
    * Gets the clearing by ID
    * @param {*} clearingId ID of the clearing
    */
-  static getClearingByClearingId$(clearingId) {    
+  static getClearingByClearingId$(clearingId) {
     //Looks for the clearing on the open clearing collection
     return (
       Rx.Observable.defer(() => {
@@ -137,9 +146,9 @@ class ClearingDA {
           return collection.findOne({ _id: clearingId });
         })
         .mergeMap(clearing => {
-          if(!clearing){
+          if (!clearing) {
             return Rx.Observable.of(null);
-          }          
+          }
 
           return Rx.Observable.forkJoin(
             Rx.Observable.of(clearing),
@@ -164,18 +173,18 @@ class ClearingDA {
               //Get the businesses
               .mergeMap(businessIds => BusinessDA.getBusinessByIds$(businessIds).toArray())
           )
-          .map(([clearing, businessArray]) => {
-            const business = businessArray.find(business => business._id == clearing.businessId) || {};
-            clearing.businessName = business.name;
-            clearing.input = this.transformMovements(clearing.input, businessArray);
-            clearing.output = this.transformMovements(clearing.output, businessArray);
-            clearing.partialSettlement.input = this.transformMovements(clearing.partialSettlement.input, businessArray);
-            clearing.partialSettlement.output = this.transformMovements(clearing.partialSettlement.output, businessArray);
-            console.log('Clearing END =>> ', clearing);
-            return clearing;
-          });
+            .map(([clearing, businessArray]) => {
+              const business = businessArray.find(business => business._id == clearing.businessId) || {};
+              clearing.businessName = business.name;
+              clearing.input = this.transformMovements(clearing.input, businessArray);
+              clearing.output = this.transformMovements(clearing.output, businessArray);
+              clearing.partialSettlement.input = this.transformMovements(clearing.partialSettlement.input, businessArray);
+              clearing.partialSettlement.output = this.transformMovements(clearing.partialSettlement.output, businessArray);
+              console.log('Clearing END =>> ', clearing);
+              return clearing;
+            });
         })
-        
+
     );
   }
 
@@ -198,8 +207,8 @@ class ClearingDA {
    */
   static transformMovements(movements, businessArray = []) {
     const transformedMovements = [];
-    if (movements) {      
-      Object.keys(movements).forEach(businessId => {        
+    if (movements) {
+      Object.keys(movements).forEach(businessId => {
         const amount = movements[businessId].amount;
         const business = businessArray.find(business => business._id == businessId) || {};
         transformedMovements.push({ businessId, amount, businessName: business.name });
@@ -220,6 +229,31 @@ class ClearingDA {
     }
     return undefined;
   }
+
+
+  /**
+   * find and close (set open to false) a clearing
+   * @param string clearingId 
+   * @returns {Rx.Observable} of result {found, closed, clearing}
+   */
+  static closeClearing$(clearingId) {
+    return Rx.Observable.defer(
+      () => mongoDB.db.collection(OpenClearingCollectionName)
+        .findOneAndUpdate(
+          { _id: clearingId },
+          { $set: { open: false } },
+          { upsert: false, returnOriginal: false }
+        ))
+      //.do(x => console.log(`###########${Object.keys(x).map(key => `[${key}:${JSON.stringify(x[key])}]`).join('-')}`))
+      .map(result => {
+        return {
+          found: result.lastErrorObject.n > 0,
+          closed: result.value ? !result.value.open : false,
+          clearing: result.value,
+        };
+      })
+  }
+
 }
 
 /**

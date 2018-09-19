@@ -1,12 +1,10 @@
 // TEST LIBS
-const assert = require('assert');
 const Rx = require('rxjs');
 const uuidv4 = require('uuid/v4');
 const expect = require('chai').expect;
 
 //LIBS FOR TESTING
 const MongoDB = require('../../bin/data/MongoDB').MongoDB;
-const AccumulatedTransactionDA = require('../../bin/data/AccumulatedTransactionDA');
 
 //
 let mongo = undefined;
@@ -24,7 +22,7 @@ before run please start mongoDB:
 
 */
 
-describe('AccumulatedTransactionDA', function () {
+describe('MongoDB', function () {
 
     /*
     * PREAPARE
@@ -45,18 +43,7 @@ describe('AccumulatedTransactionDA', function () {
                     },
                     () => { return done(); }
                 );
-        }),
-            it('instance AccumulatedTransactionDA', function (done) {
-                AccumulatedTransactionDA.start$(mongo)
-                    .subscribe(
-                        (evt) => console.log(`AccumulatedTransactionDA Start: ${evt}`),
-                        (error) => {
-                            console.error(`AccumulatedTransactionDA Start failed: ${error}`);
-                            return done(error);
-                        },
-                        () => { return done(); }
-                    );
-            });
+        })
     });
 
 
@@ -64,26 +51,27 @@ describe('AccumulatedTransactionDA', function () {
     * TESTS
     */
 
-    describe('createAccumulatedTransactions$', function () {
-        let dummyData = [
-            { "fromBu": "B", "toBu": "A", "amount": 8900, "timestamp": 1537213573008, "transactionIds": { "AFCC_RELOADED": ["A_B_100", "A_B_1000", "B_A_10000"] } }
-        ];
-        it('insert one accumulated transactions', function (done) {
-            AccumulatedTransactionDA.generateAccumulatedTransactionsStatement$(dummyData)
-                .toArray()
-                .mergeMap(statements => mongo.createCollection$('AccumulatedTransactions').mapTo(statements))
-                .mergeMap(statements => mongo.applyAll$(statements))
-                //.do(statment => console.log(`Apply: ${JSON.stringify(statment, null, 1)}`))
-                .map(([txs, txResult]) => Object.values(txs[0].insertedIds))
-                .do(atIds => expect(atIds).to.have.length(dummyData.length))
-                .mergeMap(atIds => Rx.Observable.from(atIds))
-                .mergeMap(atId => AccumulatedTransactionDA.getAccumulatedTransaction$(atId))
-                .map(persistedAt => [persistedAt, dummyData.filter(at => at.fromBu == persistedAt.fromBu && at.timestamp == persistedAt.timestamp).pop()])
-                .do( ([persistedAt, dummyAt]) => {
-                    dummyAt._id = persistedAt._id;
-                    expect(persistedAt).to.be.deep.equals(dummyAt);
-                })
+    describe('moveDocumentToOtherCollectionsStatements$', function () {
+        it('move document', function (done) {
+            const fromCollectionName = "SOURCE";
+            const toCollectionName = "DEST";
+            const document = { a: 1, b: 2, c: 3, _id: uuidv4() };
+
+            Rx.Observable.forkJoin(
+                Rx.Observable.defer(() => mongo.db.collection(fromCollectionName).insertOne(document)),
+                mongo.createCollection$(toCollectionName)
+            )
+                .switchMapTo(mongo.moveDocumentToOtherCollectionsStatements$(fromCollectionName, toCollectionName, document._id))
+                .mergeMap(() =>
+                    Rx.Observable.forkJoin(
+                        Rx.Observable.defer(() => mongo.db.collection(fromCollectionName).findOne({ _id: document._id })),
+                        Rx.Observable.defer(() => mongo.db.collection(toCollectionName).findOne({ _id: document._id }))
+                    ))
                 .first()
+                .do(([originalDoc, newDoc]) => {
+                    expect(originalDoc).to.be.null;
+                    expect(newDoc).to.be.deep.equals(document);
+                })
                 .subscribe(
                     (evt) => { },
                     (error) => {
@@ -94,9 +82,7 @@ describe('AccumulatedTransactionDA', function () {
                         return done();
                     }
                 );
-
         });
-
     });
 
 

@@ -1,12 +1,11 @@
 // TEST LIBS
-const assert = require('assert');
 const Rx = require('rxjs');
 const uuidv4 = require('uuid/v4');
 const expect = require('chai').expect;
 
 //LIBS FOR TESTING
 const MongoDB = require('../../bin/data/MongoDB').MongoDB;
-const AccumulatedTransactionDA = require('../../bin/data/AccumulatedTransactionDA');
+const SettlementDA = require('../../bin/data/SettlementDA');
 
 //
 let mongo = undefined;
@@ -24,7 +23,7 @@ before run please start mongoDB:
 
 */
 
-describe('AccumulatedTransactionDA', function () {
+describe('SettlementDA', function () {
 
     /*
     * PREAPARE
@@ -46,12 +45,12 @@ describe('AccumulatedTransactionDA', function () {
                     () => { return done(); }
                 );
         }),
-            it('instance AccumulatedTransactionDA', function (done) {
-                AccumulatedTransactionDA.start$(mongo)
+            it('instance SettlementDA', function (done) {
+                SettlementDA.start$(mongo)
                     .subscribe(
-                        (evt) => console.log(`AccumulatedTransactionDA Start: ${evt}`),
+                        (evt) => console.log(`SettlementDA Start: ${evt}`),
                         (error) => {
-                            console.error(`AccumulatedTransactionDA Start failed: ${error}`);
+                            console.error(`SettlementDA Start failed: ${error}`);
                             return done(error);
                         },
                         () => { return done(); }
@@ -64,24 +63,28 @@ describe('AccumulatedTransactionDA', function () {
     * TESTS
     */
 
-    describe('createAccumulatedTransactions$', function () {
+    describe('generate and persists Settlements', function () {
         let dummyData = [
-            { "fromBu": "B", "toBu": "A", "amount": 8900, "timestamp": 1537213573008, "transactionIds": { "AFCC_RELOADED": ["A_B_100", "A_B_1000", "B_A_10000"] } }
+            {_id:uuidv4(), fromBu:'1', toBu:'a', amount:1},
+            {_id:uuidv4(), fromBu:'2', toBu:'b', amount:2},
+            {_id:uuidv4(), fromBu:'3', toBu:'c', amount:3},
+            {_id:uuidv4(), fromBu:'4', toBu:'d', amount:4},
+            {_id:uuidv4(), fromBu:'5', toBu:'e', amount:5},
         ];
-        it('insert one accumulated transactions', function (done) {
-            AccumulatedTransactionDA.generateAccumulatedTransactionsStatement$(dummyData)
+        it('insert multiple settlements', function (done) {
+            SettlementDA.generateSettlementInsertStatement$(dummyData)
                 .toArray()
-                .mergeMap(statements => mongo.createCollection$('AccumulatedTransactions').mapTo(statements))
+                .mergeMap(statements => mongo.createCollection$('Settlements').mapTo(statements))
                 .mergeMap(statements => mongo.applyAll$(statements))
                 //.do(statment => console.log(`Apply: ${JSON.stringify(statment, null, 1)}`))
                 .map(([txs, txResult]) => Object.values(txs[0].insertedIds))
-                .do(atIds => expect(atIds).to.have.length(dummyData.length))
-                .mergeMap(atIds => Rx.Observable.from(atIds))
-                .mergeMap(atId => AccumulatedTransactionDA.getAccumulatedTransaction$(atId))
-                .map(persistedAt => [persistedAt, dummyData.filter(at => at.fromBu == persistedAt.fromBu && at.timestamp == persistedAt.timestamp).pop()])
-                .do( ([persistedAt, dummyAt]) => {
-                    dummyAt._id = persistedAt._id;
-                    expect(persistedAt).to.be.deep.equals(dummyAt);
+                .do(settIds => expect(settIds).to.have.length(dummyData.length))
+                .mergeMap(settIds => Rx.Observable.from(settIds))
+                .mergeMap(settId => SettlementDA.getSettlement$(settId))
+                .map(persistedSettlement => [persistedSettlement, dummyData.filter(sett => sett.fromBu == persistedSettlement.fromBu && sett.amount == persistedSettlement.amount).pop()])
+                .do( ([persistedSettlement, dummySett]) => {
+                    dummySett._id = persistedSettlement._id;
+                    expect(persistedSettlement).to.be.deep.equals(dummySett);
                 })
                 .first()
                 .subscribe(

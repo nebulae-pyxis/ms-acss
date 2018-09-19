@@ -31,6 +31,60 @@ class MongoDB {
   }
 
   /**
+   * Stops DB connections
+   * Returns an Obserable that resolve to a string log
+   */
+  stop$() {
+    return Rx.Observable.create(observer => {
+      this.client.close();
+      observer.next("Mongo DB Client closed");
+      observer.complete();
+    });
+  }
+
+
+  /**
+   * Ensure Index creation
+   * Returns an Obserable that resolve to a string log
+   */
+  createIndexes$() {
+    return Rx.Observable.create(async observer => {
+      //observer.next('Creating index for DB_NAME.COLLECTION_NAME => ({ xxxx: 1 })  ');
+      //await this.db.collection('COLLECTION_NAME').createIndex( { xxxx: 1});
+
+      observer.next("All indexes created");
+      observer.complete();
+    });
+  }
+
+
+  /**
+   * Ensure collection creation
+   */
+  createCollections$() {
+    return Rx.Observable.concat(
+      this.createCollection$('AccumulatedTransactions'),
+      this.createCollection$('Transactions'),
+      this.createCollection$('TransactionsCursor'),
+      this.createCollection$('Clearing'),
+      this.createCollection$('ClosedClearing'),
+      this.createCollection$('Business'),
+      this.createCollection$('Settlements'),
+    );
+  }
+
+  /**
+   * Ensure collection creation
+   */
+  createCollection$(collectionName) {
+    return Rx.Observable.create(async observer => {
+      await this.db.createCollection(collectionName);
+      observer.next(`collection ${this.dbName}.${collectionName} created`);
+      observer.complete();
+    });
+  }
+
+  /**
    * Returns an observable that takes an array of operations (insert, updateOne, ...)
    * an executes each one on Mongo in a transactional environment.
    * If an error ocurs the transaction will be aborted and all of the operations will be ignored.
@@ -115,58 +169,62 @@ class MongoDB {
     );
   }
 
+
   /**
-   * Stops DB connections
-   * Returns an Obserable that resolve to a string log
+   * Moves a document from one collection to another collection (Atomic)
+   * @param string fromCollectionName current document collection
+   * @param string toCollectionName desired document collections
+   * @param string documentId ID of the document to move
+   * @returns {Rx.Observable}
    */
-  stop$() {
-    return Rx.Observable.create(observer => {
-      this.client.close();
-      observer.next("Mongo DB Client closed");
-      observer.complete();
-    });
+  moveDocumentToOtherCollectionsStatements$(fromCollectionName, toCollectionName, documentId) {
+    return this.generateMoveDocumentToOtherCollectionsStatements$(fromCollectionName, toCollectionName, documentId)
+      .toArray()
+      .mergeMap(statements => this.applyAll$(statements));
+  }
+
+
+  /**
+   * generates the statements to moves a document from one collection to another collection
+   * @param string fromCollectionName current document collection
+   * @param string toCollectionName desired document collections
+   * @param string documentId ID of the document to move
+   * @returns {Rx.Observable}
+   */
+  generateMoveDocumentToOtherCollectionsStatements$(fromCollectionName, toCollectionName, documentId) {
+    const fromCollection = this.db.collection(fromCollectionName);
+
+    return Rx.Observable.defer(() => fromCollection.findOne({ _id: documentId }))
+      .mergeMap(document =>
+        Rx.Observable.merge(
+          Rx.Observable.of(
+            {
+              collection: toCollectionName,
+              operation: "insertOne",
+              operationArgs: [document]
+            }
+          ),
+          Rx.Observable.of(
+            {
+              collection: fromCollectionName,
+              operation: "remove",
+              operationArgs: [{ _id: documentId }]
+            }
+          ),
+        )
+      );
   }
 
   /**
-   * Ensure Index creation
-   * Returns an Obserable that resolve to a string log
+   * Drop current DB
    */
-  createIndexes$() {
+  dropDB$() {
     return Rx.Observable.create(async observer => {
-      //observer.next('Creating index for DB_NAME.COLLECTION_NAME => ({ xxxx: 1 })  ');
-      //await this.db.collection('COLLECTION_NAME').createIndex( { xxxx: 1});
-
-      observer.next("All indexes created");
+      await this.db.dropDatabase();
+      observer.next(`Database ${this.dbName} dropped`);
       observer.complete();
     });
   }
-
-
-  /**
-   * Ensure collection creation
-   */
-  createCollections$() {
-    return Rx.Observable.concat(
-      this.createCollection$('AccumulatedTransactions'),
-      this.createCollection$('Transactions'),
-      this.createCollection$('TransactionsCursor'),
-      this.createCollection$('Clearing'),
-      this.createCollection$('ClosedClearing'),
-      this.createCollection$('Business'),
-    );
-  }
-
-  /**
-   * Ensure collection creation
-   */
-  createCollection$(collectionName) {
-    return Rx.Observable.create(async observer => {
-      await this.db.createCollection(collectionName);
-      observer.next(`collection ${this.dbName}.${collectionName} created`);
-      observer.complete();
-    });
-  }
-
 
   /**
    * extracts every item in the mongo cursor, one by one

@@ -1,137 +1,232 @@
-// // TEST LIBS
-// const assert = require("assert");
-// const Rx = require("rxjs");
-// const uuid = require("uuid/v4");
+// TEST LIBS
+const assert = require('assert');
+const Rx = require('rxjs');
+const uuidv4 = require('uuid/v4');
+const expect = require('chai').expect;
 
-// //LIBS FOR TESTING
-// const transactionAccumulatedEventConsumer = require("../../bin/domain/TransactionAccumulatedEventConsumer")();
-// const ClearingDA = require("../../bin/data/ClearingDA");
-// const MongoDB = require("../../bin/data/MongoDB").MongoDB;
+//LIBS FOR TESTING
+const MongoDB = require('../../bin/data/MongoDB').MongoDB;
+const ClearingDA = require('../../bin/data/ClearingDA');
+const accumulatedTransactionEventConsumer = require("../../bin/domain/AccumulatedTransactionEventConsumer")();
 
-// //GLOABAL VARS to use between tests
-// let mongoDB;
-// let businessUuid;
-// let transactionAccumulatedEvent;
+//
+let mongo = undefined;
 
-// /*
-// NOTES:
-// before run please start docker-compose:
-//   cd deployment/compose/
-//   docker-compose up
-// */
 
-// describe("Transaction accumulated event", function() {
-//   describe("Prepare Environment", function() {
-//     it("instance MongoDB client", done => {
-//       const dbUuid = uuid();
-//       console.log("DB UUID ==> ", dbUuid);
+/*
+NOTES:
+before run please start mongoDB:
+  docker-compose up setup-rs
 
-//       mongoDB = new MongoDB({
-//         url: "mongodb://localhost:27017",
-//         dbName: `TEST_${dbUuid}`
-//       });
-//       mongoDB
-//         .start$()
-//         .mergeMap(() => ClearingDA.start$(mongoDB))
-//         .subscribe(
-//           evt => console.log(`MongoDB start: ${evt}`),
-//           error => {
-//             console.error(`MongoDB start: ${error}`);
-//             return done(error);
-//           },
-//           () => {
-//             console.error(`MongoDB start completed`);
-//             return done();
-//           }
-//         );
-//     });
-//   });
+  remember to config /etc/hosts to resolve store-mongo1, store-mongo2, store-mongo3
+    127.0.0.1 store-mongo1
+    127.0.0.1 store-mongo2
+    127.0.0.1 store-mongo3
 
-//   describe("Receives accumulated transactions event", function() {
-//     it("Process each accumulated transaction", function(done) {
-//         transactionAccumulatedEvent = {
-//             _id: 1,
-//             fromBu: '1a',
-//             toBu: '2b',
-//             amount: 25000,            
-//         }
+*/
 
-//         transactionAccumulatedEventConsumer
-//         .generateClearingOperations$(transactionAccumulatedEvent)
-//         .toArray()
-//         .subscribe(mongoOperations => {
-//             assert.equal(mongoOperations.length, 2, "Mongo operations");
+describe('ClearingDA', function () {
 
-//             const firstOperation = {
-//                 collection: "Clearing",
-//                 operation: "updateOne",
-//                 operationArgs: [
-//                   { businessId: '1a' },
-//                   {
-//                     $inc: { 'output.1a.amount': 25000 },
-//                     $set: { lastUpdateTimestamp: '' },
-//                     $push: { accumulatedTransactions: 1},
-//                     $setOnInsert: {
-//                       timestamp: '',
-//                       businessId: '1a'
-//                     }
-//                   },
-//                   { $upsert: true }
-//                 ]
-//               };
+  /*
+  * PREAPARE
+  */
 
-//               const secondOperation = {
-//                 collection: "Clearing",
-//                 operation: "updateOne",
-//                 operationArgs: [
-//                   { businessId: '2b' },
-//                   {
-//                     $inc: { 'input.2b.amount': 25000 },
-//                     $set: { lastUpdateTimestamp: '' },
-//                     $push: { accumulatedTransactions: 1},
-//                     $setOnInsert: {
-//                       timestamp: '',
-//                       businessId: '2b'
-//                     }
-//                   },
-//                   { $upsert: true }
-//                 ]
-//               };
+  describe('Prepare test DB', function () {
+    it('instance Mongo', function (done) {
+      mongo = new MongoDB({
+        url: 'mongodb://localhost:27017,localhost:27018,localhost:27019?replicaSet=rs0',
+        dbName: `test_${uuidv4()}_acss`
+      });
+      mongo.start$()
+        .subscribe(
+          (evt) => console.log(`Mongo Start: ${evt}`),
+          (error) => {
+            console.error(`Mongo Start failed: ${error}`);
+            return done(error);
+          },
+          () => { return done(); }
+        );
+    }),
+      it('instance ClearingDA', function (done) {
+        ClearingDA.start$(mongo)
+          .subscribe(
+            (evt) => console.log(`ClearingDA Start: ${evt}`),
+            (error) => {
+              console.error(`ClearingDA Start failed: ${error}`);
+              return done(error);
+            },
+            () => { return done(); }
+          );
+      });
+  });
 
-//               mongoOperations[0].operationArgs[1]['$set'] = { lastUpdateTimestamp: '' };
-//               mongoOperations[1].operationArgs[1]['$set'] = { lastUpdateTimestamp: '' };
-//               mongoOperations[0].operationArgs[1]['$setOnInsert']['timestamp'] = '';
-//               mongoOperations[1].operationArgs[1]['$setOnInsert']['timestamp'] = '';
 
-//             assert.deepEqual(firstOperation, mongoOperations[0], "Mongo operations");
+  /*
+  * TESTS
+  */
 
-//             assert.deepEqual(secondOperation, mongoOperations[1], "Mongo operations");   
 
-//             console.log('Mongo operations => ', JSON.stringify(mongoOperations));
-//         },
-//         error => {
-//           console.error(`Error generating Mongo operations: ${error}`);
-//           return done(error);
-//         },
-//         () => {
-//           return done();
-//         });
-//     });
-//   });
+  describe("Receives accumulated transactions event", function () {
+    it("Process each accumulated transaction", function (done) {
+      transactionAccumulatedEvent = {
+        _id: 1,
+        fromBu: '1a',
+        toBu: '2b',
+        amount: 25000,
+      }
 
-//   describe("de-prepare Envrionment", function() {
-//     it("stop Mongo", function(done) {
-//       mongoDB.stop$().subscribe(
-//         evt => console.log(`MongoDB stop: ${evt}`),
-//         error => {
-//           console.error(`MongoDB stop: ${error}`);
-//           return done(false);
-//         },
-//         () => {
-//           console.error(`MongoDB stop completed`);
-//           return done();
-//         }
-//       );
-//     });
-//   });
-// });
+      accumulatedTransactionEventConsumer
+        .generateClearingOperations$(transactionAccumulatedEvent)
+        .toArray()
+        .subscribe(mongoOperations => {
+          assert.equal(mongoOperations.length, 2, "Mongo operations");
+
+          const firstOperation = {
+            collection: "Clearing",
+            operation: "updateOne",
+            operationArgs: [
+              { businessId: '1a' },
+              {
+                $inc: { 'output.1a.amount': 25000 },
+                $set: { lastUpdateTimestamp: '' },
+                $push: { accumulatedTransactions: 1 },
+                $setOnInsert: {
+                  timestamp: '',
+                  businessId: '1a'
+                }
+              },
+              { $upsert: true }
+            ]
+          };
+
+          const secondOperation = {
+            collection: "Clearing",
+            operation: "updateOne",
+            operationArgs: [
+              { businessId: '2b' },
+              {
+                $inc: { 'input.2b.amount': 25000 },
+                $set: { lastUpdateTimestamp: '' },
+                $push: { accumulatedTransactions: 1 },
+                $setOnInsert: {
+                  timestamp: '',
+                  businessId: '2b'
+                }
+              },
+              { $upsert: true }
+            ]
+          };
+
+          mongoOperations[0].operationArgs[1]['$set'] = { lastUpdateTimestamp: '' };
+          mongoOperations[1].operationArgs[1]['$set'] = { lastUpdateTimestamp: '' };
+          mongoOperations[0].operationArgs[1]['$setOnInsert']['timestamp'] = '';
+          mongoOperations[1].operationArgs[1]['$setOnInsert']['timestamp'] = '';
+
+          assert.deepEqual(firstOperation, mongoOperations[0], "Mongo operations");
+
+          assert.deepEqual(secondOperation, mongoOperations[1], "Mongo operations");
+
+          //console.log('Mongo operations => ', JSON.stringify(mongoOperations));
+        },
+          error => {
+            console.error(`Error generating Mongo operations: ${error}`);
+            return done(error);
+          },
+          () => {
+            return done();
+          });
+    });
+  });
+
+  describe('closeClearing$', function () {
+    it('on no found clearing', function (done) {
+      const clearingId = uuidv4();
+      ClearingDA.closeClearing$(clearingId)
+        .first()
+        .subscribe(
+          ({ found, closed, clearing }) => {
+            expect(found).to.be.equals(false);
+            expect(closed).to.be.equals(false);
+            expect(clearing).to.be.null;
+          },
+          (error) => {
+            console.error(`failed: ${error}`);
+            return done(error);
+          },
+          () => {
+            return done();
+          }
+        );
+    });
+    it('on open clearing', function (done) {
+      const clearingId = uuidv4();
+      Rx.Observable.defer(() => mongo.db.collection('Clearing').insertOne({ _id: clearingId, open: true }))
+        .switchMapTo(ClearingDA.closeClearing$(clearingId))
+        .first()
+        .subscribe(
+          ({ found, closed, clearing }) => {
+            expect(found).to.be.equals(true);
+            expect(closed).to.be.equals(true);
+            expect(clearing).to.not.be.null;
+          },
+          (error) => {
+            console.error(`failed: ${error}`);
+            return done(error);
+          },
+          () => {
+            return done();
+          }
+        );
+    });
+
+    it('on found and close clearing', function (done) {
+      const clearingId = uuidv4();
+      Rx.Observable.defer(() => mongo.db.collection('Clearing').insertOne({ _id: clearingId, open: true }))
+        .switchMapTo(ClearingDA.closeClearing$(clearingId))
+        .first()
+        .subscribe(
+          ({ found, closed, clearing }) => {
+            expect(found).to.be.equals(true);
+            expect(closed).to.be.equals(true);
+            expect(clearing).to.not.be.null;
+          },
+          (error) => {
+            console.error(`failed: ${error}`);
+            return done(error);
+          },
+          () => {
+            return done();
+          }
+        );
+    });
+  });
+
+  /*
+  * DE-PREAPARE
+  */
+
+  describe('de-prepare test DB', function () {
+    it('delete mongoDB', function (done) {
+      mongo.dropDB$()
+        .subscribe(
+          (evt) => console.log(`${evt}`),
+          (error) => {
+            console.error(`Mongo DropDB failed: ${error}`);
+            return done(error);
+          },
+          () => { return done(); }
+        );
+    });
+    it('stop mongo', function (done) {
+      mongo.stop$()
+        .subscribe(
+          (evt) => console.log(`Mongo Stop: ${evt}`),
+          (error) => {
+            console.error(`Mongo Stop failed: ${error}`);
+            return done(error);
+          },
+          () => { return done(); }
+        );
+    });
+  });
+});

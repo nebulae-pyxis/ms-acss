@@ -4,6 +4,7 @@ const eventSourcing = require("../../tools/EventSourcing")();
 const businessEventConsumer = require("../../domain/BusinessEventConsumer")();
 const accumulatedTransactionEventConsumer = require("../../domain/AccumulatedTransactionEventConsumer")();
 const clearingJobTriggeredEventHandler = require("../../domain/ClearingJobTriggeredEventHandler")();
+const settlement = require("../../domain/settlement/");
 
 /**
  * Singleton instance
@@ -27,7 +28,7 @@ class EventStoreService {
    *    emit value: { aggregateType, eventType, handlerName}
    */
   start$() {
-    //default error handler
+    //default error handler,
     const onErrorHandler = error => {
       console.error("Error handling  EventStore incoming event", error);
       process.exit(1);
@@ -134,6 +135,10 @@ class EventStoreService {
         fn: clearingJobTriggeredEventHandler.handleClearingJobTriggeredEvent$,
         obj: clearingJobTriggeredEventHandler
       },
+      SettlementJobTriggered: {
+        fn: settlement.eventSourcing.handleSettlementJobTriggeredEvent$,
+        obj: settlement.eventSourcing
+      },
     };
   }
 
@@ -159,6 +164,10 @@ class EventStoreService {
       {
         aggregateType: "Cronjob",
         eventType: "ClearingJobTriggered"
+      },
+      {
+        aggregateType: "Cronjob",
+        eventType: "SettlementJobTriggered"
       }
 
     ]

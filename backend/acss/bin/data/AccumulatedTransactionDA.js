@@ -5,6 +5,7 @@ const BusinessDA = require("./BusinessDA");
 const Rx = require("rxjs");
 const CollectionName = "AccumulatedTransactions";
 const { CustomError } = require("../tools/customError");
+const ObjectID = require('mongodb').ObjectID;
 
 class AccumulatedTransactionDA {
 
@@ -45,7 +46,7 @@ class AccumulatedTransactionDA {
   static getAccumulatedTransaction$(accumulatedTransactionId) {
     const collection = mongoDB.db.collection(CollectionName);
     return Rx.Observable.defer(() =>
-      collection.findOne({ _id: accumulatedTransactionId })
+      collection.findOne({ _id: new ObjectID.createFromHexString(accumulatedTransactionId) })
     );
   }
 

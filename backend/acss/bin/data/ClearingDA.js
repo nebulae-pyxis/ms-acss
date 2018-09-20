@@ -5,7 +5,6 @@ const Rx = require("rxjs");
 const OpenClearingCollectionName = "Clearing";
 const ClosedClearingCollectionName = "ClosedClearing";
 const BusinessDA = require("./BusinessDA");
-const { CustomError } = require("../tools/customError");
 
 class ClearingDA {
   static start$(mongoDbInstance) {
@@ -193,6 +192,7 @@ class ClearingDA {
    * @param {*} collectionVsOperationAndCommand array of Mongo operations
    */
   static executeOperations$(collectionVsOperationAndCommand) {
+    console.log('executeOperations => ', JSON.stringify(collectionVsOperationAndCommand));
     return mongoDB.applyAll$(collectionVsOperationAndCommand);
   }
 

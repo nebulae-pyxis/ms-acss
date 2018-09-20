@@ -2,6 +2,7 @@
 const Rx = require('rxjs');
 const uuidv4 = require('uuid/v4');
 const expect = require('chai').expect;
+const assert = require('assert');
 
 //LIBS FOR TESTING
 const MongoDB = require('../../bin/data/MongoDB').MongoDB;
@@ -45,6 +46,74 @@ describe('MongoDB', function () {
                 );
         })
     });
+
+    /*
+    * TESTS
+    */
+
+   describe('Apply multiple operations in an transactional environment$', function () {
+    it('Apply all', function (done) {
+        const collectionName = "operations";
+        const collectionVsOperationCommand = [
+            {
+                collection: collectionName,
+                operation: "insertOne",
+                operationArgs: [{ name: "operation1", timestamp: new Date().getTime(), state: true }]
+            },
+            {
+                collection: collectionName,
+                operation: "updateOne",
+                operationArgs: [{ name: "operation1"}, { $set: {state: false} }]
+            },
+            {
+                collection: collectionName,
+                operation: "insertMany",
+                operationArgs: [
+                    [
+                        { name: "operation2", timestamp: new Date().getTime(), state: true }, 
+                        { name: "operation3", timestamp: new Date().getTime(), state: false }
+                    ]
+                ]
+            },
+        ];
+
+        
+
+        Rx.Observable.defer(()=>
+            mongo.createCollection$(collectionName)
+        )
+            .mergeMap(res => mongo.applyAll$(collectionVsOperationCommand))
+            .do(res => console.log('AppliAll ================> ', JSON.stringify(res)))
+            .mergeMap(() => Rx.Observable.defer(() => mongo.db.collection(collectionName).find({}).toArray()))
+            .subscribe(
+                (data) => { 
+                    console.log('MONGO DATA => ', data);
+                    const firstData = data[0];
+                    delete firstData._id;
+
+                    const secondData = data[1];
+                    delete secondData._id;
+
+                    const thirdData = data[2];
+                    delete thirdData._id;
+                    
+                    assert.deepEqual(firstData, { name: "operation1", timestamp: collectionVsOperationCommand[0].operationArgs[0].timestamp, state: false }, "The data does not match");
+
+                    assert.deepEqual(secondData, { name: "operation2", timestamp: collectionVsOperationCommand[2].operationArgs[0][0].timestamp, state: true }, "The data does not match");
+
+                    assert.deepEqual(thirdData, { name: "operation3", timestamp: collectionVsOperationCommand[2].operationArgs[0][1].timestamp, state: false }, "The data does not match");
+                },
+                (error) => {
+                    console.error(`failed: ${error}`);
+                    return done(error);
+                },
+                () => {
+                    return done();
+                }
+            );
+    });
+});
+
 
 
     /*

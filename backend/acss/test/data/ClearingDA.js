@@ -85,14 +85,15 @@ describe('ClearingDA', function () {
             collection: "Clearing",
             operation: "updateOne",
             operationArgs: [
-              { businessId: '1a' },
+              { businessId: '1a', open: true },
               {
                 $inc: { 'output.1a.amount': 25000 },
                 $set: { lastUpdateTimestamp: '' },
                 $push: { accumulatedTransactions: 1 },
                 $setOnInsert: {
                   timestamp: '',
-                  businessId: '1a'
+                  businessId: '1a',
+                  open: true
                 }
               },
               { $upsert: true }
@@ -103,14 +104,15 @@ describe('ClearingDA', function () {
             collection: "Clearing",
             operation: "updateOne",
             operationArgs: [
-              { businessId: '2b' },
+              { businessId: '2b', open: true },
               {
                 $inc: { 'input.2b.amount': 25000 },
                 $set: { lastUpdateTimestamp: '' },
                 $push: { accumulatedTransactions: 1 },
                 $setOnInsert: {
                   timestamp: '',
-                  businessId: '2b'
+                  businessId: '2b',
+                  open: true
                 }
               },
               { $upsert: true }

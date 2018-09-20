@@ -130,12 +130,13 @@ class MongoDB {
                 //Executes each operation on Mongo
                 return (
                   Rx.Observable.from(collectionVsOperationAndCommand)
-                    .concatMap(data => {
+                    .concatMap(data => {                      
                       //To execute all of the operations into a transactionsal environment, we must pass the session to each operation
                       data.operationOps =
                         data.operationOps == null
                           ? { session }
                           : { ...data.operationOps, session };
+
                       return this.db
                         .collection(data.collection)
                       [data.operation](
@@ -150,17 +151,16 @@ class MongoDB {
               .mergeMap(
                 txs => Rx.Observable.defer(() => session.commitTransaction())
                   .mergeMap(txResult =>
-                    //Ends Mongo session
-                    Rx.Observable.bindCallback(session.endSession.bind(session))().mapTo([txs, txResult])
+                      //Ends Mongo session
+                     Rx.Observable.bindCallback(session.endSession.bind(session))().mapTo([txs, txResult])                   
                   )
               )
               //If an error ocurred, the transaction is aborted
               .catch(err => {
-                console.log("Error TX: ", err);
                 return Rx.Observable.of(err)
                   .mergeMap(error => session.abortTransaction())
                   .mergeMap(txResult =>
-                    Rx.Observable.bindNodeCallback(session.endSession)
+                    Rx.Observable.bindCallback(session.endSession.bind(session))()
                   )
                   .mergeMap(error => Rx.Observable.throw(err)); // Rethrow so calling function sees error);
               })

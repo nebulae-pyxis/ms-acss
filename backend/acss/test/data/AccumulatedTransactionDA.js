@@ -72,7 +72,9 @@ describe('AccumulatedTransactionDA', function () {
             AccumulatedTransactionDA.generateAccumulatedTransactionsStatement$(dummyData)
                 .toArray()
                 .mergeMap(statements => mongo.createCollection$('AccumulatedTransactions').mapTo(statements))
-                .mergeMap(statements => mongo.applyAll$(statements))
+                .mergeMap(statements => {
+                    return mongo.applyAll$(statements);
+                })
                 //.do(statment => console.log(`Apply: ${JSON.stringify(statment, null, 1)}`))
                 .map(([txs, txResult]) => Object.values(txs[0].insertedIds))
                 .do(atIds => expect(atIds).to.have.length(dummyData.length))

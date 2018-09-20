@@ -65,7 +65,7 @@ class EventStoreService {
     const subscription =
       //MANDATORY:  AVOIDS ACK REGISTRY DUPLICATIONS
       eventSourcing.eventStore.ensureAcknowledgeRegistry$(aggregateType)
-        .mergeMap(() => eventSourcing.eventStore.getEventListener$(aggregateType, mbeKey))
+        .mergeMap(() => eventSourcing.eventStore.getEventListener$(aggregateType, mbeKey, false))
         .filter(evt => evt.et === eventType)
         .mergeMap(evt => Rx.Observable.concat(
           handler.fn.call(handler.obj, evt),
@@ -127,7 +127,7 @@ class EventStoreService {
         fn: businessEventConsumer.handleBusinessGeneralInfoUpdated$,
         obj: businessEventConsumer
       },
-      ClearingTransactionAccumulated: {
+      AcssAccumulatedTransactionGenerated: {
         fn: accumulatedTransactionEventConsumer.handleTransactionAccumulatedEvent$,
         obj: accumulatedTransactionEventConsumer
       },
@@ -158,8 +158,8 @@ class EventStoreService {
         eventType: "BusinessGeneralInfoUpdated"
       },
       {
-        aggregateType: "ClearingTransaction",
-        eventType: "ClearingTransactionAccumulated"
+        aggregateType: "Acss",
+        eventType: "AcssAccumulatedTransactionGenerated"
       },
       {
         aggregateType: "Cronjob",

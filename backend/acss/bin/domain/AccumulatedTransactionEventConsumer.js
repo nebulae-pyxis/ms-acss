@@ -2,6 +2,7 @@ const Rx = require("rxjs");
 const broker = require("../tools/broker/BrokerFactory")();
 const MATERIALIZED_VIEW_TOPIC = "materialized-view-updates";
 const ClearingDA = require("../data/ClearingDA");
+const ClearingJobErrorDA = require('../data/ClearingJobErrorDA');
 const AccumulatedTransactionDA = require("../data/AccumulatedTransactionDA");
 
 let instance;
@@ -20,17 +21,28 @@ class TransactionAccumulatedEventConsumer {
     const txIds = transactionAccumulatedEvent.data;
 
     //Iterates over the array of accumulated tx ids
-    return (
-      Rx.Observable.from(txIds.ids)
+    return Rx.Observable.from(txIds.ids)
         //Gets each accumulated tx from Mongo
         .mergeMap(accumulatedTxId => AccumulatedTransactionDA.getAccumulatedTransaction$(accumulatedTxId))
         .mergeMap(accumulatedTx => this.generateClearingOperations$(accumulatedTx))
         .toArray()
         //at the end these operations will be executed in only one transaction.
-        .mergeMap(mongoOperations =>
-          ClearingDA.executeOperations$(mongoOperations)
-        )
-    );
+        .mergeMap(mongoOperations => ClearingDA.executeOperations$(mongoOperations))
+        .map(val => `Clearings updated; ok:${val}`)
+        .catch(error => {
+          console.log(`An error was generated while a clearing was being updated: ${error.stack}`);
+          return this.errorHandler$(error.stack, transactionAccumulatedEvent);
+        });
+  }
+
+  /**
+   * Error handler
+   * @param {*} error 
+   * @param {*} event 
+   */
+  errorHandler$(error, event){
+    return Rx.Observable.of({error, event})
+    .mergeMap(log => ClearingJobErrorDA.persistClearingUpdateError$(log))
   }
 
   /**
@@ -61,9 +73,9 @@ class TransactionAccumulatedEventConsumer {
                 businessId: businessId,
                 open: true
               }
-            },
-            { $upsert: true }
-          ]
+            }
+          ],
+          operationOps: { upsert: true }
         };
 
         const dynamicObj = {};

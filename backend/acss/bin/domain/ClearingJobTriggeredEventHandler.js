@@ -1,7 +1,10 @@
 const Rx = require('rxjs');
 const broker = require('../tools/broker/BrokerFactory')();
+const eventSourcing = require("../tools/EventSourcing")();
+const Event = require("@nebulae/event-store").Event;
 const MATERIALIZED_VIEW_TOPIC = "materialized-view-updates";
 const TransactionsCursorDA = require('../data/TransactionsCursorDA');
+const ClearingJobErrorDA = require('../data/ClearingJobErrorDA');
 const TransactionsDA = require('../data/TransactionsDA');
 const AccumulatedTransactionDA = require('../data/AccumulatedTransactionDA');
 const mongoDB = require('../data/MongoDB').singleton();
@@ -19,13 +22,12 @@ class ClearingJobTriggeredEventHandler {
      * @param {ClearingJobTriggeredEvent} clearingJobTriggeredEvent 
      */
     handleClearingJobTriggeredEvent$(clearingJobTriggeredEvent) {
-        console.log('handleClearingJobTriggeredEvent');
         const cursorLimitTimestamp = Date.now() - 5000;
         return TransactionsCursorDA.getCursor$()
             .mergeMap(cursor =>
-                TransactionsDA.getTransactions$(cursor, cursorLimitTimestamp)
-                    .mergeMap(transactions$ => this.accumulateTransactions$(transactions$))
-                    .map(accumulatedTransactions => { return { accumulatedTransactions, cursor };})
+                this.accumulateTransactions$(TransactionsDA.getTransactions$(cursor, cursorLimitTimestamp))
+                    .toArray()
+                    .map(accumulatedTransactions => { return { accumulatedTransactions, cursor }; })
             ).mergeMap(({ accumulatedTransactions, cursor }) => {
                 const newCursor = { ...cursor };
                 newCursor.timestamp = cursorLimitTimestamp;
@@ -33,8 +35,37 @@ class ClearingJobTriggeredEventHandler {
                     AccumulatedTransactionDA.generateAccumulatedTransactionsStatement$(accumulatedTransactions),
                     TransactionsCursorDA.generateSetCursorStatement$(newCursor)
                 );
-            }).mergeMap(statements => mongoDB.applyAll$(statements))
-            .map(([txs, txResult]) => `Clearing job trigger handling: ok:${txResult.ok}`);
+            })
+            .mergeMap(statements => mongoDB.applyAll$(statements).map(res=> [statements, res]))
+            .mergeMap(([statements, [txs, txResult]]) => {
+                return Rx.Observable.from(txs)
+                .map(tx => {
+                    return tx.insertedIds ? Object.values(tx.insertedIds): []
+                })
+                .reduce((acc, array) => [...acc, ...array], [])
+                .mergeMap(ids => {
+                    return eventSourcing.eventStore.emitEvent$(
+                        new Event({
+                          eventType: 'AcssAccumulatedTransactionGenerated',
+                          eventTypeVersion: 1,
+                          aggregateType: 'Acss',
+                          aggregateId: 0,
+                          data: {ids},
+                          user: 'SYSTEM'
+                        })
+                      ).mapTo([txs, txResult])
+                })
+            })
+            .map(([txs, txResult]) => `Clearing job trigger handling: ok:${txResult.ok}`)
+            .catch(error => {
+                console.log(`An error was generated while a clearingJobTriggeredEvent was being processed: ${error.stack}`);
+                return this.errorHandler$(error.stack, clearingJobTriggeredEvent);
+            });
+    }
+
+    errorHandler$(error, event){
+        return Rx.Observable.of({error, event})
+        .mergeMap(log => ClearingJobErrorDA.persistClearingJobError$(log))
     }
 
     /**
@@ -44,7 +75,7 @@ class ClearingJobTriggeredEventHandler {
      */
     accumulateTransactions$(transactions$) {
         return transactions$
-            .map(t => {  // build group key and values
+            .map(t => {  // build group key and values                
                 t.groupKey = [t.fromBu, t.toBu].sort().join('-');
                 t.groupAmount = t.fromBu === t.groupKey.split('-')[0] ? t.amount : (-1 * t.amount);
                 return t;

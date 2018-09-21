@@ -2,7 +2,7 @@ const Rx = require("rxjs");
 const broker = require("../tools/broker/BrokerFactory")();
 const MATERIALIZED_VIEW_TOPIC = "materialized-view-updates";
 const ClearingDA = require("../data/ClearingDA");
-const ClearingJobErrorDA = require('../data/ClearingJobErrorDA');
+const LogErrorDA = require('../data/LogErrorDA');
 const AccumulatedTransactionDA = require("../data/AccumulatedTransactionDA");
 
 let instance;
@@ -42,7 +42,7 @@ class TransactionAccumulatedEventConsumer {
    */
   errorHandler$(error, event){
     return Rx.Observable.of({error, event})
-    .mergeMap(log => ClearingJobErrorDA.persistClearingUpdateError$(log))
+    .mergeMap(log => LogErrorDA.persistClearingError$$(log))
   }
 
   /**

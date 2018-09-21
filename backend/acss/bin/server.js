@@ -12,7 +12,7 @@ const SettlementDA = require('./data/SettlementDA');
 const BusinessDA = require('./data/BusinessDA');
 const TransactionsCursorDA = require('./data/TransactionsCursorDA');
 const TransactionsDA = require('./data/TransactionsDA');
-const ClearingJobErrorDA = require('./data/ClearingJobErrorDA');
+const LogErrorDA = require('./data/LogErrorDA');
 const AccumulatedTransactionDA = require('./data/AccumulatedTransactionDA');
 const graphQlService = require('./services/gateway/GraphQlService')();
 const Rx = require('rxjs');
@@ -26,7 +26,7 @@ const start = () => {
         ClearingDA.start$(),
         SettlementDA.start$(),
         TransactionsCursorDA.start$(),
-        ClearingJobErrorDA.start$(),
+        LogErrorDA.start$(),
         TransactionsDA.start$(),
         AccumulatedTransactionDA.start$(),
         graphQlService.start$()

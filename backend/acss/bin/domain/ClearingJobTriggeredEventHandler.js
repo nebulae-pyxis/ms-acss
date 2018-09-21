@@ -4,7 +4,7 @@ const eventSourcing = require("../tools/EventSourcing")();
 const Event = require("@nebulae/event-store").Event;
 const MATERIALIZED_VIEW_TOPIC = "materialized-view-updates";
 const TransactionsCursorDA = require('../data/TransactionsCursorDA');
-const ClearingJobErrorDA = require('../data/ClearingJobErrorDA');
+const LogErrorDA = require('../data/LogErrorDA');
 const TransactionsDA = require('../data/TransactionsDA');
 const AccumulatedTransactionDA = require('../data/AccumulatedTransactionDA');
 const mongoDB = require('../data/MongoDB').singleton();
@@ -67,7 +67,7 @@ class ClearingJobTriggeredEventHandler {
 
     errorHandler$(error, event){
         return Rx.Observable.of({error, event})
-        .mergeMap(log => ClearingJobErrorDA.persistClearingJobError$(log))
+        .mergeMap(log => LogErrorDA.persistAccumulatedTransactionsError$(log))
     }
 
     /**

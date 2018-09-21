@@ -7,6 +7,7 @@ const expect = require('chai').expect;
 //LIBS FOR TESTING
 const MongoDB = require('../../bin/data/MongoDB').MongoDB;
 const AccumulatedTransactionDA = require('../../bin/data/AccumulatedTransactionDA');
+const ObjectID = require('mongodb').ObjectID;
 
 //
 let mongo = undefined;
@@ -65,8 +66,10 @@ describe('AccumulatedTransactionDA', function () {
     */
 
     describe('createAccumulatedTransactions$', function () {
+        const fromId = ObjectID.createFromHexString('5ba40f2aadb8cf1138aac25d');
+        const toId = ObjectID.createFromHexString('5ba40f2aadb8cf1138aac25f');
         let dummyData = [
-            { "fromBu": "B", "toBu": "A", "amount": 8900, "timestamp": 1537213573008, "transactionIds": { "AFCC_RELOADED": ["A_B_100", "A_B_1000", "B_A_10000"] } }
+            { "fromBu": fromId, "toBu":  toId, "amount": 8900, "timestamp": 1537213573008, "transactionIds": { "AFCC_RELOADED": ["A_B_100", "A_B_1000", "B_A_10000"] } }
         ];
         it('insert one accumulated transactions', function (done) {
             AccumulatedTransactionDA.generateAccumulatedTransactionsStatement$(dummyData)
@@ -79,8 +82,8 @@ describe('AccumulatedTransactionDA', function () {
                 .map(([txs, txResult]) => Object.values(txs[0].insertedIds))
                 .do(atIds => expect(atIds).to.have.length(dummyData.length))
                 .mergeMap(atIds => Rx.Observable.from(atIds))
-                .mergeMap(atId => AccumulatedTransactionDA.getAccumulatedTransaction$(atId))
-                .map(persistedAt => [persistedAt, dummyData.filter(at => at.fromBu == persistedAt.fromBu && at.timestamp == persistedAt.timestamp).pop()])
+                .mergeMap(atId => AccumulatedTransactionDA.getAccumulatedTransaction$(atId.toString()))
+                .map(persistedAt => [persistedAt, dummyData.filter(at => at.fromBu.toHexString() == persistedAt.fromBu && at.timestamp == persistedAt.timestamp).pop()])
                 .do( ([persistedAt, dummyAt]) => {
                     dummyAt._id = persistedAt._id;
                     expect(persistedAt).to.be.deep.equals(dummyAt);

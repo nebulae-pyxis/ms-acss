@@ -30,8 +30,8 @@ class SettlementES {
       .mergeMap(
         ({ clearing, settlements }) => Rx.Observable.merge(
           SettlementDA.generateSettlementInsertStatement$(settlements),
-          //generate collateral clearing updates QL,
-          mongoDB.generateMoveDocumentToOtherCollectionsStatements$(ClearingDA.openClearingCollectionName,ClearingDA.closedClearingCollectionName,clearing._id)
+          SettlementHelper.generateCollateralClearingsMods$(clearing.businessId, settlements),
+          mongoDB.generateMoveDocumentToOtherCollectionsStatements$(ClearingDA.openClearingCollectionName, ClearingDA.closedClearingCollectionName, clearing._id)
         ).toArray()
       ).mergeMap(statements => mongoDB.applyAll$(statements))
       .map(([txs, txResult]) => `Settlement job trigger handling for business ${settlementJobTriggered.businessId}: ok:${txResult.ok}`);

@@ -119,7 +119,8 @@ class ClearingDA {
    */
   static getOpenClearingByBusinessId$(businessId) {
     const collection = mongoDB.db.collection(OpenClearingCollectionName);
-    return Rx.Observable.defer(() => collection.findOne({ businessId: id }));
+    return Rx.Observable.defer(() => collection.findOne({ businessId, open: true }))
+      .filter(obj => obj !== null);
   }
 
   /**

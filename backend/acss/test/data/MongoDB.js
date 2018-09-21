@@ -83,7 +83,7 @@ describe('MongoDB', function () {
             mongo.createCollection$(collectionName)
         )
             .mergeMap(res => mongo.applyAll$(collectionVsOperationCommand))
-            .do(res => console.log('AppliAll ================> ', JSON.stringify(res)))
+            //.do(res => console.log('AppliAll ================> ', JSON.stringify(res)))
             .mergeMap(() => Rx.Observable.defer(() => mongo.db.collection(collectionName).find({}).toArray()))
             .subscribe(
                 (data) => { 

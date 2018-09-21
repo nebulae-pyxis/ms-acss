@@ -95,9 +95,9 @@ describe('ClearingDA', function () {
                   businessId: '1a',
                   open: true
                 }
-              },
-              { $upsert: true }
-            ]
+              },              
+            ],
+            "operationOps": { upsert: true }
           };
 
           const secondOperation = {
@@ -115,8 +115,9 @@ describe('ClearingDA', function () {
                   open: true
                 }
               },
-              { $upsert: true }
-            ]
+              
+            ],
+            "operationOps": { upsert: true }
           };
 
           mongoOperations[0].operationArgs[1]['$set'] = { lastUpdateTimestamp: '' };

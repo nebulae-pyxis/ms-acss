@@ -189,11 +189,9 @@ describe('SettlementHelper', function () {
                 expect(finalClearingB.partialSettlement.input[0].buId).to.be.equals(businessMainId);
                 expect(finalClearingB.partialSettlement.input[0].amount).to.be.equals(300);
                 expect(finalClearingB.partialSettlement.input[0].amount).to.not.be.null;
-
-
-            })
+            }).first()
                 .subscribe(
-                    (evt) => console.log(evt),
+                    (evt) => { },
                     (error) => {
                         console.error(`failed: ${error}`);
                         return done(error);

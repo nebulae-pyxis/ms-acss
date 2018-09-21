@@ -3,6 +3,7 @@
 const Rx = require("rxjs");
 const ClearingDA = require("../data/ClearingDA");
 const AccumulatedTransactionDA = require("../data/AccumulatedTransactionDA");
+const SettlementDA = require("../data/SettlementDA");
 const TransactionDA = require("../data/TransactionsDA");
 const broker = require("../tools/broker/BrokerFactory")();
 const eventSourcing = require("../tools/EventSourcing")();
@@ -28,20 +29,19 @@ class Clearing {
    * Gets the clearings of a business
    *
    * @param args args
-   * @param args.businessId Id of the business (This values is taken into account if the user that perform the request has the role system-admin)
+   * @param args.businessId Id of the business (This values is taken into account if the user that perform the request has the role SYSADMIN)
    */
   getClearingsFromBusiness$({ args }, authToken) {
-    console.log('getClearingsFormBusiness -> ', args);
     return RoleValidator.checkPermissions$(
       authToken.realm_access.roles,
       "ACSS",
       "getClearingsFromBusiness$()",
       PERMISSION_DENIED_ERROR_CODE.code,
       PERMISSION_DENIED_ERROR_CODE.description,
-      ["system-admin", "business-owner"]
+      ["SYSADMIN", "business-owner"]
     )
       .mergeMap(val =>{
-        args.businessId = authToken.realm_access.roles.includes("system-admin") ? args.businessId: null;
+        args.businessId = authToken.realm_access.roles.includes("SYSADMIN") ? args.businessId: null;
         return ClearingDA.getAllClearingsFromBusiness$(args.page, args.count, args.businessId ? args.businessId : authToken.businessId);
       })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
@@ -57,14 +57,13 @@ class Clearing {
    * @param args.id Id of the clearing
    */
   getClearingById$({ args }, authToken) {
-    console.log('Clearing backedn');
     return RoleValidator.checkPermissions$(
       authToken.realm_access.roles,
       "ACSS",
       "getClearingsById$()",
       PERMISSION_DENIED_ERROR_CODE.code,
       PERMISSION_DENIED_ERROR_CODE.description,
-      ["system-admin", "business-owner"]
+      ["SYSADMIN", "business-owner"]
     )
       .mergeMap(role => {
         console.log('Role', role);
@@ -89,7 +88,7 @@ class Clearing {
       "getAccumulatedTransactionsByIds$()",
       PERMISSION_DENIED_ERROR_CODE.code,
       PERMISSION_DENIED_ERROR_CODE.description,
-      ["system-admin", "business-owner"]
+      ["SYSADMIN", "business-owner"]
     )
       .mergeMap(role => {
         return AccumulatedTransactionDA.getAccumulatedTransactionsByIds$(args.page, args.count, args.ids)
@@ -114,10 +113,60 @@ class Clearing {
       "getTransactionsByIds$()",
       PERMISSION_DENIED_ERROR_CODE.code,
       PERMISSION_DENIED_ERROR_CODE.description,
-      ["system-admin", "business-owner"]
+      ["SYSADMIN", "business-owner"]
     )
       .mergeMap(role => {
         return TransactionDA.getTransactionsByIds$(args.page, args.count, args.ids)
+      })
+      .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
+      .catch(err => {
+        return this.handleError$(err);
+      });
+  }
+
+    /**
+   * Gets the settlements associated with the specified clearing id
+   *
+   * @param args args
+   * @param args.clearingId Id of the clearing 
+   */
+  getSettlementsByClearingId$({ args }, authToken) {
+    console.log('getSettlementsByClearingId backend');
+    return RoleValidator.checkPermissions$(
+      authToken.realm_access.roles,
+      "ACSS",
+      "getSettlementsByClearingId$()",
+      PERMISSION_DENIED_ERROR_CODE.code,
+      PERMISSION_DENIED_ERROR_CODE.description,
+      ["SYSADMIN", "business-owner"]
+    )
+      .mergeMap(role => {
+        return SettlementDA.getSettlementsByClearingId$(args.page, args.count, args.clearingId)
+      })
+      .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
+      .catch(err => {
+        return this.handleError$(err);
+      });
+  }
+
+      /**
+   * Gets the amount of settlements associated with the specified clearing id
+   *
+   * @param args args
+   * @param args.clearingId Id of the clearing 
+   */
+  getSettlementsCountByClearingId$({ args }, authToken) {
+    console.log('getSettlementsCountByClearingId backend');
+    return RoleValidator.checkPermissions$(
+      authToken.realm_access.roles,
+      "ACSS",
+      "getSettlementsCountByClearingId$()",
+      PERMISSION_DENIED_ERROR_CODE.code,
+      PERMISSION_DENIED_ERROR_CODE.description,
+      ["SYSADMIN", "business-owner"]
+    )
+      .mergeMap(role => {
+        return SettlementDA.getSettlementsCountByClearingId$(args.clearingId)
       })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
       .catch(err => {

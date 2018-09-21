@@ -5,10 +5,9 @@ const BusinessDA = require("./BusinessDA");
 const Rx = require("rxjs");
 const CollectionName = "AccumulatedTransactions";
 const { CustomError } = require("../tools/customError");
-const ObjectID = require('mongodb').ObjectID;
+const ObjectID = require("mongodb").ObjectID;
 
 class AccumulatedTransactionDA {
-
   static start$(mongoDbInstance) {
     return Rx.Observable.create(observer => {
       if (mongoDbInstance) {
@@ -22,21 +21,19 @@ class AccumulatedTransactionDA {
     });
   }
 
-
   /**
    * takes an array of accumulated transactions and creates a single insert statement
-   * @param {Array} accumulatedTransactions 
+   * @param {Array} accumulatedTransactions
    * @returns {Rx.Observable} insert statement
    */
   static generateAccumulatedTransactionsStatement$(accumulatedTransactions) {
-    return Rx.Observable.of(accumulatedTransactions)
-      .map(ats => {
-        return {
-          collection: CollectionName,
-          operation: "insertMany",
-          operationArgs: [ats]
-        };
-      });
+    return Rx.Observable.of(accumulatedTransactions).map(ats => {
+      return {
+        collection: CollectionName,
+        operation: "insertMany",
+        operationArgs: [ats]
+      };
+    });
   }
 
   /**
@@ -46,7 +43,9 @@ class AccumulatedTransactionDA {
   static getAccumulatedTransaction$(accumulatedTransactionId) {
     const collection = mongoDB.db.collection(CollectionName);
     return Rx.Observable.defer(() =>
-      collection.findOne({ _id: new ObjectID.createFromHexString(accumulatedTransactionId) })
+      collection.findOne({
+        _id: new ObjectID.createFromHexString(accumulatedTransactionId)
+      })
     );
   }
 
@@ -61,34 +60,49 @@ class AccumulatedTransactionDA {
     const collection = mongoDB.db.collection(CollectionName);
     return Rx.Observable.defer(() =>
       collection
-        .find({ _id: { $in: ids } })
+        .find({
+          _id: { $in: ids.map(id => new ObjectID.createFromHexString(id)) }
+        })
         .sort({ timestamp: -1 })
         .skip(count * page)
         .limit(count)
         .toArray()
-    )
-      .mergeMap(accumulatedTransactions => {
-
-        const buNamesMap$ = Rx.Observable.from(accumulatedTransactions)
-          .mergeMap(at => Rx.Observable.from([at.fromBu, at.toBu]))
-          .distinct()
-          .mergeMap(buId => BusinessDA.getBusinessByIds$([buId]).map(business => { return { id: business._id, name: business.name } }))
-          .reduce((acc, val) => {
-            acc[val.id] = val.name;
-            return acc;
-          }, {});
-
-        return Rx.Observable.combineLatest(
-          buNamesMap$,
-          Rx.Observable.from(accumulatedTransactions)
-        )
-          .map(([cache, at]) => {
-            const txIds = Object.keys(at.transactionIds).map(key => ({ type: key, ids: at.transactionIds[key] }));
-            at.transactionIds = txIds;
-            return { ...at, fromBusinessName: cache[at.fromBu], toBusinessName: cache[at.toBu] };
+    ).mergeMap(accumulatedTransactions => {
+      //Get the names of the business involved n the tx
+      const buNamesMap$ = Rx.Observable.from(accumulatedTransactions)
+        .mergeMap(at => Rx.Observable.from([at.fromBu, at.toBu]))
+        .distinct()
+        .mergeMap(buId =>
+          BusinessDA.getBusinessByIds$([buId]).map(business => {
+            return { id: business._id, name: business.name };
           })
-      })
-      .toArray();
+        )
+        .reduce((acc, val) => {
+          acc[val.id] = val.name;
+          return acc;
+        }, {});
+
+      return buNamesMap$
+        .mergeMap(buNamesMap =>
+          Rx.Observable.from(accumulatedTransactions).map(
+            accumulatedTransaction => [buNamesMap, accumulatedTransaction]
+          )
+        )
+        .map(([cache, at]) => {
+          //Change the structure of the accumulated tx to send the info through Grapqhl
+          const txIds = Object.keys(at.transactionIds).map(key => ({
+            type: key,
+            ids: at.transactionIds[key]
+          }));
+          at.transactionIds = txIds;
+          return {
+            ...at,
+            fromBusinessName: cache[at.fromBu],
+            toBusinessName: cache[at.toBu]
+          };
+        })
+        .toArray();
+    });
   }
 
   /**

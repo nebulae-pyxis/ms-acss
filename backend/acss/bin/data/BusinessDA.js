@@ -25,7 +25,6 @@ class BusinessDA {
    * @param {String} id business ID
    */
   static getBusiness$(id) {
-    console.log('getBusiness$(id) ', id);
     const collection = mongoDB.db.collection(CollectionName);
     return Rx.Observable.defer(() => collection.findOne({ '_id': id }));
   }

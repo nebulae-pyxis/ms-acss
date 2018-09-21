@@ -3,26 +3,24 @@
 let mongoDB = undefined;
 const Rx = require("rxjs");
 const CollectionName = "Transactions";
-const MongoDB = require('./MongoDB').MongoDB;
-const ObjectID = require('mongodb').ObjectID;
+const MongoDB = require("./MongoDB").MongoDB;
+const ObjectID = require("mongodb").ObjectID;
 const BusinessDA = require("./BusinessDA");
 const { CustomError } = require("../tools/customError");
 
 class TransactionsDA {
-
   static start$(mongoDbInstance) {
-    return Rx.Observable.create((observer) => {
+    return Rx.Observable.create(observer => {
       if (mongoDbInstance) {
         mongoDB = mongoDbInstance;
-        observer.next('using given mongo instance ');
+        observer.next("using given mongo instance ");
       } else {
-        mongoDB = require('./MongoDB').singleton();
-        observer.next('using singleton system-wide mongo instance');
+        mongoDB = require("./MongoDB").singleton();
+        observer.next("using singleton system-wide mongo instance");
       }
       observer.complete();
     });
   }
-
 
   /**
    * returns a transaction stream of trasactions beggining with the cursor up to the limit timestamp
@@ -33,13 +31,16 @@ class TransactionsDA {
   static getTransactions$(cursor, timestampLimit = Date.now()) {
     const collection = mongoDB.db.collection(CollectionName);
     const findQuery = {
-      timestamp: { '$lte': timestampLimit }
+      timestamp: { $lte: timestampLimit }
     };
     if (cursor) {
-      findQuery.timestamp['$gt'] = cursor.timestamp;
+      findQuery.timestamp["$gt"] = cursor.timestamp;
     }
-    return Rx.Observable.bindNodeCallback(collection.find.bind(collection))(findQuery)
-      .mergeMap(cursor => Rx.Observable.defer(() => MongoDB.extractAllFromMongoCursor$(cursor)));
+    return Rx.Observable.bindNodeCallback(collection.find.bind(collection))(
+      findQuery
+    ).mergeMap(cursor =>
+      Rx.Observable.defer(() => MongoDB.extractAllFromMongoCursor$(cursor))
+    );
   }
 
   /**
@@ -50,11 +51,11 @@ class TransactionsDA {
   static createTransactions$(transactions) {
     const collection = mongoDB.db.collection(CollectionName);
     return Rx.Observable.defer(() => collection.insertMany(transactions))
-    .pluck('ops')
-    .map(ops => ops.map(o=>o._id));
+      .pluck("ops")
+      .map(ops => ops.map(o => o._id));
   }
 
-    /**
+  /**
    * gets all the transactions by its id
    *
    * @param {int} page Indicates the page number which will be returned
@@ -62,11 +63,13 @@ class TransactionsDA {
    * @param {[String]]} ids transaction ids to query.
    */
   static getTransactionsByIds$(page, count, ids) {
-    console.log('getTransactionsByIds )=> ', ids);
+    console.log("getTransactionsByIds => ", ids);
     const collection = mongoDB.db.collection(CollectionName);
     return Rx.Observable.defer(() =>
       collection
-        .find({ _id: { $in: ids.map(id => new ObjectID.createFromHexString(id) ) } })
+        .find({
+          _id: { $in: ids.map(id => new ObjectID.createFromHexString(id)) }
+        })
         .sort({ timestamp: -1 })
         .skip(count * page)
         .limit(count)
@@ -76,24 +79,30 @@ class TransactionsDA {
         const buNamesMap$ = Rx.Observable.from(transactions)
           .mergeMap(tx => Rx.Observable.from([tx.fromBu, tx.toBu]))
           .distinct()
-          .mergeMap(buId => BusinessDA.getBusinessByIds$([buId]).map(business => { return { id: business._id, name: business.name } }))
+          .mergeMap(buId =>
+            BusinessDA.getBusinessByIds$([buId]).map(business => {
+              return { id: business._id, name: business.name };
+            })
+          )
           .reduce((acc, val) => {
             acc[val.id] = val.name;
             return acc;
           }, {});
 
-        return Rx.Observable.combineLatest(
-          buNamesMap$,
-          Rx.Observable.from(transactions)
-        )
+        return buNamesMap$
+          .mergeMap(buNamesMap =>
+            Rx.Observable.from(transactions).map(tx => [buNamesMap, tx])
+          )
           .map(([cache, tx]) => {
-            return { ...tx, fromBusinessName: cache[tx.fromBu], toBusinessName: cache[tx.toBu] };
-          })
+            return {
+              ...tx,
+              fromBusinessName: cache[tx.fromBu],
+              toBusinessName: cache[tx.toBu]
+            };
+          });
       })
       .toArray();
   }
-
-
 }
 
 /**

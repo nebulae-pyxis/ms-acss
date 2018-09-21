@@ -67,7 +67,7 @@ class TransactionAccumulatedEventConsumer {
             { businessId: businessId, open: true },
             {
               $set: { lastUpdateTimestamp: timestamp },
-              $push: { accumulatedTransactions: accumulatedTx._id },
+              $push: { accumulatedTransactionIds: accumulatedTx._id },
               $setOnInsert: {
                 timestamp: timestamp,
                 businessId: businessId,

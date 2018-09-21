@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs/Observable";
 import { GatewayService } from "../../../../api/gateway.service";
-import { getAccumulatedTransactionsByIds, getTransactionsByIds } from "../gql/acss";
+import { getAccumulatedTransactionsByIds, getTransactionsByIds, getSettlementsByClearingId, getSettlementsCountByClearingId } from "../gql/acss";
 
 @Injectable()
 export class ClearingService {
@@ -41,6 +41,42 @@ export class ClearingService {
         count: count,
         filterType: filterType,
         ids: ids
+      },
+      fetchPolicy: "network-only",
+      errorPolicy: "all"
+    });
+  }
+
+  /**
+   * Gets settlements associated with the specified clearing Id
+   * @param page page number of the query
+   * @param count Max amount of rows to be return
+   * @param clearingId Clearing ID
+   */
+  getSettlementsByClearingId$(page, count, clearingId) {
+    console.log('settlement query => ', page, count, clearingId);
+    return this.gateway.apollo.query<any>({
+      query: getSettlementsByClearingId,
+      variables: {
+        page: page,
+        count: count,
+        clearingId: clearingId
+      },
+      fetchPolicy: "network-only",
+      errorPolicy: "all"
+    });
+  }
+
+  /**
+   * Gets the amount of settlements associated with the specified clearing Id
+   * @param id Clearing ID
+   */
+  getSettlementsCountByClearingId$(clearingId) {
+    console.log('settlement count query => ', clearingId);
+    return this.gateway.apollo.query<any>({
+      query: getSettlementsCountByClearingId,
+      variables: {
+        clearingId: clearingId
       },
       fetchPolicy: "network-only",
       errorPolicy: "all"

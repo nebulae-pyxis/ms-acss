@@ -2,6 +2,7 @@
 
 let mongoDB = undefined;
 const Rx = require("rxjs");
+const ObjectID = require('mongodb').ObjectID;
 const OpenClearingCollectionName = "Clearing";
 const ClosedClearingCollectionName = "ClosedClearing";
 const BusinessDA = require("./BusinessDA");
@@ -51,7 +52,6 @@ class ClearingDA {
         true
       );
     }).mergeMap(openClearing => {
-      console.log('openClearing => ', openClearing);
       const countClosedClearing = openClearing.length == 0 ? count - 1 : count;
       return Rx.Observable.forkJoin(
         Rx.Observable.of(openClearing),
@@ -63,7 +63,6 @@ class ClearingDA {
           false
         )
       ).map(([openClearingArray, closedClearingArray]) => {
-        console.log('MERGE ========> ', openClearingArray);
         return [
           ...openClearingArray,
           ...closedClearingArray
@@ -90,12 +89,8 @@ class ClearingDA {
         .limit(count)
         .toArray();
     })
-      .mergeMap(clearings => {
-        console.log('clearings ==> ', clearings);
-        return Rx.Observable.from(clearings);
-      })
+      .mergeMap(clearings => Rx.Observable.from(clearings))
       .map(clearing => {
-        console.log('-------------------> ', clearing);
         clearing.partialSettlement = clearing.partialSettlement || {};
         clearing.open = open;
 
@@ -121,7 +116,7 @@ class ClearingDA {
     const collection = mongoDB.db.collection(OpenClearingCollectionName);
     return Rx.Observable.defer(() => collection.findOne({ businessId: id }));
   }
-
+  
   /**
    * Gets the clearing by ID
    * @param {*} clearingId ID of the clearing
@@ -131,7 +126,7 @@ class ClearingDA {
     return (
       Rx.Observable.defer(() => {
         const collection = mongoDB.db.collection(OpenClearingCollectionName);
-        return collection.findOne({ _id: clearingId });
+        return collection.findOne({ _id: new ObjectID.createFromHexString(clearingId) });
       })
         //If the clearing was not found, we have to look for the clearing on the closed clearing collection
         .mergeMap(clearing => {

@@ -80,7 +80,7 @@ module.exports = {
               "getACSSBusinesses",
               PERMISSION_DENIED_ERROR_CODE,
               "Permission denied",
-              ["system-admin", "business-owner"]
+              ["SYSADMIN", "business-owner"]
             )
               .mergeMap(response => {
                 return broker.forwardAndGetReply$(
@@ -101,7 +101,7 @@ module.exports = {
               "getAllClearingsFromBusiness",
               PERMISSION_DENIED_ERROR_CODE,
               "Permission denied",
-              ["system-admin", "business-owner"]
+              ["SYSADMIN", "business-owner"]
             ).mergeMap(response => {
                 return broker.forwardAndGetReply$(
                   "Clearing",
@@ -121,7 +121,7 @@ module.exports = {
               "getClearingById",
               PERMISSION_DENIED_ERROR_CODE,
               "Permission denied",
-              ["system-admin", "business-owner"]
+              ["SYSADMIN", "business-owner"]
             ).mergeMap(response => {
                 return broker.forwardAndGetReply$(
                   "Clearing",
@@ -141,7 +141,7 @@ module.exports = {
               "getAccumulatedTransactionsByIds",
               PERMISSION_DENIED_ERROR_CODE,
               "Permission denied",
-              ["system-admin", "business-owner"]
+              ["SYSADMIN", "business-owner"]
             ).mergeMap(response => {
                 return broker.forwardAndGetReply$(
                   "Clearing",
@@ -161,7 +161,7 @@ module.exports = {
               "getTransactionsByIds",
               PERMISSION_DENIED_ERROR_CODE,
               "Permission denied",
-              ["system-admin", "business-owner"]
+              ["SYSADMIN", "business-owner"]
             ).mergeMap(response => {
                 return broker.forwardAndGetReply$(
                   "Clearing",

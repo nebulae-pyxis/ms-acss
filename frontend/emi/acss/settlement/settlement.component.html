@@ -1,3 +1,54 @@
-<p>
-  settlement works!
-</p>
+      <!-- CONTENT CARD -->
+
+      <div class="content-card mat-white-bg">
+  
+        <div fxLayout="column" style="width: 100%; justify-content: space-between" fxLayout.gt-sm="row">
+          <div fxLayout="column" fxFlex="100" fxFlex.gt-sm="100" fxFlex.gt-md="100">
+            <mat-table id="settlement-table" class="item-table" #table [dataSource]="dataSource">
+  
+              <!-- Timestamp Column -->
+              <ng-container cdkColumnDef="timestamp">
+                <mat-header-cell *cdkHeaderCellDef>{{'ACSS.TIMESTAMP' | translate}}</mat-header-cell>
+                <mat-cell *cdkCellDef="let settlement">
+                  <p class="text-truncate">{{settlement.timestamp | date: 'd/MM/y HH:mm:ss'}}</p>
+                </mat-cell>
+              </ng-container>
+  
+              <!-- From Column -->
+              <ng-container cdkColumnDef="from">
+                <mat-header-cell *cdkHeaderCellDef>{{'ACSS.FROM' | translate}}</mat-header-cell>
+                <mat-cell *cdkCellDef="let settlement">
+                  <p class="text-truncate">{{settlement.fromBusinessName}}</p>
+                </mat-cell>
+              </ng-container>
+  
+              <!-- To Column -->
+              <ng-container cdkColumnDef="to">
+                <mat-header-cell *cdkHeaderCellDef>{{'ACSS.TO' | translate}}</mat-header-cell>
+                <mat-cell *cdkCellDef="let settlement">
+                  <p class="text-truncate">{{settlement.toBusinessName}}</p>
+                </mat-cell>
+              </ng-container>
+  
+              <!-- Amount Column -->
+              <ng-container cdkColumnDef="amount">
+                <mat-header-cell *cdkHeaderCellDef>{{'ACSS.AMOUNT' | translate}}</mat-header-cell>
+                <mat-cell *cdkCellDef="let settlement">
+                  <p class="text-truncate">{{settlement.amount | currency}}</p>
+                </mat-cell>
+              </ng-container>
+  
+              <mat-header-row *cdkHeaderRowDef="displayedColumns"></mat-header-row>
+  
+              <mat-row *cdkRowDef="let settlement; columns: displayedColumns;" class="product">
+              </mat-row>
+  
+            </mat-table>
+  
+            <mat-paginator #paginator [length]="tableSize" [pageIndex]="0" [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]">
+            </mat-paginator>
+          </div>
+        </div>
+      </div>
+  
+      <!-- / CONTENT CARD -->

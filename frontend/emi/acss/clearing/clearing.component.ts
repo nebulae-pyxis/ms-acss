@@ -1,29 +1,19 @@
 ////////// RXJS ///////////
 // tslint:disable-next-line:import-blacklist
 import * as Rx from "rxjs/Rx";
-import { map, mergeMap, toArray, filter, tap, startWith } from "rxjs/operators";
-import { Subscription } from 'rxjs/Subscription';
+import {  mergeMap, filter, tap } from "rxjs/operators";
 
-import { Output } from '@angular/core';
 //////////// ANGULAR MATERIAL ///////////
 import {
   MatPaginator,
   MatSort,
-  Sort,
   MatTableDataSource,
-  MatDialog,
   MatSnackBar
 } from "@angular/material";
 import { fuseAnimations } from '../../../../core/animations';
 
 ////////// ANGULAR //////////
 import { Component, OnInit, OnDestroy, Input, ViewChild, ElementRef } from "@angular/core";
-import {
-  FormBuilder,
-  FormGroup,
-  FormControl,
-  Validators
-} from "@angular/forms";
 
 //////////// i18n ////////////
 import { FuseTranslationLoaderService } from "../../../../core/services/translation-loader.service";
@@ -32,7 +22,7 @@ import { locale as english } from "../i18n/en";
 import { locale as spanish } from "../i18n/es";
 
 import { ClearingService } from './clearing.service';
-import { Clearing } from './entities/clearing';
+import { Clearing } from '../entities/clearing';
 
 @Component({
   selector: 'app-clearing',
@@ -97,7 +87,7 @@ export class ClearingComponent implements OnInit, OnDestroy {
     sortOrder = null;
     itemPerPage = '';
 
-  constructor(private formBuilder: FormBuilder,
+  constructor(
     private translationLoader: FuseTranslationLoaderService,
     private translate: TranslateService,
     private clearingService: ClearingService,
@@ -119,7 +109,7 @@ export class ClearingComponent implements OnInit, OnDestroy {
     // this.incomesDataSource.paginator = this.paginatorIncomes;
     this.incomesResultsLength = this.clearing.input.length;
 
-    this.outcomesDataSource.data = this.clearing.output;
+    this.outcomesDataSource = new MatTableDataSource<Element>(this.clearing.output);
     // this.outcomesDataSource.paginator = this.paginatorOutcomes;
     this.outcomesResultsLength = this.clearing.output.length;
 

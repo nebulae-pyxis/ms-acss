@@ -39,7 +39,7 @@ type AccumulatedTransaction {
   "Ids of the involved transactions"
   transactionIds: [GroupedTransactions]!
   "Amount"
-  amount: BigInt!
+  amount: Float!
 }
 
 type GroupedTransactions {
@@ -62,7 +62,7 @@ type Clearing {
   input: [Movement]
   output: [Movement]
   partialSettlement: PartialSettlement
-  accumulatedTransactionIds: [Int]!
+  accumulatedTransactionIds: [String]!
   open: Boolean
 }
 
@@ -73,7 +73,7 @@ type Movement {
   "Business name involved in the movement"
   businessName: String
   "Movement amount"
-  amount: Int!
+  amount: Float!
 }
 
 "Money movement"
@@ -83,7 +83,7 @@ type SettlementMovement {
   "Business name involved in the movement"
   businessName: String
   "Movement amount"
-  amount: Int!
+  amount: Float!
   "Settlement ID"
   settlementId: String!
 }
@@ -99,7 +99,7 @@ type Transaction {
   "Transaction id"
   _id: ID!
   "Transaction amount"
-  amount: BigInt!
+  amount: Float!
   "From business"
   fromBu: String!
   fromBusinessName: String
@@ -116,6 +116,26 @@ type Transaction {
   evt: Event!
 }
 
+"Settlement info"
+type Settlement {
+  "Settlement id"
+  _id: ID!
+  "Settlement amount"
+  amount: Float!
+  "From business"
+  fromBu: String!
+  "From business name"
+  fromBusinessName: String
+  "To business"
+  toBu: String!
+  "To business name"
+  toBusinessName: String
+  "Timestamp"
+  timestamp: BigInt
+  "Clearing ID"
+  clearingId: String!
+}
+
 "Hello world sample, please remove"
 type HelloWorldACSS {
   "text"
@@ -127,7 +147,7 @@ type Query {
   getACSSBusiness: Business
   "Get businesses"
   getACSSBusinesses: [Business]
-  "Gets the clearings from a business. the value businessId is taken into account if and only if the user has the role system-admin, If a business is not specified, this will return the clearings associated with the business of the user that is performing the request "
+  "Gets the clearings from a business. the value businessId is taken into account if and only if the user has the role SYSADMIN, If a business is not specified, this will return the clearings associated with the business of the user that is performing the request "
   getAllClearingsFromBusiness(page: Int!, count: Int!, businessId: String): [Clearing]
   "Gets the clearing with the indicated ID"
   getClearingById(id: ID!): Clearing
@@ -135,6 +155,10 @@ type Query {
   getAccumulatedTransactionsByIds(page: Int!, count: Int!, ids: [ID!]): [AccumulatedTransaction]
   "Gets transactions by ids"
   getTransactionsByIds(page: Int!, count: Int!, filterType: String, ids: [ID!]): [Transaction]
+  "Gets settlements associated with the specified clearing ID"
+  getSettlementsByClearingId(page: Int!, count: Int!, clearingId: String!): [Settlement]
+  "Gets the amount of settlements associated with the specified clearing ID"
+  getSettlementsCountByClearingId(clearingId: String!): Int!
 }
 
 type Subscription {

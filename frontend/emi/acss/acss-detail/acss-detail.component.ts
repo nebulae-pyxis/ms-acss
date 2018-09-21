@@ -80,7 +80,7 @@ export class ACSSDetailComponent implements OnInit, OnDestroy {
   async checkIfUserIsSystemAdmin(){
     this.userRoles = await this.keycloakService.getUserRoles(true);
 
-    this.isSystemAdmin = this.userRoles.some(role => role === 'system-admin');
+    this.isSystemAdmin = this.userRoles.some(role => role === 'SYSADMIN');
 
     if (!this.isSystemAdmin){
       this.getBusiness$();

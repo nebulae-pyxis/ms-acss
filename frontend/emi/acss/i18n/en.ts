@@ -26,7 +26,8 @@ export const locale = {
       TYPE: 'Type',
       AMOUNT: 'Value',
       TRANSACTIONS: 'Transactions',
-      ACCUMULATED_TRANSACTION_DETAIL: 'Accumulated transactions detail'
+      ACCUMULATED_TRANSACTION_DETAIL: 'Accumulated transactions detail',
+      SELECT_BUSINESS: 'Select a business'
     },
     ERRORS: {
       17001: 'Internal server error',

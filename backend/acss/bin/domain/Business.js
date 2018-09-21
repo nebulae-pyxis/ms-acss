@@ -3,12 +3,7 @@
 const Rx = require("rxjs");
 const BusinessDA = require("../data/BusinessDA");
 const BusinessValidatorHelper = require("./BusinessValidatorHelper");
-const broker = require("../tools/broker/BrokerFactory")();
-const eventSourcing = require("../tools/EventSourcing")();
 const RoleValidator = require("../tools/RoleValidator");
-const Event = require("@nebulae/event-store").Event;
-const uuidv4 = require("uuid/v4");
-const MATERIALIZED_VIEW_TOPIC = "materialized-view-updates";
 const {
   CustomError,
   DefaultError,
@@ -32,12 +27,8 @@ class Business {
    * @param {*} args args 
    */
   getACSSBusiness$({ args }, authToken) {
-    console.log('getACSSBusiness =>', authToken);
     return BusinessValidatorHelper.validateData$(authToken)
       .mergeMap(val => BusinessDA.getBusiness$(authToken.businessId))
-      .do(val => {
-        console.log('Prueba => ', val);
-      })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
       .catch(err => {
         return this.handleError$(err);
@@ -56,7 +47,7 @@ class Business {
       "getACSSBusinesses$()",
       PERMISSION_DENIED_ERROR_CODE,
       "Permission denied",
-      ["system-admin", "business-owner"]
+      ["SYSADMIN", "business-owner"]
     )
       .mergeMap(val => BusinessDA.getAllBusinesses$())
       .toArray()

@@ -1,4 +1,4 @@
-import { ACSSService } from './acss.service';
+import { ACSSService } from "./acss.service";
 
 ////////// ANGULAR //////////
 import {
@@ -6,7 +6,8 @@ import {
   OnInit,
   ViewChild,
   ElementRef,
-  OnDestroy
+  OnDestroy,
+  AfterViewInit
 } from "@angular/core";
 import {
   FormBuilder,
@@ -14,7 +15,7 @@ import {
   FormControl,
   Validators
 } from "@angular/forms";
-import { KeycloakService } from 'keycloak-angular';
+import { KeycloakService } from "keycloak-angular";
 
 //////////// i18n ////////////
 import { FuseTranslationLoaderService } from "./../../../core/services/translation-loader.service";
@@ -29,46 +30,63 @@ import {
   MatTableDataSource,
   MatSnackBar
 } from "@angular/material";
-import { fuseAnimations } from '../../../core/animations';
+import { fuseAnimations } from "../../../core/animations";
 
 ////////// RXJS ///////////
 // tslint:disable-next-line:import-blacklist
 import * as Rx from "rxjs/Rx";
-import { map, mergeMap, toArray, filter, tap } from "rxjs/operators";
+import {
+  map,
+  mergeMap,
+  toArray,
+  filter,
+  tap,
+  combineLatest
+} from "rxjs/operators";
 
 @Component({
   // tslint:disable-next-line:component-selector
-  selector: 'acss',
-  templateUrl: './acss.component.html',
-  styleUrls: ['./acss.component.scss'],
+  selector: "acss",
+  templateUrl: "./acss.component.html",
+  styleUrls: ["./acss.component.scss"],
   animations: fuseAnimations
 })
 export class ACSSComponent implements OnInit, OnDestroy {
-
-  userRoles: any;
+  // userRoles: any;
   isSystemAdmin: Boolean = false;
   // Rxjs subscriptions
   subscriptions = [];
-   // Columns to show in the table
-  displayedColumns = ['timestamp', 'lastUpdateTimestamp', 'open', 'projected_balance'];
+  // Columns to show in the table
+  displayedColumns = [
+    'timestamp',
+    'lastUpdateTimestamp',
+    'open',
+    'projected_balance'
+  ];
   // Table data
   dataSource = new MatTableDataSource();
   businessForm: FormGroup;
   businessQuery$: Rx.Observable<any>;
+  businessUserLogged: any = null;
+  allBusiness: any = [];
   selectedBusiness: any = null;
   selectedClearing: any = null;
+  selectedBusinessSubject: Rx.Subject<any> = new Rx.Subject();
 
-  //Table values
-  @ViewChild(MatPaginator) paginator: MatPaginator;
-  @ViewChild("filter") filter: ElementRef;
-  @ViewChild(MatSort) sort: MatSort;
+  // Table values
+  @ViewChild(MatPaginator)
+  paginator: MatPaginator;
+  @ViewChild('filter')
+  filter: ElementRef;
+  @ViewChild(MatSort)
+  sort: MatSort;
   tableSize: number;
   page = 0;
   count = 10;
-  filterText = "";
+  filterText = '';
   sortColumn = null;
   sortOrder = null;
-  itemPerPage = "";
+  itemPerPage = '';
 
   constructor(
     private formBuilder: FormBuilder,
@@ -76,14 +94,62 @@ export class ACSSComponent implements OnInit, OnDestroy {
     private translationLoader: FuseTranslationLoaderService,
     private translate: TranslateService,
     private snackBar: MatSnackBar,
-    private keycloakService: KeycloakService,
+    private keycloakService: KeycloakService
   ) {
     this.translationLoader.loadTranslations(english, spanish);
   }
 
-
   ngOnInit() {
-    this.checkIfUserIsSystemAdmin();
+    this.businessForm = this.createBusinessForm();
+    this.refreshTable();
+  }
+
+  /**
+   * Creates the business detail form and its validations
+   */
+  createBusinessForm() {
+    return this.formBuilder.group({
+      business: new FormControl(null, Validators.required)
+    });
+  }
+
+  /**
+   * Refresh the info of the table according to the paginator and the selected business
+   */
+  refreshTable() {
+    this.subscriptions.push(
+      Rx.Observable.combineLatest(
+        this.loadBusinessData$(),
+        this.getPaginator$(),
+        this.selectedBusinessSubject.startWith(null)
+      )
+        .pipe(
+          mergeMap(([businessData, paginator, selectedBusiness]) => {
+            const isAdmin = businessData[0];
+            const businessUser = businessData[1];
+            if (!selectedBusiness && isAdmin) {
+              return Rx.Observable.of([]).map(clearings => [
+                businessData,
+                clearings
+              ]);
+            }
+            return this.getClearingsFromBusiness$(
+              paginator.pageIndex,
+              paginator.pageSize,
+              isAdmin ? selectedBusiness._id : businessUser._id
+            )
+              .map(clearings => clearings.data.getAllClearingsFromBusiness)
+              .map(clearings => [businessData, clearings]);
+          })
+        )
+        .subscribe(([businessData, clearings]) => {
+          console.log('businessData => ', businessData);
+          console.log('Clearings => ', clearings);
+          this.allBusiness = businessData[2];
+          this.isSystemAdmin = businessData[0];
+          this.dataSource.data = clearings;
+        })
+    );
   }
 
   /**
@@ -92,49 +158,61 @@ export class ACSSComponent implements OnInit, OnDestroy {
    * @param count Limits the number of documents in the result set
    * @param businessId Business ID filter
    */
-  refreshDataTable(page, count, businessId) {
-    this.subscriptions.push(this.aCSSService
+  getClearingsFromBusiness$(page, count, businessId) {
+    return this.aCSSService
       .getClearingsFromBusiness$(page, count, businessId)
       .pipe(
         mergeMap(resp => this.graphQlAlarmsErrorHandler$(resp)),
-        filter((resp: any) => !resp.errors || resp.errors.length === 0),
-      ).subscribe(model => {
-        this.dataSource.data = model.data.getAllClearingsFromBusiness;
-      }));
+        filter((resp: any) => !resp.errors || resp.errors.length === 0)
+      );
   }
 
+  /**
+   * Listens when a new business have been selected
+   * @param business  selected business
+   */
+  onSelectBusinessEvent(business) {
+    this.selectedBusinessSubject.next(business);
+  }
 
   /**
-   * Checks if the user is system admin
+   * Paginator of the table
    */
-  async checkIfUserIsSystemAdmin(){
-    this.userRoles = await this.keycloakService.getUserRoles(true);
+  getPaginator$() {
+    return this.paginator.page.startWith({ pageIndex: 0, pageSize: 10 });
+  }
 
-    this.isSystemAdmin = this.userRoles.some(role => role === 'system-admin');
-
-    if (!this.isSystemAdmin){
-      this.getBusiness$();      
-    }
-    this.refreshDataTable(this.page, this.count, undefined);
+  loadBusinessData$() {
+    return Rx.Observable.of(this.keycloakService.getUserRoles(true)).pipe(
+      mergeMap(userRoles => {
+        const isAdmin = userRoles.some(role => role === 'SYSADMIN');
+        console.log('isAdmin => ', isAdmin);
+        return Rx.Observable.forkJoin(
+          Rx.Observable.of(isAdmin),
+          this.getBusiness$(),
+          isAdmin ? this.getAllBusiness$() : Rx.Observable.of([])
+        );
+      }),
+      tap(val => console.log('loadBusinessData$ EMISSION => ', val))
+    );
   }
 
   /**
    * get the business which the user belongs
    */
-  getBusiness$(){
-    this.subscriptions.push(this.aCSSService.getACSSBusiness$()
-    .pipe(
-      map(res => res.data.getACSSBusiness)
-    ).subscribe(business => {
-      this.selectedBusiness = business;
-    }));
+  getBusiness$() {
+    return this.aCSSService
+      .getACSSBusiness$()
+      .pipe(
+        map(res => res.data.getACSSBusiness)
+      );
   }
 
   /**
    * Creates an observable of business
    */
-  createBusinessObservable(){
-    this.businessQuery$ = this.aCSSService.getACSSBusinesses$().pipe(
+  getAllBusiness$() {
+    return this.aCSSService.getACSSBusinesses$().pipe(
       mergeMap(res => {
         return Rx.Observable.from(res.data.getACSSBusinesses);
       }),
@@ -149,54 +227,72 @@ export class ACSSComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Creates the business detail form and its validations
-   */
-  createBusinessForm() {
-    return this.formBuilder.group({
-      business: new FormControl(null, Validators.required)
-    });
-  }
-
-  /**
    * Receives the selected clearing
    * @param clearing selected clearing
    */
-  selectClearingRow(clearing){
+  selectClearingRow(clearing) {
     this.selectedClearing = clearing;
   }
 
-    /**
+
+  /**
    * Calculates the projected balance according to the clearing info
    * @param clearing Clearing info
    */
-  calculateProjectedBalance(clearing){
-    const inputs = clearing.input.reduce((inputA,inputB) => {
+  calculateProjectedBalance(clearing) {
+    const inputs = clearing.input.reduce((inputA, inputB) => {
       return inputA.amount || 0 + inputB.amount || 0;
     }, 0);
 
-    const outputs = clearing.output.reduce((outputA,outputB) => {
+    const outputs = clearing.output.reduce((outputA, outputB) => {
       return outputA.amount || 0 + outputB.amount || 0;
     }, 0);
 
-    const partialSettlementOutputs = clearing.partialSettlement.input.reduce((outputA,outputB) => {
-      return outputA.amount + outputB.amount;
-    }, 0);
+    const partialSettlementOutputs = clearing.partialSettlement.input.reduce(
+      (outputA, outputB) => {
+        return outputA.amount + outputB.amount;
+      },
+      0
+    );
 
-    const partialSettlementInputs = clearing.partialSettlement.input.reduce((inputA,inputB) => {
-      return inputA.amount + inputB.amount;
-    }, 0);
+    const partialSettlementInputs = clearing.partialSettlement.input.reduce(
+      (inputA, inputB) => {
+        return inputA.amount + inputB.amount;
+      },
+      0
+    );
 
-    return (inputs + partialSettlementInputs) - (outputs + partialSettlementOutputs);
+    return (
+      inputs + partialSettlementInputs - (outputs + partialSettlementOutputs)
+    );
   }
 
+    // /**
+  //  * Finds the clearings
+  //  * @param page page number
+  //  * @param count Limits the number of documents in the result set
+  //  * @param businessId Business ID filter
+  //  */
+  // refreshDataTable(page, count, businessId) {
+  //   this.subscriptions.push(
+  //     this.aCSSService
+  //       .getClearingsFromBusiness$(page, count, businessId)
+  //       .pipe(
+  //         mergeMap(resp => this.graphQlAlarmsErrorHandler$(resp)),
+  //         filter((resp: any) => !resp.errors || resp.errors.length === 0)
+  //       )
+  //       .subscribe(model => {
+  //         this.dataSource.data = model.data.getAllClearingsFromBusiness;
+  //       })
+  //   );
+  // }
 
-    /**
+  /**
    * Handles the Graphql errors and show a message to the user
-   * @param response 
+   * @param response
    */
-  graphQlAlarmsErrorHandler$(response){
-    return Rx.Observable.of(JSON.parse(JSON.stringify(response)))
-    .pipe(
+  graphQlAlarmsErrorHandler$(response) {
+    return Rx.Observable.of(JSON.parse(JSON.stringify(response))).pipe(
       tap((resp: any) => {
         this.showSnackBarError(resp);
         return resp;
@@ -204,22 +300,21 @@ export class ACSSComponent implements OnInit, OnDestroy {
     );
   }
 
-    /**
+  /**
    * Shows an error snackbar
    * @param response
    */
-  showSnackBarError(response){    
-    if (response.errors){
-
+  showSnackBarError(response) {
+    if (response.errors) {
       if (Array.isArray(response.errors)) {
         response.errors.forEach(error => {
           if (Array.isArray(error)) {
             error.forEach(errorDetail => {
-              this.showMessageSnackbar('ERRORS.' + errorDetail.message.code);
+              this.showMessageSnackbar("ERRORS." + errorDetail.message.code);
             });
-          }else{
+          } else {
             response.errors.forEach(error => {
-              this.showMessageSnackbar('ERRORS.' + error.message.code);
+              this.showMessageSnackbar("ERRORS." + error.message.code);
             });
           }
         });
@@ -227,33 +322,31 @@ export class ACSSComponent implements OnInit, OnDestroy {
     }
   }
 
-    /**
+  /**
    * Shows a message snackbar on the bottom of the page
    * @param messageKey Key of the message to i18n
    * @param detailMessageKey Key of the detail message to i18n
    */
-  showMessageSnackbar(messageKey, detailMessageKey?){
+  showMessageSnackbar(messageKey, detailMessageKey?) {
     let translationData = [];
-    if(messageKey){
+    if (messageKey) {
       translationData.push(messageKey);
     }
 
-    if(detailMessageKey){
+    if (detailMessageKey) {
       translationData.push(detailMessageKey);
     }
 
-    this.translate.get(translationData)
-    .subscribe(data => {
+    this.translate.get(translationData).subscribe(data => {
       this.snackBar.open(
-        messageKey ? data[messageKey]: '',
-        detailMessageKey ? data[detailMessageKey]: '',
+        messageKey ? data[messageKey] : "",
+        detailMessageKey ? data[detailMessageKey] : "",
         {
           duration: 2000
         }
       );
     });
   }
-
 
   ngOnDestroy() {
     if (this.subscriptions) {
@@ -262,5 +355,4 @@ export class ACSSComponent implements OnInit, OnDestroy {
       });
     }
   }
-
 }

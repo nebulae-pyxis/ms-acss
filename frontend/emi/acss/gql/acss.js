@@ -119,6 +119,27 @@ export const getTransactionsByIds = gql`
   }
 `;
 
+export const getSettlementsByClearingId = gql`
+  query getSettlementsByClearingId($page: Int!, $count: Int!, $clearingId: String!){
+    getSettlementsByClearingId(page: $page, count: $count, clearingId: $clearingId){
+      _id
+      amount
+      fromBu
+      fromBusinessName
+      toBu
+      toBusinessName
+      timestamp
+      clearingId
+    }
+  }
+`;
+
+export const getSettlementsCountByClearingId = gql`
+  query getSettlementsCouintByClearingId($clearingId: String!){
+    getSettlementsCountByClearingId(clearingId: $clearingId)
+  }
+`;
+
 
 //Hello world sample, please remove
 export const ACSSHelloWorldSubscription = gql`

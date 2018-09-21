@@ -26,7 +26,8 @@ export const locale = {
       AMOUNT: 'Valor',
       TIMESTAMP: 'Fecha',
       TRANSACTIONS: 'Transacciones',
-      ACCUMULATED_TRANSACTION_DETAIL: 'Detalle de transacciones acumuladas'
+      ACCUMULATED_TRANSACTION_DETAIL: 'Detalle de transacciones acumuladas',
+      SELECT_BUSINESS: 'Seleccione un negocio'
     },
     ERRORS: {
       17001: 'Error interno de servidor',

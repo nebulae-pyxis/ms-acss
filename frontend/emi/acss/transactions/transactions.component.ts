@@ -9,13 +9,6 @@ import {
 } from "@angular/core";
 import { Router, ActivatedRoute } from "@angular/router";
 
-import {
-  FormBuilder,
-  FormGroup,
-  FormControl,
-  Validators
-} from "@angular/forms";
-
 //////////// i18n ////////////
 import { FuseTranslationLoaderService } from "../../../../core/services/translation-loader.service";
 import { TranslateService } from "@ngx-translate/core";
@@ -42,14 +35,13 @@ import { ClearingService } from "../clearing/clearing.service";
   templateUrl: "./transactions.component.html",
   styleUrls: ["./transactions.component.scss"]
 })
-export class TransactionsComponent implements OnInit {
+export class TransactionsComponent implements OnInit, OnDestroy {
   // Rxjs subscriptions
   subscriptions = [];
   // Columns to show in the table
   displayedColumns = ["timestamp", "from", "to", "type", "amount"];
   // Table data
   dataSource = new MatTableDataSource();
-  businessForm: FormGroup;
   businessQuery$: Rx.Observable<any>;
   selectedAccumulatedTransaction: any = null;
 
@@ -69,7 +61,6 @@ export class TransactionsComponent implements OnInit {
   itemPerPage = "";
 
   constructor(
-    private formBuilder: FormBuilder,
     private clearingService: ClearingService,
     private translationLoader: FuseTranslationLoaderService,
     private translate: TranslateService,
@@ -98,7 +89,7 @@ export class TransactionsComponent implements OnInit {
             console.log("Paginator changed ", paginator);
             const txIdsArray = [];
             txIds.forEach(tx => {
-              txIdsArray.push(tx.ids);
+              txIdsArray.push(...tx.ids);
             });
             this.tableSize = txIdsArray.length;
             console.log("txIdsArray => ", txIdsArray);

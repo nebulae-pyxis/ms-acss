@@ -3,27 +3,36 @@
   <form fxLayout="row">
 
     <div fxLayout="row" fxLayout.xs="column" fxFlex="100">
-      <div fxLayout="row" fxLayoutAlign="start center" fxFlex="32">
-          <span class="h1 title secondary-text">{{'ACSS.DATE' | translate}}:</span>
+      <div fxLayout="row" fxLayoutAlign="start center" fxFlex="25">
+          <span class="h2 title secondary-text">{{'ACSS.TIMESTAMP' | translate}}:</span>
           <span>&nbsp;&nbsp;</span>
-          <div class="h2">
+          <div class="h3">
               <span>{{convertMillisToDate(clearing.timestamp) | date: 'd/MM/y HH:mm:ss'}}</span>
               <span> </span>
           </div>
       </div>
 
-      <div fxLayout="row" fxLayoutAlign="start center" fxFlex="49">
-          <span class="h1 title secondary-text">{{'ACSS.PROJECTED_BALANCE' | translate}}:</span>
+      <div fxLayout="row" fxLayoutAlign="start center" fxFlex="25">
+        <span class="h2 title secondary-text">{{'ACSS.LAST_UPDATE_TIMESTAMP' | translate}}:</span>
+        <span>&nbsp;&nbsp;</span>
+        <div class="h3">
+            <span>{{convertMillisToDate(clearing.lastUpdateTimestamp) | date: 'd/MM/y HH:mm:ss'}}</span>
+            <span> </span>
+        </div>
+    </div>
+
+      <div fxLayout="row" fxLayoutAlign="start center" fxFlex="25">
+          <span class="h2 title secondary-text">{{'ACSS.PROJECTED_BALANCE' | translate}}:</span>
           <span>&nbsp;&nbsp;</span>
-          <div class="h2">
+          <div class="h3">
               <span class="value">{{calculateProjectedBalance(clearing) | currency}}</span>
           </div>
       </div>
 
-      <div fxLayout="row" fxLayoutAlign="start center" fxFlex="32">
-          <span class="h1 title secondary-text">{{'ACSS.STATE' | translate}}:</span>
+      <div fxLayout="row" fxLayoutAlign="start center" fxFlex="25">
+          <span class="h2 title secondary-text">{{'ACSS.STATE' | translate}}:</span>
           <span>&nbsp;&nbsp;</span>
-          <div class="h2">
+          <div class="h3">
               <span class="value" *ngIf="clearing.open">{{'ACSS.OPEN' | translate}}</span>
               <span class="value" *ngIf="!clearing.open">{{'ACSS.CLOSE' | translate}}</span>
           </div>
@@ -37,22 +46,21 @@
         </div>
 
         <div class="pb-16" fxLayout="row" fxLayoutAlign="start center">
-            <mat-icon class="m-0 mr-16">class</mat-icon>
+            <mat-icon class="m-0 mr-16">chrome_reader_mode</mat-icon>
             <div class="h2 secondary-text">{{'ACSS.GENERAL_INCOME_OUTCOME' | translate}}</div>
         </div>
 
         <div fxLayout="row" fxLayout.xs="column"  fxLayoutAlign="space-between start">
           <div fxLayout="column" fxFlex="49">
             
-            <div class="fuse-widget-front mat-white-bg mat-elevation-z2" fxLayout="column">
-                <div class="p-12 mb-2 border-bottom" fxLayout="row" fxLayoutAlign="space-between center">
+            <div class="fuse-widget-front mat-white-bg mat-elevation-z3" fxLayout="column">
+                <div class="p-12 border-bottom border-top" fxLayout="row" fxLayoutAlign="space-between center">
                   <div fxLayout="row" fxLayoutAlign="start center">
                     <mat-icon class="m-0 mr-16">trending_up</mat-icon>
                     <div class="h2 secondary-text">{{'ACSS.INCOMES' | translate}}</div>
                   </div>
                 </div>
-            <mat-table id="incomes-table" class="item-table pb-12" [dataSource]="incomesDataSource"
-              fusePerfectScrollbar>
+            <mat-table id="incomes-table" class="item-table adaptativeTable" [dataSource]="incomesDataSource" fusePerfectScrollbar >
   
               <!-- Business name Column -->
               <ng-container cdkColumnDef="businessName">
@@ -83,10 +91,8 @@
 
           
           <div fxLayout="column" fxFlex="49">
-
-            
-            <div class="fuse-widget-front mat-white-bg mat-elevation-z2">
-                <div class="p-12 mb-2 border-bottom" fxLayout="row" fxLayoutAlign="space-between center">
+            <div class="fuse-widget-front mat-white-bg mat-elevation-z3">
+                <div class="p-12 mb-2 border-bottom border-top" fxLayout="row" fxLayoutAlign="space-between center">
                   <div fxLayout="row" fxLayoutAlign="start center">
                     <mat-icon class="m-0 mr-16">trending_down</mat-icon>
                     <div class="h2 secondary-text">{{'ACSS.OUTCOMES' | translate}}</div>
@@ -94,7 +100,7 @@
                 </div>
 
 
-            <mat-table id="incomes-table" class="item-table pb-12" [dataSource]="outcomesDataSource"
+            <mat-table id="incomes-table" class="item-table adaptativeTable" [dataSource]="outcomesDataSource" 
               fusePerfectScrollbar>
   
               <!-- Business name Column -->
@@ -128,21 +134,21 @@
           </div>
   
           <div class="pb-16" fxLayout="row" fxLayoutAlign="start center">
-              <mat-icon class="m-0 mr-16">check_circle</mat-icon>
+              <mat-icon class="m-0 mr-16">money</mat-icon>
               <div class="h2 secondary-text">{{'ACSS.PARTIAL_SETTLEMENT' | translate}}</div>
           </div>
 
         <!-- Partial settlement - Incomes and Outcomes -->
       <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-between">
         <div fxLayout="column" fxFlex="49">          
-          <div class="fuse-widget-front mat-white-bg mat-elevation-z2">
-              <div class="p-12 mb-2 border-bottom" fxLayout="row" fxLayoutAlign="space-between center">
+          <div class="fuse-widget-front mat-white-bg mat-elevation-z3">
+              <div class="p-12 mb-2 border-bottom border-top" fxLayout="row" fxLayoutAlign="space-between center">
                 <div fxLayout="row" fxLayoutAlign="start center">
                   <mat-icon class="m-0 mr-16">trending_up</mat-icon>
                   <div class="h2 secondary-text">{{'ACSS.INCOMES' | translate}}</div>
                 </div>
               </div>
-          <mat-table id="partial-settlement-incomes-table" class="item-table" [dataSource]="partialSettlementIncomesDataSource" fusePerfectScrollbar>
+          <mat-table id="partial-settlement-incomes-table" class="item-table adaptativeTable" [dataSource]="partialSettlementIncomesDataSource" fusePerfectScrollbar>
             <!-- Business name Column -->
             <ng-container cdkColumnDef="businessName">
               <mat-header-cell *cdkHeaderCellDef>{{'ACSS.BUSINESS' | translate}}</mat-header-cell>
@@ -168,14 +174,14 @@
           </div>
         </div>
         <div fxLayout="column" fxFlex="49" style="justify-content: space-between">
-            <div class="fuse-widget-front mat-white-bg mat-elevation-z2">
-                <div class="p-12 mb-2 border-bottom" fxLayout="row" fxLayoutAlign="space-between center">
+            <div class="fuse-widget-front mat-white-bg mat-elevation-z3">
+                <div class="p-12 mb-2 border-bottom border-top" fxLayout="row" fxLayoutAlign="space-between center">
                   <div fxLayout="row" fxLayoutAlign="start center">
                     <mat-icon class="m-0 mr-16">trending_up</mat-icon>
                     <div class="h2 secondary-text">{{'ACSS.OUTCOMES' | translate}}</div>
                   </div>
                 </div>
-          <mat-table id="partial-settlement-outcomes-table" class="item-table" [dataSource]="partialSettlementOutcomesDataSource" fusePerfectScrollbar>
+          <mat-table id="partial-settlement-outcomes-table" class="item-table adaptativeTable" [dataSource]="partialSettlementOutcomesDataSource" fusePerfectScrollbar>
 
             <!-- Business name Column -->
             <ng-container cdkColumnDef="businessName">
@@ -219,8 +225,7 @@
           </div>
         </div>
 
-      <mat-table id="cumulated-transactions-table" class="item-table" #table [dataSource]="accumulatedTransactionsDataSource"
-        class="mat-elevation-z2" fusePerfectScrollbar>
+      <mat-table id="cumulated-transactions-table" class="item-table" #table [dataSource]="accumulatedTransactionsDataSource" fusePerfectScrollbar>
 
         <!-- Date Column -->
         <ng-container cdkColumnDef="date">
@@ -278,42 +283,5 @@
     </div>
 
       <!-- / Accumulated transactions -->
-
-  <mat-accordion multi="true" *ngIf="false">
-
-    <mat-expansion-panel [expanded]="true">
-      <mat-expansion-panel-header>
-        <mat-panel-title>
-
-          <div class="h2">{{'ACSS.GENERAL_INCOME_OUTCOME' | translate}}</div>
-        </mat-panel-title>
-      </mat-expansion-panel-header>
-
-    </mat-expansion-panel>
-
-    <mat-expansion-panel [expanded]="true">
-      <mat-expansion-panel-header>
-        <mat-panel-title>
-          <div class="h2">{{'ACSS.PARTIAL_SETTLEMENT' | translate}}</div>
-        </mat-panel-title>
-      </mat-expansion-panel-header>
-
-      
-
-    </mat-expansion-panel>
-
-
-    <mat-expansion-panel [expanded]="true">
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            <div class="h2">{{'ACSS.ACCUMULATED_TRANSACTIONS' | translate}}</div>
-          </mat-panel-title>
-        </mat-expansion-panel-header>
-
-        
-
-    </mat-expansion-panel>
-
-  </mat-accordion>
 
 </div>

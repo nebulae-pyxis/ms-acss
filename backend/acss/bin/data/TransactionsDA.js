@@ -63,7 +63,6 @@ class TransactionsDA {
    * @param {[String]]} ids transaction ids to query.
    */
   static getTransactionsByIds$(page, count, ids) {
-    console.log("getTransactionsByIds => ", ids);
     const collection = mongoDB.db.collection(CollectionName);
     return Rx.Observable.defer(() =>
       collection

@@ -207,7 +207,7 @@ class MongoDB {
           Rx.Observable.of(
             {
               collection: fromCollectionName,
-              operation: "remove",
+              operation: "deleteOne",
               operationArgs: [{ _id: documentId }]
             }
           ),

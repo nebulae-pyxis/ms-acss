@@ -16,7 +16,6 @@ class BusinessEventConsumer {
      * @param {*} businessCreatedEvent business created event
      */
     handleBusinessCreated$(businessCreatedEvent) { 
-        console.log('handleBusinessCreated$', businessCreatedEvent); 
         const business = businessCreatedEvent.data;
         return BusinessDA.persistBusiness$(business);
     }
@@ -26,7 +25,6 @@ class BusinessEventConsumer {
      * @param {*} businessGeneralInfoUpdatedEvent business general info updated event
      */
     handleBusinessGeneralInfoUpdated$(businessGeneralInfoUpdatedEvent) {  
-        console.log('businessGeneralInfoUpdatedEvent$', businessGeneralInfoUpdatedEvent); 
         const businessGeneralInfo = businessGeneralInfoUpdatedEvent.data;
         return BusinessDA.updateBusinessGeneralInfo$(businessGeneralInfoUpdatedEvent.aid, businessGeneralInfo);
     }

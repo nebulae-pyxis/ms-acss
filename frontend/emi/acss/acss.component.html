@@ -12,21 +12,20 @@
       fxLayoutAlign.gt-xs="space-between center">
 
       <!-- APP TITLE -->
-      <div class="logo my-12 m-sm-0" fxLayout="row" fxLayoutAlign="start center">
+      <div class="logo my-12 m-sm-0" fxLayout="column" fxLayoutAlign="start start" fxFlex="60">
         <mat-icon class="logo-icon mr-16" *fuseIfOnDom [@animate]="{value:'*',params:{delay:'50ms',scale:'0.2'}}">user</mat-icon>
-        <span class="logo-text h1" *fuseIfOnDom [@animate]="{value:'*',params:{delay:'100ms',x:'-25px'}}">{{'ACSS.ACSS'
-          | translate}}</span>
+        <span class="logo-text h1" *fuseIfOnDom [@animate]="{value:'*',params:{delay:'100ms',x:'-25px'}}">{{'ACSS.ACSS' | translate}}</span>
       </div>
       <!-- / APP TITLE -->
       <!-- BUSINESS FILTER -->
-      <div fxLayout="column" fxLayout.gt-sm="row">
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutAlign="start start" fxFlex="40">
         <div class="search-input-wrapper mx-12 m-md-0" fxFlex="1 0 auto" fxLayout="row" fxLayoutAlign="start center">
           <label for="search" style="margin-bottom: 10px" class="mr-20">
             <span class="mat-title">{{'ACSS.BUSINESS' | translate}}</span>
           </label>
-          <form name="businessForm" [formGroup]="businessForm" fxLayout="row" fxFlex>
+          <form name="businessForm" [formGroup]="businessForm" fxFlex>
             <mat-form-field class="w-100-p">
-              <mat-select placeholder="{{'ACSS.SELECT_BUSINESS' | translate}}" (selectionChange)="onSelectBusinessEvent($event.value)">
+              <mat-select placeholder="{{'ACSS.SELECT_BUSINESS' | translate}}" [(value)]="selectedBusinessData" (selectionChange)="onSelectBusinessEvent($event.value)">
 
                 <mat-option *ngFor="let business of allBusiness" [value]="business">
                   {{business.name}} - {{business._id}} 
@@ -75,7 +74,7 @@
 
       <div fxLayout="column" style="width: 100%; justify-content: space-between" fxLayout.gt-sm="row">
         <div fxLayout="column" fxFlex="100" fxFlex.gt-sm="100" fxFlex.gt-md="100">
-          <mat-table id="item-table" class="item-table" #table [dataSource]="dataSource">
+          <mat-table id="clearing-table" class="item-table" #table [dataSource]="dataSource" [@animateStagger]="{value:'50'}">
 
             <!-- Timestamp Column -->
             <ng-container cdkColumnDef="timestamp">

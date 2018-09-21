@@ -3,6 +3,8 @@
 let mongoDB = undefined;
 const Rx = require("rxjs");
 const CollectionName = "Settlements";
+const ObjectID = require("mongodb").ObjectID;
+const BusinessDA = require("./BusinessDA");
 
 class SettlementDA {
 
@@ -98,7 +100,7 @@ class SettlementDA {
 
         return buNamesMap$
           .mergeMap(buNamesMap =>
-            Rx.Observable.from(settlements).map(tx => [buNamesMap, settlement])
+            Rx.Observable.from(settlements).map(settlement => [buNamesMap, settlement])
           )
           .map(([cache, settlement]) => {
             return {

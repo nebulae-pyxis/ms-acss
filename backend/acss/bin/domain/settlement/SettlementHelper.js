@@ -70,7 +70,9 @@ class SettlementHelper {
         Rx.Observable.from(debits).map(debit => { return { type: "$inc", field: `output.${debit.toBu}.amount`, value: (debit.amount * -1) }; }),
         Rx.Observable.from(debits).map(debit => { return { type: "$push", field: `partialSettlement.output`, value: { buId: debit.toBu, amount: debit.amount, settlementId: debit._id } }; }),
         Rx.Observable.from(credits).map(credit => { return { type: "$inc", field: `input.${credit.fromBu}.amount`, value: (credit.amount * -1) }; }),
-        Rx.Observable.from(credits).map(credit => { return { type: "$push", field: `partialSettlement.input`, value: { buId: credit.fromBu, amount: credit.amount, settlementId: credit._id } }; })
+        Rx.Observable.from(credits).map(credit => { return { type: "$push", field: `partialSettlement.input`, value: { buId: credit.fromBu, amount: credit.amount, settlementId: credit._id } }; }),
+        Rx.Observable.of( { type: "$set", field: `lastUpdateTimestamp`, value: Date.now() })
+
       ).reduce(
         //lets put all the increments and pushes on the same transactions
         (acc, operation) => {
@@ -80,7 +82,7 @@ class SettlementHelper {
         {
           collection: ClearingDA.openClearingCollectionName,
           operation: "updateOne",
-          operationArgs: [{ _id: clearing._id }, { "$inc": {}, "$push": {} }]
+          operationArgs: [{ _id: clearing._id }, { "$inc": {}, "$push": {},  "$set": {}  }]
         })
       );
   }

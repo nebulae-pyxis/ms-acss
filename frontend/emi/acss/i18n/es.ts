@@ -24,10 +24,11 @@ export const locale = {
       CLEARING_LIST: 'Compensaciones',
       TYPE: 'Tipo',
       AMOUNT: 'Valor',
-      TIMESTAMP: 'Fecha',
+      TIMESTAMP: 'Fecha apertura',
       TRANSACTIONS: 'Transacciones',
       ACCUMULATED_TRANSACTION_DETAIL: 'Detalle de transacciones acumuladas',
-      SELECT_BUSINESS: 'Seleccione un negocio'
+      SELECT_BUSINESS: 'Seleccione un negocio',
+      AFCC_RELOAD: 'Recarga'
     },
     ERRORS: {
       17001: 'Error interno de servidor',

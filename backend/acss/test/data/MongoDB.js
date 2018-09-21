@@ -87,7 +87,6 @@ describe('MongoDB', function () {
             .mergeMap(() => Rx.Observable.defer(() => mongo.db.collection(collectionName).find({}).toArray()))
             .subscribe(
                 (data) => { 
-                    console.log('MONGO DATA => ', data);
                     const firstData = data[0];
                     delete firstData._id;
 

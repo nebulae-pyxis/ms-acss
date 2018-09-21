@@ -89,7 +89,7 @@ describe('ClearingDA', function () {
               {
                 $inc: { 'output.1a.amount': 25000 },
                 $set: { lastUpdateTimestamp: '' },
-                $push: { accumulatedTransactions: 1 },
+                $push: { accumulatedTransactionIds: 1 },
                 $setOnInsert: {
                   timestamp: '',
                   businessId: '1a',
@@ -108,7 +108,7 @@ describe('ClearingDA', function () {
               {
                 $inc: { 'input.2b.amount': 25000 },
                 $set: { lastUpdateTimestamp: '' },
-                $push: { accumulatedTransactions: 1 },
+                $push: { accumulatedTransactionIds: 1 },
                 $setOnInsert: {
                   timestamp: '',
                   businessId: '2b',
@@ -163,8 +163,9 @@ describe('ClearingDA', function () {
     });
     it('on open clearing', function (done) {
       const clearingId = uuidv4();
-      Rx.Observable.defer(() => mongo.db.collection('Clearing').insertOne({ _id: clearingId, open: true }))
-        .switchMapTo(ClearingDA.closeClearing$(clearingId))
+      const businessId = 1;
+      Rx.Observable.defer(() => mongo.db.collection('Clearing').insertOne({ _id: clearingId, businessId, open: true }))
+        .switchMapTo(ClearingDA.closeClearing$(businessId))
         .first()
         .subscribe(
           ({ found, closed, clearing }) => {
@@ -184,8 +185,9 @@ describe('ClearingDA', function () {
 
     it('on found and close clearing', function (done) {
       const clearingId = uuidv4();
-      Rx.Observable.defer(() => mongo.db.collection('Clearing').insertOne({ _id: clearingId, open: true }))
-        .switchMapTo(ClearingDA.closeClearing$(clearingId))
+      const businessId = 1;
+      Rx.Observable.defer(() => mongo.db.collection('Clearing').insertOne({ _id: clearingId, businessId, open: true }))
+        .switchMapTo(ClearingDA.closeClearing$(businessId))
         .first()
         .subscribe(
           ({ found, closed, clearing }) => {

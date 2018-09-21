@@ -69,9 +69,9 @@ export class ACSSComponent implements OnInit, OnDestroy {
   businessQuery$: Rx.Observable<any>;
   businessUserLogged: any = null;
   allBusiness: any = [];
-  selectedBusiness: any = null;
+  selectedBusinessData: any = null;
   selectedClearing: any = null;
-  selectedBusinessSubject: Rx.Subject<any> = new Rx.Subject();
+  //selectedBusinessSubject: Rx.Subject<any> = new Rx.Subject();
 
   // Table values
   @ViewChild(MatPaginator)
@@ -121,7 +121,7 @@ export class ACSSComponent implements OnInit, OnDestroy {
       Rx.Observable.combineLatest(
         this.loadBusinessData$(),
         this.getPaginator$(),
-        this.selectedBusinessSubject.startWith(null)
+        this.aCSSService.selectedBusinessEvent$.startWith(null)
       )
         .pipe(
           mergeMap(([businessData, paginator, selectedBusiness]) => {
@@ -139,14 +139,15 @@ export class ACSSComponent implements OnInit, OnDestroy {
               isAdmin ? selectedBusiness._id : businessUser._id
             )
               .map(clearings => clearings.data.getAllClearingsFromBusiness)
-              .map(clearings => [businessData, clearings]);
+              .map(clearings => [businessData, clearings, selectedBusiness]);
           })
         )
-        .subscribe(([businessData, clearings]) => {
+        .subscribe(([businessData, clearings, selectedBusiness]) => {
           console.log('businessData => ', businessData);
           console.log('Clearings => ', clearings);
-          this.allBusiness = businessData[2];
           this.isSystemAdmin = businessData[0];
+          this.selectedBusinessData = selectedBusiness;
+          this.allBusiness = businessData[2];
           this.dataSource.data = clearings;
         })
     );
@@ -172,7 +173,8 @@ export class ACSSComponent implements OnInit, OnDestroy {
    * @param business  selected business
    */
   onSelectBusinessEvent(business) {
-    this.selectedBusinessSubject.next(business);
+    this.aCSSService.selectedBusiness(business);
+    // this.selectedBusinessSubject.next(business);
   }
 
   /**

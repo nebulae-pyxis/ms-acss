@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { GatewayService } from '../../../api/gateway.service';
 import {
   getClearingById,
@@ -14,9 +15,24 @@ import {
 @Injectable()
 export class ACSSService {
 
+  private selectedBusinessSubject = new BehaviorSubject(null);
 
   constructor(private gateway: GatewayService) {
 
+  }
+
+  /**
+   * Returns an observable
+   */
+  get selectedBusinessEvent$(){
+    return this.selectedBusinessSubject.asObservable();
+  }
+
+  /**
+   * Set the selected business
+   */
+  selectedBusiness(business){
+    this.selectedBusinessSubject.next(business);
   }
 
   /**

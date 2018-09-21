@@ -22,11 +22,38 @@
         min-height: 64px;
     }
 
-    .mat-row {
+    .item {
       position: relative;
       cursor: pointer;
-      height: 52px;
-      padding: 0 12px !important;
+      height: 84px;
+    }
+
+    .mat-cell {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .mat-column-id {
+      flex: 0 1 84px;
+    }
+
+    .mat-column-image {
+      flex: 0 1 84px;
+
+      .item-image {
+        width: 52px;
+        height: 52px;
+        border: 1px solid rgba(0, 0, 0, 0.12);
+      }
+    }
+
+    .active-icon {
+      border-radius: 50%;
+    }
+
+    .mat-column-buttons {
+      flex: 0 1 80px;
     }
   }
 }

@@ -20,14 +20,15 @@ export const locale = {
       FROM: 'From',
       TO: 'To',
       PROJECTED_BALANCE: 'Projected balance',
-      TIMESTAMP: 'Date',
+      TIMESTAMP: 'Opening date',
       LAST_UPDATE_TIMESTAMP: 'Last update',
       CLEARING_LIST: 'Clearing',
       TYPE: 'Type',
       AMOUNT: 'Value',
       TRANSACTIONS: 'Transactions',
       ACCUMULATED_TRANSACTION_DETAIL: 'Accumulated transactions detail',
-      SELECT_BUSINESS: 'Select a business'
+      SELECT_BUSINESS: 'Select a business',
+      AFCC_RELOAD: 'Reload'
     },
     ERRORS: {
       17001: 'Internal server error',

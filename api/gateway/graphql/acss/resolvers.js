@@ -174,6 +174,46 @@ module.exports = {
               .mergeMap(response => getResponseFromBackEnd$(response))
               .toPromise();
         },
+        getSettlementsByClearingId(root, args, context) {
+            return RoleValidator.checkPermissions$(
+              context.authToken.realm_access.roles,
+              contextName,
+              "getSettlementsByClearingId",
+              PERMISSION_DENIED_ERROR_CODE,
+              "Permission denied",
+              ["SYSADMIN", "business-owner"]
+            ).mergeMap(response => {
+                return broker.forwardAndGetReply$(
+                  "Clearing",
+                  "gateway.graphql.query.getSettlementsByClearingId",
+                  { root, args, jwt: context.encodedToken },
+                  2000
+                );
+              })
+              .catch(err => handleError$(err, "getSettlementsByClearingId"))
+              .mergeMap(response => getResponseFromBackEnd$(response))
+              .toPromise();
+        },
+        getSettlementsCountByClearingId(root, args, context) {
+            return RoleValidator.checkPermissions$(
+              context.authToken.realm_access.roles,
+              contextName,
+              "getSettlementsCountByClearingId",
+              PERMISSION_DENIED_ERROR_CODE,
+              "Permission denied",
+              ["SYSADMIN", "business-owner"]
+            ).mergeMap(response => {
+                return broker.forwardAndGetReply$(
+                  "Clearing",
+                  "gateway.graphql.query.getSettlementsCountByClearingId",
+                  { root, args, jwt: context.encodedToken },
+                  2000
+                );
+              })
+              .catch(err => handleError$(err, "getSettlementsByClearingId"))
+              .mergeMap(response => getResponseFromBackEnd$(response))
+              .toPromise();
+        },
     },
 
     //// MUTATIONS ///////

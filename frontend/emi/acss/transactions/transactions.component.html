@@ -69,7 +69,7 @@
             <ng-container cdkColumnDef="type">
               <mat-header-cell *cdkHeaderCellDef>{{'ACSS.TYPE' | translate}}</mat-header-cell>
               <mat-cell *cdkCellDef="let transaction">
-                <p class="text-truncate">{{transaction.type}}</p>
+                <p class="text-truncate">{{'ACSS.'+transaction.type | translate}}</p>
               </mat-cell>
             </ng-container>
 

@@ -39,7 +39,6 @@ class ClearingDA {
    * @returns {Observable}
    */
   static getAllClearingsFromBusiness$(page, count, businessId) {
-    console.log('getAllClearingsFromBusiness => ', businessId);
     return Rx.Observable.defer(() => {
       if (page != 0) {
         return Rx.Observable.of([]);
@@ -48,8 +47,7 @@ class ClearingDA {
         OpenClearingCollectionName,
         businessId,
         page,
-        1,
-        true
+        1
       );
     }).mergeMap(openClearing => {
       const countClosedClearing = openClearing.length == 0 ? count - 1 : count;
@@ -59,8 +57,7 @@ class ClearingDA {
           ClosedClearingCollectionName,
           businessId,
           page,
-          countClosedClearing,
-          false
+          countClosedClearing
         )
       ).map(([openClearingArray, closedClearingArray]) => {
         return [
@@ -77,9 +74,8 @@ class ClearingDA {
    * @param {*} businessId Id of the business to query
    * @param {*} page Indicates the page number which will be returned
    * @param {*} count Indicates the max amount of rows that will be return.
-   * @param {*} open Boolean that indicates if the query is being performing over the open clearing collection.
    */
-  static getClearings$(collectionName, businessId, page, count, open) {
+  static getClearings$(collectionName, businessId, page, count) {
     return Rx.Observable.defer(() => {
       const collection = mongoDB.db.collection(collectionName);
       return collection
@@ -92,7 +88,6 @@ class ClearingDA {
       .mergeMap(clearings => Rx.Observable.from(clearings))
       .map(clearing => {
         clearing.partialSettlement = clearing.partialSettlement || {};
-        clearing.open = open;
 
         clearing.input = this.transformMovements(clearing.input);
         clearing.output = this.transformMovements(clearing.output);
@@ -132,13 +127,12 @@ class ClearingDA {
         //If the clearing was not found, we have to look for the clearing on the closed clearing collection
         .mergeMap(clearing => {
           if (clearing) {
-            clearing.open = true;
             return Rx.Observable.of(clearing);
           }
           const collection = mongoDB.db.collection(
             ClosedClearingCollectionName
           );
-          return collection.findOne({ _id: clearingId });
+          return collection.findOne({ _id: new ObjectID.createFromHexString(clearingId) });
         })
         .mergeMap(clearing => {
           if (!clearing) {
@@ -175,7 +169,6 @@ class ClearingDA {
               clearing.output = this.transformMovements(clearing.output, businessArray);
               clearing.partialSettlement.input = this.transformMovements(clearing.partialSettlement.input, businessArray);
               clearing.partialSettlement.output = this.transformMovements(clearing.partialSettlement.output, businessArray);
-              console.log('Clearing END =>> ', clearing);
               return clearing;
             });
         })
@@ -188,7 +181,6 @@ class ClearingDA {
    * @param {*} collectionVsOperationAndCommand array of Mongo operations
    */
   static executeOperations$(collectionVsOperationAndCommand) {
-    console.log('executeOperations => ', JSON.stringify(collectionVsOperationAndCommand));
     return mongoDB.applyAll$(collectionVsOperationAndCommand);
   }
 
@@ -229,14 +221,14 @@ class ClearingDA {
 
   /**
    * find and close (set open to false) a clearing
-   * @param string clearingId 
+   * @param string businessId 
    * @returns {Rx.Observable} of result {found, closed, clearing}
    */
-  static closeClearing$(clearingId) {
+  static closeClearing$(businessId) {
     return Rx.Observable.defer(
       () => mongoDB.db.collection(OpenClearingCollectionName)
         .findOneAndUpdate(
-          { _id: clearingId },
+          { businessId: businessId },
           { $set: { open: false } },
           { upsert: false, returnOriginal: false }
         ))

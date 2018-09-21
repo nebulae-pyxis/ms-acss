@@ -86,13 +86,11 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       )
         .pipe(
           mergeMap(([txIds, paginator]) => {
-            console.log("Paginator changed ", paginator);
             const txIdsArray = [];
             txIds.forEach(tx => {
               txIdsArray.push(...tx.ids);
             });
             this.tableSize = txIdsArray.length;
-            console.log("txIdsArray => ", txIdsArray);
 
             return this.clearingService.getTransactionsByIds$(
               paginator.pageIndex,

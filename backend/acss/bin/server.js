@@ -8,6 +8,7 @@ const eventSourcing = require('./tools/EventSourcing')();
 const eventStoreService = require('./services/event-store/EventStoreService')();
 const mongoDB = require('./data/MongoDB').singleton();
 const ClearingDA = require('./data/ClearingDA');
+const SettlementDA = require('./data/SettlementDA');
 const BusinessDA = require('./data/BusinessDA');
 const TransactionsCursorDA = require('./data/TransactionsCursorDA');
 const TransactionsDA = require('./data/TransactionsDA');
@@ -23,6 +24,7 @@ const start = () => {
         mongoDB.start$(),
         BusinessDA.start$(),
         ClearingDA.start$(),
+        SettlementDA.start$(),
         TransactionsCursorDA.start$(),
         ClearingJobErrorDA.start$(),
         TransactionsDA.start$(),

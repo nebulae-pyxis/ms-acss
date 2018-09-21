@@ -66,7 +66,6 @@ class Clearing {
       ["SYSADMIN", "business-owner"]
     )
       .mergeMap(role => {
-        console.log('Role', role);
         return ClearingDA.getClearingByClearingId$(args.id);
       })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
@@ -106,7 +105,6 @@ class Clearing {
    * @param args.ids Ids of the transactions
    */
   getTransactionsByIds$({ args }, authToken) {
-    console.log('getTransactionsByIds backend');
     return RoleValidator.checkPermissions$(
       authToken.realm_access.roles,
       "ACSS",
@@ -131,7 +129,6 @@ class Clearing {
    * @param args.clearingId Id of the clearing 
    */
   getSettlementsByClearingId$({ args }, authToken) {
-    console.log('getSettlementsByClearingId backend');
     return RoleValidator.checkPermissions$(
       authToken.realm_access.roles,
       "ACSS",
@@ -156,7 +153,6 @@ class Clearing {
    * @param args.clearingId Id of the clearing 
    */
   getSettlementsCountByClearingId$({ args }, authToken) {
-    console.log('getSettlementsCountByClearingId backend');
     return RoleValidator.checkPermissions$(
       authToken.realm_access.roles,
       "ACSS",

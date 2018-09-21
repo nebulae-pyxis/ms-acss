@@ -28,7 +28,9 @@ class ClearingJobTriggeredEventHandler {
                 this.accumulateTransactions$(TransactionsDA.getTransactions$(cursor, cursorLimitTimestamp))
                     .toArray()
                     .map(accumulatedTransactions => { return { accumulatedTransactions, cursor }; })
-            ).mergeMap(({ accumulatedTransactions, cursor }) => {
+            )
+            .filter(({ accumulatedTransactions, cursor }) => accumulatedTransactions.length > 0)
+            .mergeMap(({ accumulatedTransactions, cursor }) => {
                 const newCursor = { ...cursor };
                 newCursor.timestamp = cursorLimitTimestamp;
                 return Rx.Observable.forkJoin(

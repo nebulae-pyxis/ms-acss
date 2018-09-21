@@ -110,8 +110,8 @@ export class SettlementComponent implements OnInit, OnDestroy {
             this.clearingService
               .getSettlementsCountByClearingId$(this.selectedClearing._id)
               .map(countData => [
-                settlementData.data.getSettlementByClearingId,
-                countData.data
+                settlementData.data.getSettlementsByClearingId,
+                countData.data.getSettlementsCountByClearingId
               ])
           )
         )

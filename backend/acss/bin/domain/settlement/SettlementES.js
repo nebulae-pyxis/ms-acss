@@ -18,14 +18,25 @@ class SettlementES {
    * @returns {Rx.Observable}
    */
   handleSettlementJobTriggeredEvent$(settlementJobTriggered) {
-    return ClearingDA.closeClearing$(settlementJobTriggered.businessId)
+    return ClearingDA.closeClearing$(settlementJobTriggered.data.businessId)
       .filter(({ found, closed, clearing }) => found && closed && clearing !== null)
       .pluck('clearing')
+      .map(clearing => {
+        //normalizes data structure
+        clearing.input = clearing.input || [];
+        clearing.output = clearing.output || [];
+        clearing.partialSettlement = clearing.partialSettlement || {};
+        clearing.partialSettlement.input = clearing.partialSettlement.input || [];
+        clearing.partialSettlement.output = clearing.partialSettlement.output || [];
+        return clearing;
+      })
       .mergeMap(
         (clearing) =>
           SettlementHelper.generateSettlements$(clearing)
             .toArray()
-            .map(settlements => { clearing, settlements })
+            .map(settlements => {
+              return {clearing, settlements}
+            })
       )
       .mergeMap(
         ({ clearing, settlements }) => Rx.Observable.merge(

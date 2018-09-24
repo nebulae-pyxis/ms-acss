@@ -42,7 +42,7 @@ class TransactionAccumulatedEventConsumer {
    */
   errorHandler$(error, event){
     return Rx.Observable.of({error, event})
-    .mergeMap(log => LogErrorDA.persistClearingError$$(log))
+    .mergeMap(log => LogErrorDA.persistClearingError$(log))
   }
 
   /**

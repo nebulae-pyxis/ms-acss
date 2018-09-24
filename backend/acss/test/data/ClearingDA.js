@@ -87,7 +87,7 @@ describe('ClearingDA', function () {
             operationArgs: [
               { businessId: '1a', open: true },
               {
-                $inc: { 'output.1a.amount': 25000 },
+                $inc: { 'output.2b.amount': 25000 },
                 $set: { lastUpdateTimestamp: '' },
                 $push: { accumulatedTransactionIds: 1 },
                 $setOnInsert: {
@@ -106,7 +106,7 @@ describe('ClearingDA', function () {
             operationArgs: [
               { businessId: '2b', open: true },
               {
-                $inc: { 'input.2b.amount': 25000 },
+                $inc: { 'input.1a.amount': 25000 },
                 $set: { lastUpdateTimestamp: '' },
                 $push: { accumulatedTransactionIds: 1 },
                 $setOnInsert: {

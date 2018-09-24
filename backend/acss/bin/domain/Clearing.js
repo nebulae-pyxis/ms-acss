@@ -40,8 +40,8 @@ class Clearing {
       PERMISSION_DENIED_ERROR_CODE.description,
       ["SYSADMIN", "business-owner"]
     )
-      .mergeMap(val =>{
-        args.businessId = authToken.realm_access.roles.includes("SYSADMIN") ? args.businessId: null;
+      .mergeMap(roles =>{
+        args.businessId = roles.SYSADMIN ? args.businessId: null;
         return ClearingDA.getAllClearingsFromBusiness$(args.page, args.count, args.businessId ? args.businessId : authToken.businessId);
       })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
@@ -66,7 +66,7 @@ class Clearing {
       ["SYSADMIN", "business-owner"]
     )
       .mergeMap(role => {
-        return ClearingDA.getClearingByClearingId$(args.id);
+        return ClearingDA.getClearingByClearingId$(args.id, role.SYSADMIN ? undefined: authToken.businessId);
       })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
       .catch(err => {
@@ -90,7 +90,7 @@ class Clearing {
       ["SYSADMIN", "business-owner"]
     )
       .mergeMap(role => {
-        return AccumulatedTransactionDA.getAccumulatedTransactionsByIds$(args.page, args.count, args.ids)
+        return AccumulatedTransactionDA.getAccumulatedTransactionsByIds$(args.page, args.count, args.ids, role.SYSADMIN ? undefined: authToken.businessId)
       })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
       .catch(err => {
@@ -113,8 +113,8 @@ class Clearing {
       PERMISSION_DENIED_ERROR_CODE.description,
       ["SYSADMIN", "business-owner"]
     )
-      .mergeMap(role => {
-        return TransactionDA.getTransactionsByIds$(args.page, args.count, args.ids)
+      .mergeMap(roles => {
+        return TransactionDA.getTransactionsByIds$(args.page, args.count, args.ids, roles.SYSADMIN ? undefined:authToken.businessId)
       })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
       .catch(err => {
@@ -137,8 +137,8 @@ class Clearing {
       PERMISSION_DENIED_ERROR_CODE.description,
       ["SYSADMIN", "business-owner"]
     )
-      .mergeMap(role => {
-        return SettlementDA.getSettlementsByClearingId$(args.page, args.count, args.clearingId)
+      .mergeMap(roles => {
+        return SettlementDA.getSettlementsByClearingId$(args.page, args.count, args.clearingId, roles.SYSADMIN ? undefined:authToken.businessId)
       })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
       .catch(err => {
@@ -161,8 +161,8 @@ class Clearing {
       PERMISSION_DENIED_ERROR_CODE.description,
       ["SYSADMIN", "business-owner"]
     )
-      .mergeMap(role => {
-        return SettlementDA.getSettlementsCountByClearingId$(args.clearingId)
+      .mergeMap(roles => {
+        return SettlementDA.getSettlementsCountByClearingId$(args.clearingId, roles.SYSADMIN ? undefined:authToken.businessId)
       })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
       .catch(err => {

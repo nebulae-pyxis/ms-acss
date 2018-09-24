@@ -116,13 +116,19 @@ class ClearingDA {
   /**
    * Gets the clearing by ID
    * @param {*} clearingId ID of the clearing
+   * @param {*} businessId ID of the business
    */
-  static getClearingByClearingId$(clearingId) {
+  static getClearingByClearingId$(clearingId, businessId) {
+    const filter ={ _id: new ObjectID.createFromHexString(clearingId) };
+    if(businessId){
+      filter["businessId"] = businessId;
+    }
+
     //Looks for the clearing on the open clearing collection
     return (
       Rx.Observable.defer(() => {
         const collection = mongoDB.db.collection(OpenClearingCollectionName);
-        return collection.findOne({ _id: new ObjectID.createFromHexString(clearingId) });
+        return collection.findOne(filter);
       })
         //If the clearing was not found, we have to look for the clearing on the closed clearing collection
         .mergeMap(clearing => {
@@ -132,7 +138,7 @@ class ClearingDA {
           const collection = mongoDB.db.collection(
             ClosedClearingCollectionName
           );
-          return collection.findOne({ _id: new ObjectID.createFromHexString(clearingId) });
+          return collection.findOne(filter);
         })
         .mergeMap(clearing => {
           if (!clearing) {
@@ -229,7 +235,7 @@ class ClearingDA {
       () => mongoDB.db.collection(OpenClearingCollectionName)
         .findOneAndUpdate(
           { businessId: businessId },
-          { $set: { open: false } },
+          { $set: { open: false, lastUpdateTimestamp: Date.now() } },
           { upsert: false, returnOriginal: false }
         ))
       //.do(x => console.log(`###########${Object.keys(x).map(key => `[${key}:${JSON.stringify(x[key])}]`).join('-')}`))

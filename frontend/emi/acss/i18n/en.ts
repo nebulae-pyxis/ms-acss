@@ -2,7 +2,7 @@ export const locale = {
   lang: 'en',
   data: {
     ACSS: {
-      ACSS: 'Automated clearing and settlement system',
+      ACSS: 'Automated Clearing and Settlement System',
       BUSINESS_DETAIL: 'Business detail',
       CLEARING: 'Clearing',
       SETTLEMENT: 'Settlement',
@@ -13,7 +13,7 @@ export const locale = {
       INCOMES: 'Incomes',
       OUTCOMES: 'Outcomes',
       OPEN: 'Open',
-      CLOSE: 'Close',
+      CLOSE: 'Closed',
       GENERAL_INCOME_OUTCOME: 'General',
       PARTIAL_SETTLEMENT: 'Partial settlement',
       ACCUMULATED_TRANSACTIONS: 'Accumulated transactions',
@@ -28,7 +28,15 @@ export const locale = {
       TRANSACTIONS: 'Transactions',
       ACCUMULATED_TRANSACTION_DETAIL: 'Accumulated transactions detail',
       SELECT_BUSINESS: 'Select a business',
-      AFCC_RELOAD: 'Reload'
+      AFCC_RELOAD: 'Reload',
+      CHANNEL: 'Channel',
+      CHANNEL_ID: 'ID',
+      VERS_CONFIG_CHANNEL: 'Version channel config',
+      VERS_CHANNEL_BACKEND: 'Version backend',
+      EVT: 'Event',
+      EVT_ID: 'ID',
+      EVT_TYPE: 'tipo',
+      USER: 'Usuario'
     },
     ERRORS: {
       17001: 'Internal server error',

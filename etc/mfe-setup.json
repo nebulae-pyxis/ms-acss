@@ -19,14 +19,14 @@
                 "id": "acss",
                 "icon": "dashboard",
                 "translate": {
-                    "en": "acss_en",
-                    "es": "acss_es"
+                    "en": "acss",
+                    "es": "acss"
                 },
                 "navURL": "/acss",
                 "path": "acss",
                 "loadChildren": "./main/content/acss/acss.module#ACSSModule",
                 "priority": 1000,
-                "roles" : ["developer"],
+                "roles" : ["business-owner", "SYSADMIN"],
                 "default" : false
             }            
         ],

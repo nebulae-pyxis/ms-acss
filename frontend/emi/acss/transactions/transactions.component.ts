@@ -1,3 +1,4 @@
+import { TransactionDialogComponent } from './transaction-dialog/transaction-dialog.component';
 import { Observable } from "rxjs/Observable";
 ////////// ANGULAR //////////
 import {
@@ -20,7 +21,8 @@ import {
   MatPaginator,
   MatSort,
   MatTableDataSource,
-  MatSnackBar
+  MatSnackBar,
+  MatDialog
 } from "@angular/material";
 import { fuseAnimations } from "../../../../core/animations";
 
@@ -44,6 +46,8 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   dataSource = new MatTableDataSource();
   businessQuery$: Rx.Observable<any>;
   selectedAccumulatedTransaction: any = null;
+  selectedTransaction: any = null;
+  expandedElement: any = null;
 
   //Table values
   @ViewChild(MatPaginator)
@@ -58,7 +62,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   filterText = "";
   sortColumn = null;
   sortOrder = null;
-  itemPerPage = "";
+  itemPerPage = "";  
 
   constructor(
     private clearingService: ClearingService,
@@ -66,13 +70,30 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     private translate: TranslateService,
     private snackBar: MatSnackBar,
     private router: Router,
-    private activatedRouter: ActivatedRoute
+    private activatedRouter: ActivatedRoute,
+    public dialog: MatDialog
   ) {
     this.translationLoader.loadTranslations(english, spanish);
   }
 
   ngOnInit() {
     this.refreshTable();
+  }
+
+  /**
+   * gets the text data to show in the tooltip
+   * @param transaction 
+   */
+  getToolTipData(transaction){
+    return JSON.stringify(transaction.channel)
+  }
+
+  openDialog(transaction): void {
+    this.selectedTransaction = transaction;
+    const dialogRef = this.dialog.open(TransactionDialogComponent, {
+      width: '350px',
+      data: transaction
+    });
   }
 
   /**

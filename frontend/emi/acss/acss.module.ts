@@ -12,6 +12,7 @@ import { ACSSDetailComponent } from './acss-detail/acss-detail.component';
 import { ACSSDetailService } from './acss-detail/acss-detail.service';
 import { ClearingService } from './clearing/clearing.service';
 import { TransactionsComponent } from './transactions/transactions.component';
+import { TransactionDialogComponent } from './transactions/transaction-dialog/transaction-dialog.component';
 
 const routes: Routes = [
   {
@@ -34,12 +35,14 @@ const routes: Routes = [
     RouterModule.forChild(routes),
     FuseWidgetModule
   ],
+  entryComponents: [TransactionDialogComponent],
   declarations: [
     ACSSComponent,
     ACSSDetailComponent,
     ClearingComponent,
     SettlementComponent,
-    TransactionsComponent
+    TransactionsComponent,
+    TransactionDialogComponent
   ],
   providers: [ ACSSService, ACSSDetailService, ClearingService, DatePipe]
 })

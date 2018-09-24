@@ -27,18 +27,23 @@ static checkPermissions$(
   ) {
     return Rx.Observable.from(requiredRoles)
       .map(requiredRole => {
+        const role = {name: requiredRole, value: false};
         if (
           userRoles == undefined ||
           userRoles.length == 0 ||
           !userRoles.includes(requiredRole)
         ) {
-          return false;
+          role.value = false;
         }
-        return true;
+        role.value = true;
+        return role;
       })
-      .toArray()
+      .reduce((acc, val) => {
+        acc[val.name] = val.value;
+        return acc;
+      }, {})
       .mergeMap(validRoles => {
-        if (!validRoles.includes(true)) {
+        if (!Object.values(validRoles).includes(true)) {
           return Rx.Observable.throw(
             new CustomError(contextName, method, errorCode, errorMessage)
           );

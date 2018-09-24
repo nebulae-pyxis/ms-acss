@@ -1,0 +1,42 @@
+<div fxLayout="column" fxLayoutAlign="space-between start">
+<div fxLayout="column" class="p-12">
+  <div class="h2">{{'ACSS.CHANNEL' | translate}}</div>
+
+  <div fxLayout="row">
+    <label class="h3">{{'ACSS.CHANNEL_ID' | translate}}:</label>
+    <label class="subtitle secondary-text">{{transaction.channel.id}}</label>
+  </div>
+
+  <div fxLayout="row">
+    <label class="h3">{{'ACSS.VERS_CONFIG_CHANNEL' | translate}}:</label>
+    <label class="subtitle secondary-text">{{transaction.channel.c}}</label>
+  </div>
+
+  <div fxLayout="row">
+    <label class="h3">{{'ACSS.VERS_CHANNEL_BACKEND' | translate}}:</label>
+    <label class="subtitle secondary-text">{{transaction.channel.v}}</label>
+  </div>
+
+</div>
+
+<div fxLayout="column" class="p-12">
+  <div class="h2">{{'ACSS.EVT' | translate}}</div>
+
+  <div fxLayout="row">
+    <label class="h3">{{'ACSS.EVT_ID' | translate}}:</label>
+    <label class="subtitle secondary-text">{{transaction.evt.id}}</label>
+  </div>
+
+  <div fxLayout="row">
+    <label class="h3">{{'ACSS.EVT_TYPE' | translate}}:</label>
+    <label class="subtitle secondary-text">{{transaction.evt.type}}</label>
+  </div>
+
+  <div fxLayout="row">
+    <label class="h3">{{'ACSS.USER' | translate}}:</label>
+    <label class="subtitle secondary-text">{{transaction.evt.user}}</label>
+  </div>
+
+</div>
+
+</div>

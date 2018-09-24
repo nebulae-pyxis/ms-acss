@@ -64,7 +64,7 @@ class EventStoreService {
     const handler = this.functionMap[eventType];
     const subscription =
       //MANDATORY:  AVOIDS ACK REGISTRY DUPLICATIONS
-      eventSourcing.eventStore.ensureAcknowledgeRegistry$(aggregateType)
+      eventSourcing.eventStore.ensureAcknowledgeRegistry$(aggregateType)        
         .mergeMap(() => eventSourcing.eventStore.getEventListener$(aggregateType, mbeKey, false))
         .filter(evt => evt.et === eventType)
         .mergeMap(evt => Rx.Observable.concat(

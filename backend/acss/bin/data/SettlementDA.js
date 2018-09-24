@@ -55,13 +55,19 @@ class SettlementDA {
    *
    * @param {String} clearingId Id of the clearing
    */
-  static getSettlementsCountByClearingId$(clearingId) {
+  static getSettlementsCountByClearingId$(clearingId, businessId) {
+    const filter = {
+      clearingId: new ObjectID.createFromHexString(clearingId)
+    };
+
+    if(businessId){
+      filter["$or"]= [{fromBu: businessId}, {toBu: businessId}]
+    }
+
     const collection = mongoDB.db.collection(CollectionName);
     return Rx.Observable.defer(() =>
       collection
-        .count({
-          clearingId: new ObjectID.createFromHexString(clearingId)
-        })
+        .countDocuments(filter)
     );
   }
 
@@ -71,14 +77,21 @@ class SettlementDA {
    * @param {int} page Indicates the page number which will be returned
    * @param {int} count Indicates the amount of rows that will be returned
    * @param {String} clearingId Id of the clearing
+   * @param {String} businessId Id of the business which will be used to filter the data
    */
-  static getSettlementsByClearingId$(page, count, clearingId) {
+  static getSettlementsByClearingId$(page, count, clearingId, businessId) {
+    const filter = {
+      clearingId: new ObjectID.createFromHexString(clearingId)
+    };
+
+    if(businessId){
+      filter["$or"]= [{fromBu: businessId}, {toBu: businessId}]
+    }
+
     const collection = mongoDB.db.collection(CollectionName);
     return Rx.Observable.defer(() =>
       collection
-        .find({
-          clearingId: new ObjectID.createFromHexString(clearingId)
-        })
+        .find(filter)
         .sort({ timestamp: -1 })
         .skip(count * page)
         .limit(count)

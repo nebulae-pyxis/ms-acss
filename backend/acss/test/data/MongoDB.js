@@ -58,7 +58,7 @@ describe('MongoDB', function () {
             {
                 collection: collectionName,
                 operation: "insertOne",
-                operationArgs: [{ name: "operation1", timestamp: new Date().getTime(), state: true }]
+                operationArgs: [{ name: "operation1", timestamp: Date.now(), state: true }]
             },
             {
                 collection: collectionName,
@@ -70,8 +70,8 @@ describe('MongoDB', function () {
                 operation: "insertMany",
                 operationArgs: [
                     [
-                        { name: "operation2", timestamp: new Date().getTime(), state: true }, 
-                        { name: "operation3", timestamp: new Date().getTime(), state: false }
+                        { name: "operation2", timestamp: Date.now(), state: true }, 
+                        { name: "operation3", timestamp: Date.now(), state: false }
                     ]
                 ]
             },

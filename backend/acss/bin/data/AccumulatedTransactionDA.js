@@ -56,13 +56,18 @@ class AccumulatedTransactionDA {
    * @param {int} count Indicates the amount of rows that will be returned
    * @param {[String]]} ids accumulated transaction ids to query.
    */
-  static getAccumulatedTransactionsByIds$(page, count, ids) {
+  static getAccumulatedTransactionsByIds$(page, count, ids, businessId) {
+    const filter ={
+      _id: { $in: ids.map(id => new ObjectID.createFromHexString(id)) }
+    };
+    if(businessId){
+      filter["$or"]= [{fromBu: businessId}, {toBu: businessId}]
+    }
+
     const collection = mongoDB.db.collection(CollectionName);
     return Rx.Observable.defer(() =>
       collection
-        .find({
-          _id: { $in: ids.map(id => new ObjectID.createFromHexString(id)) }
-        })
+        .find(filter)
         .sort({ timestamp: -1 })
         .skip(count * page)
         .limit(count)

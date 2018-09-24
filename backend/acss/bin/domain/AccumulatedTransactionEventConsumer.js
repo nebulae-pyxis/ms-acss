@@ -56,7 +56,7 @@ class TransactionAccumulatedEventConsumer {
     return Rx.Observable.from([accumulatedTx.fromBu, accumulatedTx.toBu]).map(
       businessId => {
         const isFromBusiness = accumulatedTx.fromBu == businessId;
-        const timestamp = new Date().getTime();
+        const timestamp = Date.now();
 
         //Since all of the operations have to be done in an transactional environment,
         //we have to generate the JSON with the Mongo operations that will be executed on Mongo,
@@ -80,8 +80,8 @@ class TransactionAccumulatedEventConsumer {
 
         const dynamicObj = {};
         const propertyKey = isFromBusiness
-          ? `output.${businessId}.amount`
-          : `input.${businessId}.amount`;
+          ? `output.${accumulatedTx.toBu}.amount`
+          : `input.${accumulatedTx.fromBu}.amount`;
         dynamicObj[propertyKey] = accumulatedTx.amount;
         mongoOperation.operationArgs[1]["$inc"] = dynamicObj;
         return mongoOperation;

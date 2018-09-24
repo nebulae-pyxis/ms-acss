@@ -1,0 +1,64 @@
+@import 'src/app/core/scss/fuse';
+
+:host {
+  .mat-header-cell {
+    color: #444444;
+    font-size: 15px;
+  }
+
+  .mat-header-row {
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 9999;
+  }
+
+  .item-table {
+    flex: 1 1 auto;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    overflow: auto;
+    
+
+    .mat-header-row {
+        min-height: 64px;
+    }
+
+    .item {
+      position: relative;
+      cursor: pointer;
+      height: 84px;
+    }
+
+    .mat-cell {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .mat-column-id {
+      flex: 0 1 84px;
+    }
+
+    .mat-column-image {
+      flex: 0 1 84px;
+
+      .item-image {
+        width: 52px;
+        height: 52px;
+        border: 1px solid rgba(0, 0, 0, 0.12);
+      }
+    }
+
+    .active-icon {
+      border-radius: 50%;
+    }
+
+    .mat-column-buttons {
+      flex: 0 1 80px;
+    }
+  }
+}
+
+.highlight{
+  background: #B9BBB9;
+}

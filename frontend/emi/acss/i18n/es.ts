@@ -36,7 +36,8 @@ export const locale = {
       EVT: 'Evento',
       EVT_ID: 'ID',
       EVT_TYPE: 'tipo',
-      USER: 'Usuario'
+      USER: 'Usuario',
+      TX_TYPE: 'Tipos transacción'
     },
     ERRORS: {
       17001: 'Error interno de servidor',

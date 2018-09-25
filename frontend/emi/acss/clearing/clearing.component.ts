@@ -31,7 +31,9 @@ import { Clearing } from '../entities/clearing';
 })
 export class ClearingComponent implements OnInit, OnDestroy {
 
-  @Input() clearing: Clearing;
+  clearing: Clearing;
+
+  projectedBalance = 0;
 
   // Rxjs subscriptions
   subscriptions = [];
@@ -67,7 +69,7 @@ export class ClearingComponent implements OnInit, OnDestroy {
   displayedColumns = ['businessName', 'value'];
 
   // Columns to show in the acccumulated transactions table
-  displayedColumnsAccumulatedTransactions = ['date', 'from', 'to', 'value'];
+  displayedColumnsAccumulatedTransactions = ['date', 'from', 'to', 'value', 'txType'];
 
   selectedaccumulatedTransaction: any = null;
 
@@ -98,6 +100,12 @@ export class ClearingComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.refreshTables();
+  }
+
+  @Input()
+  set clearingData(clearing: Clearing) {
+      this.clearing = clearing;
+      this.projectedBalance = this.calculateProjectedBalance(clearing);
   }
 
   /**
@@ -147,6 +155,21 @@ export class ClearingComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Returns the amount of transaction 
+   * @param accumulatedTx
+   * @param type
+   */
+  getTransactionTypeAmount(accumulatedTx, type){
+    if(!accumulatedTx || !accumulatedTx.transactionIds || !accumulatedTx.transactionIds){
+      return 0;
+    }
+
+    const found = accumulatedTx.transactionIds.find(tx => tx.type == type);
+
+    return found ? found.ids.length: 0;
+  }
+
+  /**
    * converts milliseconds to date
    * @returns {Date} returns the date
    */
@@ -159,20 +182,20 @@ export class ClearingComponent implements OnInit, OnDestroy {
    * @param clearing Clearing info
    */
   calculateProjectedBalance(clearing){
-    const inputs = clearing.input.reduce((inputA,inputB) => {
-      return inputA.amount || 0 + inputB.amount || 0;
+    const inputs = clearing.input.reduce((acc,inputB) => {
+      return acc || 0 + inputB.amount || 0;
     }, 0);
 
-    const outputs = clearing.output.reduce((outputA,outputB) => {
-      return outputA.amount || 0 + outputB.amount || 0;
+    const outputs = clearing.output.reduce((acc,outputB) => {
+      return acc || 0 + outputB.amount || 0;
     }, 0);
 
-    const partialSettlementOutputs = clearing.partialSettlement.input.reduce((outputA,outputB) => {
-      return outputA.amount + outputB.amount;
+    const partialSettlementOutputs = clearing.partialSettlement.output.reduce((acc,outputB) => {      
+      return acc + (outputB.amount || 0);
     }, 0);
 
-    const partialSettlementInputs = clearing.partialSettlement.input.reduce((inputA,inputB) => {
-      return inputA.amount + inputB.amount;
+    const partialSettlementInputs = clearing.partialSettlement.input.reduce((acc,inputB) => {
+      return acc || 0 + inputB.amount || 0;
     }, 0);
 
     return (inputs + partialSettlementInputs) - (outputs + partialSettlementOutputs);

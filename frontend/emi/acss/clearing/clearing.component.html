@@ -25,7 +25,7 @@
         <span class="h2 title secondary-text">{{'ACSS.PROJECTED_BALANCE' | translate}}:</span>
         <span>&nbsp;&nbsp;</span>
         <div class="h3">
-          <span class="value">{{calculateProjectedBalance(clearing) | currency}}</span>
+          <span [className]="projectedBalance < 0 ? 'red-fg':'green-fg'">{{projectedBalance | currency}}</span>
         </div>
       </div>
 
@@ -227,7 +227,7 @@
         <mat-icon class="m-0 mr-16">group_work</mat-icon>
         <div class="h2 secondary-text">{{'ACSS.ACCUMULATED_TRANSACTIONS' | translate}}</div>
       </div>
-      <div class="text-boxed blue-bg white-fg m-0">
+      <div class="text-boxed white-fg m-0">
 
       </div>
     </div>
@@ -277,7 +277,15 @@
       </ng-container>
 
       <!-- Transactions type column -->
+      <ng-container cdkColumnDef="txType">
+        <mat-header-cell *cdkHeaderCellDef>{{'ACSS.TX_TYPE' | translate}}</mat-header-cell>
+        <mat-cell *cdkCellDef="let accumulatedTransaction">
+          <div fxLayout="row" fxLayoutAlign="start center">
+            <mat-icon matTooltip="{{'ACSS.AFCC_RELOAD' | translate}}" matBadge="{{getTransactionTypeAmount(accumulatedTransaction, 'AFCC_RELOAD')}}" matBadgeColor="warn">card_membership</mat-icon>
+          </div>
 
+        </mat-cell>
+      </ng-container>
 
       <mat-header-row *cdkHeaderRowDef="displayedColumnsAccumulatedTransactions"></mat-header-row>
 

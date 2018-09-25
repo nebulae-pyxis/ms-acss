@@ -154,9 +154,9 @@ class ClearingDA {
                 clearing.output = clearing.output || {};
                 clearing.partialSettlement = clearing.partialSettlement || {};
                 clearing.partialSettlement.input =
-                  clearing.partialSettlement.input || {};
+                  clearing.partialSettlement.input || [];
                 clearing.partialSettlement.output =
-                  clearing.partialSettlement.output || {};
+                  clearing.partialSettlement.output || [];
                 return [
                   clearing.businessId,
                   ...Object.keys(clearing.input),
@@ -173,8 +173,8 @@ class ClearingDA {
               clearing.businessName = business.name;
               clearing.input = this.transformMovements(clearing.input, businessArray);
               clearing.output = this.transformMovements(clearing.output, businessArray);
-              clearing.partialSettlement.input = this.transformMovements(clearing.partialSettlement.input, businessArray);
-              clearing.partialSettlement.output = this.transformMovements(clearing.partialSettlement.output, businessArray);
+              clearing.partialSettlement.input = this.transformPartialMovements(clearing.partialSettlement.input, businessArray);
+              clearing.partialSettlement.output = this.transformPartialMovements(clearing.partialSettlement.output, businessArray);
               return clearing;
             });
         })
@@ -206,6 +206,27 @@ class ClearingDA {
         const amount = movements[businessId].amount;
         const business = businessArray.find(business => business._id == businessId) || {};
         transformedMovements.push({ businessId, amount, businessName: business.name });
+      });
+    }
+    return transformedMovements;
+  }
+
+    /**
+   * Transforms the inputs and outputs object of the clearing in an array of inputs and outputs.
+   *
+   * This is necessary due to the inputs and outputs have the businessId as a property and this value is variable,
+   * therefore its impossible to define the object in Graphql.
+   *
+   * @param {*} movements
+   * @param {String[]} businessArray
+   */
+  static transformPartialMovements(movements, businessArray = []) {
+    const transformedMovements = [];
+    if (movements) {
+      movements.forEach(movement => {
+        const amount = movement.amount;
+        const business = businessArray.find(business => business._id == movement.buId) || {};
+        transformedMovements.push({ businessId: movement.buId, amount, businessName: business.name });
       });
     }
     return transformedMovements;

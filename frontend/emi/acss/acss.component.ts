@@ -242,31 +242,23 @@ export class ACSSComponent implements OnInit, OnDestroy {
    * @param clearing Clearing info
    */
   calculateProjectedBalance(clearing) {
-    const inputs = clearing.input.reduce((inputA, inputB) => {
-      return inputA.amount || 0 + inputB.amount || 0;
+    const inputs = clearing.input.reduce((acc,inputB) => {
+      return acc || 0 + inputB.amount || 0;
     }, 0);
 
-    const outputs = clearing.output.reduce((outputA, outputB) => {
-      return outputA.amount || 0 + outputB.amount || 0;
+    const outputs = clearing.output.reduce((acc,outputB) => {
+      return acc || 0 + outputB.amount || 0;
     }, 0);
 
-    const partialSettlementOutputs = clearing.partialSettlement.input.reduce(
-      (outputA, outputB) => {
-        return outputA.amount + outputB.amount;
-      },
-      0
-    );
+    const partialSettlementOutputs = clearing.partialSettlement.output.reduce((acc,outputB) => {      
+      return acc + (outputB.amount || 0);
+    }, 0);
 
-    const partialSettlementInputs = clearing.partialSettlement.input.reduce(
-      (inputA, inputB) => {
-        return inputA.amount + inputB.amount;
-      },
-      0
-    );
+    const partialSettlementInputs = clearing.partialSettlement.input.reduce((acc,inputB) => {
+      return acc || 0 + inputB.amount || 0;
+    }, 0);
 
-    return (
-      inputs + partialSettlementInputs - (outputs + partialSettlementOutputs)
-    );
+    return (inputs + partialSettlementInputs) - (outputs + partialSettlementOutputs);
   }
 
     // /**

@@ -4,23 +4,36 @@
         "src": "frontend/emi/acss",
         "groups": [
             {
-              "id": "GROUP_NAME",
+              "id": "SYSTEM",
               "icon": "location_searching",
               "translate": {
-                "en": "Group Name",
-                "es": "Nombre de Grupo"
+                "en": "System",
+                "es": "Sistema"
               },
-              "priority": 1000
+              "priority": 100
             }
-          ],
+        ],
+        "subgroups": [
+            {
+                "groupId": "SYSTEM",
+                "id": "ACSS",
+                "icon": "account_balance",
+                "translate": {
+                    "en": "ACSS",
+                    "es": "ACSS"
+                },
+                "priority": 2000
+            }
+        ],
         "contents": [
             {
-                "groupId": "GROUP_NAME",
-                "id": "acss",
-                "icon": "dashboard",
+                "groupId": "SYSTEM",
+                "subgroupId": "ACSS",
+                "id": "ACSS",
+                "icon": "account_balance",
                 "translate": {
-                    "en": "acss",
-                    "es": "acss"
+                    "en": "ACSS",
+                    "es": "ACSS"
                 },
                 "navURL": "/acss",
                 "path": "acss",
@@ -28,7 +41,23 @@
                 "priority": 1000,
                 "roles" : ["business-owner", "SYSADMIN"],
                 "default" : false
-            }            
+            },
+            {
+                "groupId": "SYSTEM",
+                "subgroupId": "ACSS",
+                "id": "ACSS-ERROR",
+                "icon": "error",
+                "translate": {
+                    "en": "Errors",
+                    "es": "Errores"
+                },
+                "navURL": "/acss/acss-errors",
+                "path": "acss",
+                "loadChildren": "./main/content/acss/acss.module#ACSSModule",
+                "priority": 1000,
+                "roles" : ["business-owner", "SYSADMIN"],
+                "default" : false
+            }       
         ],
         "preBuildCommands": [],
         "environmentVars": {

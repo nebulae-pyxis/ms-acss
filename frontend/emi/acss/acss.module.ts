@@ -13,6 +13,7 @@ import { ACSSDetailService } from './acss-detail/acss-detail.service';
 import { ClearingService } from './clearing/clearing.service';
 import { TransactionsComponent } from './transactions/transactions.component';
 import { TransactionDialogComponent } from './transactions/transaction-dialog/transaction-dialog.component';
+import { AcssErrorsComponent } from './acss-errors/acss-errors.component';
 
 const routes: Routes = [
   {
@@ -22,6 +23,10 @@ const routes: Routes = [
   {
     path: 'acss-detail/:id',
     component: ACSSDetailComponent,
+  },
+  {
+    path: 'acss-errors',
+    component: AcssErrorsComponent,
   },
   {
     path: 'acss-detail/:id/accumulated-transaction-detail/:accumulatedTransactionId',
@@ -42,7 +47,8 @@ const routes: Routes = [
     ClearingComponent,
     SettlementComponent,
     TransactionsComponent,
-    TransactionDialogComponent
+    TransactionDialogComponent,
+    AcssErrorsComponent
   ],
   providers: [ ACSSService, ACSSDetailService, ClearingService, DatePipe]
 })

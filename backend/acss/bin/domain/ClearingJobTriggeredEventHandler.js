@@ -86,7 +86,7 @@ class ClearingJobTriggeredEventHandler {
             .groupBy(t => t.groupKey)
             .mergeMap((group$) =>
                 group$.reduce((acc, transaction) => {
-                    acc.amount += transaction.groupAmount;
+                    acc.amount += transaction.groupAmount * 1000;
                     if (!acc.transactionIds[transaction.type]) {
                         acc.transactionIds[transaction.type] = [];
                     }
@@ -106,6 +106,7 @@ class ClearingJobTriggeredEventHandler {
                     at.toBu = fromBu;
                     at.amount = (-1 * at.amount);
                 }
+                at.amount = at.amount / 1000;
                 return at;
             });
     }

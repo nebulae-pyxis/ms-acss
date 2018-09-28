@@ -5,6 +5,8 @@ const Rx = require("rxjs");
 const jsonwebtoken = require("jsonwebtoken");
 const business = require("../../domain/Business")();
 const clearing = require("../../domain/Clearing")();
+const settlement = require("../../domain/settlement/");
+const logError = require("../../domain/log-error/");
 const jwtPublicKey = process.env.JWT_PUBLIC_KEY.replace(/\\n/g, "\n");
 
 let instance;
@@ -150,6 +152,10 @@ class GraphQlService {
         messageType: "gateway.graphql.query.getACSSBusinesses"
       },
       {
+        aggregateType: "Business",
+        messageType: "gateway.graphql.query.getBusinessById"
+      },
+      {
         aggregateType: "Clearing",
         messageType: "gateway.graphql.query.getAllClearingsFromBusiness"
       },
@@ -166,12 +172,40 @@ class GraphQlService {
         messageType: "gateway.graphql.query.getTransactionsByIds"
       },
       {
-        aggregateType: "Clearing",
+        aggregateType: "Settlement",
         messageType: "gateway.graphql.query.getSettlementsByClearingId"
       },
       {
-        aggregateType: "Clearing",
+        aggregateType: "Settlement",
         messageType: "gateway.graphql.query.getSettlementsCountByClearingId"
+      },
+      {
+        aggregateType: "Settlement",
+        messageType: "gateway.graphql.query.getSettlementsByBusinessId"
+      },
+      {
+        aggregateType: "Settlement",
+        messageType: "gateway.graphql.query.getSettlementsCountByBusinessId"
+      },
+      {
+        aggregateType: "LogError",
+        messageType: "gateway.graphql.query.getAccumulatedTransactionErrors"
+      },
+      {
+        aggregateType: "LogError",
+        messageType: "gateway.graphql.query.getAccumulatedTransactionErrorsCount"
+      },
+      {
+        aggregateType: "LogError",
+        messageType: "gateway.graphql.query.getClearingErrors"
+      },
+      {
+        aggregateType: "LogError",
+        messageType: "gateway.graphql.query.getClearingErrorsCount"
+      },
+      {
+        aggregateType: "Settlement",
+        messageType: "gateway.graphql.mutation.changeSettlementState"
       }
     ];
   }
@@ -187,6 +221,10 @@ class GraphQlService {
       },
       'gateway.graphql.query.getACSSBusinesses': {
         fn: business.getACSSBusinesses$,
+        obj: business
+      }, 
+      'gateway.graphql.query.getBusinessById': {
+        fn: business.getBusinessById$,
         obj: business
       }, 
       'gateway.graphql.query.getAllClearingsFromBusiness': {
@@ -206,12 +244,40 @@ class GraphQlService {
         obj: clearing
       },
       'gateway.graphql.query.getSettlementsByClearingId': {
-        fn: clearing.getSettlementsByClearingId$,
-        obj: clearing
+        fn: settlement.cqrs.getSettlementsByClearingId$,
+        obj: settlement.cqrs
       },
       'gateway.graphql.query.getSettlementsCountByClearingId': {
-        fn: clearing.getSettlementsCountByClearingId$,
-        obj: clearing
+        fn: settlement.cqrs.getSettlementsCountByClearingId$,
+        obj: settlement.cqrs
+      },
+      'gateway.graphql.query.getSettlementsByBusinessId': {
+        fn: settlement.cqrs.getSettlementsByBusinessId$,
+        obj: settlement.cqrs
+      },
+      'gateway.graphql.query.getSettlementsCountByBusinessId': {
+        fn: settlement.cqrs.getSettlementsCountByClearingId$,
+        obj: settlement.cqrs
+      },
+      'gateway.graphql.query.getAccumulatedTransactionErrors': {
+        fn: logError.cqrs.getAccumulatedTransactionErrors$,
+        obj: logError.cqrs
+      },
+      'gateway.graphql.query.getAccumulatedTransactionErrorsCount': {
+        fn: logError.cqrs.getAccumulatedTransactionErrorsCount$,
+        obj: logError.cqrs
+      },
+      'gateway.graphql.query.getClearingErrors': {
+        fn: logError.cqrs.getClearingErrors$,
+        obj: logError.cqrs
+      },
+      'gateway.graphql.query.getClearingErrorsCount': {
+        fn: logError.cqrs.getClearingErrorsCount$,
+        obj: logError.cqrs
+      },
+      'gateway.graphql.mutation.changeSettlementState': {
+        fn: settlement.cqrs.changeSettlementState$,
+        obj: settlement.cqrs
       },
     };
   }

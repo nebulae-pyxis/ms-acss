@@ -13,14 +13,10 @@
       <!-- APP TITLE -->
       <div fxLayout="row" fxLayoutAlign="start center">
 
-          <button class="mr-0 mr-sm-16" mat-icon-button [routerLink]="'/acss'">
-            <mat-icon>arrow_back</mat-icon>
-          </button>
-
         <div fxLayout="column" fxLayoutAlign="start start" *fuseIfOnDom>
 
           <label for="search" style="margin-bottom: 10px" class="mr-20">
-            <span class="mat-title">{{'ACSS.ACSS' | translate}}</span>
+            <span class="mat-title">{{'ACSS.ACSS_ERRORS' | translate}}</span>
           </label>
           <div class="subtitle" *ngIf="selectedBusiness">
             {{selectedBusiness.name}}
@@ -33,16 +29,13 @@
 
     <!-- CONTENT CARD -->
     <div class="content-card mat-white-bg">
-
-
         <mat-tab-group>
-
-            <mat-tab label="{{'ACSS.CLEARING' | translate}}">
-              <app-clearing *ngIf="selectedClearing" [clearingData]="selectedClearing"></app-clearing>
+            <mat-tab label="{{'ACSS.ACCUMULATED_TRANSACTIONS_ERRORS' | translate}}">
+              <app-accumulated-transaction-errors></app-accumulated-transaction-errors>
             </mat-tab>
 
-            <mat-tab label="{{'ACSS.SETTLEMENT' | translate}}" *ngIf="false">
-                <app-settlement  *ngIf="selectedClearing" [selectedClearing]="selectedClearing"></app-settlement>
+            <mat-tab label="{{'ACSS.CLEARING_ERRORS' | translate}}">
+              <app-clearing-errors></app-clearing-errors>
             </mat-tab>
 
         </mat-tab-group>

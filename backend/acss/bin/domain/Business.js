@@ -35,6 +35,28 @@ class Business {
       });
   }
 
+    /**
+   * Gets the business by its id
+   *
+   * @param {*} args args that contain the business filter
+   * @param {*} args.id id of the business
+   */
+  getBusinessById$({ args }, authToken) {
+    return RoleValidator.checkPermissions$(
+      authToken.realm_access.roles,
+      "acss",
+      "getACSSBusinesses$()",
+      PERMISSION_DENIED_ERROR_CODE,
+      "Permission denied",
+      ["SYSADMIN", "business-owner"]
+    )
+      .mergeMap(val => BusinessDA.getBusiness$(args.id))
+      .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
+      .catch(err => {
+        return this.handleError$(err);
+      });
+  }
+
   /**
    * Gets the businesses registered on the platform
    *

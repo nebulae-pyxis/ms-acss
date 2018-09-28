@@ -43,7 +43,7 @@
 
             <!-- Timestamp Column -->
             <ng-container cdkColumnDef="timestamp">
-              <mat-header-cell *cdkHeaderCellDef>{{'ACSS.TIMESTAMP' | translate}}</mat-header-cell>
+              <mat-header-cell *cdkHeaderCellDef>{{'ACSS.DATE' | translate}}</mat-header-cell>
               <mat-cell *cdkCellDef="let transaction">
                 <p class="text-truncate">{{transaction.timestamp | date: 'd/MM/y HH:mm:ss'}}</p>
               </mat-cell>

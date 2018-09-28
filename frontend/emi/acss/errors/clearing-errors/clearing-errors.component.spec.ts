@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AcssErrorsComponent } from './acss-errors.component';
+import { ClearingErrorsComponent } from './clearing-errors.component';
 
-describe('AcssErrorsComponent', () => {
-  let component: AcssErrorsComponent;
-  let fixture: ComponentFixture<AcssErrorsComponent>;
+describe('ClearingErrorsComponent', () => {
+  let component: ClearingErrorsComponent;
+  let fixture: ComponentFixture<ClearingErrorsComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AcssErrorsComponent ]
+      declarations: [ ClearingErrorsComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(AcssErrorsComponent);
+    fixture = TestBed.createComponent(ClearingErrorsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

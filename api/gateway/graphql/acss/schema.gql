@@ -126,14 +126,43 @@ type Settlement {
   fromBu: String!
   "From business name"
   fromBusinessName: String
+  "From business state"
+  fromBusinessState: SettlementState
   "To business"
   toBu: String!
   "To business name"
   toBusinessName: String
+  "To business state"
+  toBusinessState: SettlementState
   "Timestamp"
   timestamp: BigInt
   "Clearing ID"
   clearingId: String!
+}
+
+"Error info"
+type Error {
+  "Error ID"
+  _id: ID!
+  "Timestamp"
+  timestamp: BigInt
+  "Error"
+  error: String!
+  "Event"
+  event: String!
+}
+
+"Settlement states"
+enum SettlementState {
+  TO_PAY
+  PAID_OUT
+}
+
+type CommandResponse {
+  "Response code"
+  code: Int
+  "Response message"
+  message: String
 }
 
 "Hello world sample, please remove"
@@ -147,6 +176,8 @@ type Query {
   getACSSBusiness: Business
   "Get businesses"
   getACSSBusinesses: [Business]
+  "Get business by id"
+  getBusinessById(id: ID!): Business
   "Gets the clearings from a business. the value businessId is taken into account if and only if the user has the role SYSADMIN, If a business is not specified, this will return the clearings associated with the business of the user that is performing the request "
   getAllClearingsFromBusiness(page: Int!, count: Int!, businessId: String): [Clearing]
   "Gets the clearing with the indicated ID"
@@ -159,6 +190,23 @@ type Query {
   getSettlementsByClearingId(page: Int!, count: Int!, clearingId: String!): [Settlement]
   "Gets the amount of settlements associated with the specified clearing ID"
   getSettlementsCountByClearingId(clearingId: String!): Int!
+  "Gets settlements associated with the specified business ID"
+  getSettlementsByBusinessId(page: Int!, count: Int!, businessId: String!): [Settlement]
+  "Gets the amount of settlements associated with the specified business ID"
+  getSettlementsCountByBusinessId(businessId: String!): Int!
+  "Gets errors ocurred during generation of accumulated transactions"
+  getAccumulatedTransactionErrors(page: Int!, count: Int!): [Error]
+  "Gets amount of errors ocurred during generation of accumulated transactions"
+  getAccumulatedTransactionErrorsCount: Int!
+  "Gets errors ocurred during generation or update of clearing"
+  getClearingErrors(page: Int!, count: Int!): [Error]
+  "Gets amount of errors ocurred during generation or update of clearing"
+  getClearingErrorsCount: Int!
+}
+
+type Mutation {
+  "change settlement state"
+  changeSettlementState(settlementId: ID!,settlementState: SettlementState!): CommandResponse
 }
 
 type Subscription {

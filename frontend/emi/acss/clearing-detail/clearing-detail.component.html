@@ -13,7 +13,7 @@
       <!-- APP TITLE -->
       <div fxLayout="row" fxLayoutAlign="start center">
 
-          <button class="mr-0 mr-sm-16" mat-icon-button [routerLink]="'/acss'">
+          <button class="mr-0 mr-sm-16" mat-icon-button [routerLink]="'/acss/clearing'">
             <mat-icon>arrow_back</mat-icon>
           </button>
 
@@ -39,10 +39,6 @@
 
             <mat-tab label="{{'ACSS.CLEARING' | translate}}">
               <app-clearing *ngIf="selectedClearing" [clearingData]="selectedClearing"></app-clearing>
-            </mat-tab>
-
-            <mat-tab label="{{'ACSS.SETTLEMENT' | translate}}" *ngIf="false">
-                <app-settlement  *ngIf="selectedClearing" [selectedClearing]="selectedClearing"></app-settlement>
             </mat-tab>
 
         </mat-tab-group>

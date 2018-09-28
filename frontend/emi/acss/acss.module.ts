@@ -8,29 +8,35 @@ import { ACSSService } from './acss.service';
 import { ACSSComponent } from './acss.component';
 import { ClearingComponent } from './clearing/clearing.component';
 import { SettlementComponent } from './settlement/settlement.component';
-import { ACSSDetailComponent } from './acss-detail/acss-detail.component';
-import { ACSSDetailService } from './acss-detail/acss-detail.service';
+import { ClearingDetailComponent } from './clearing-detail/clearing-detail.component';
+import { ClearingDetailService } from './clearing-detail/clearing-detail.service';
 import { ClearingService } from './clearing/clearing.service';
 import { TransactionsComponent } from './transactions/transactions.component';
 import { TransactionDialogComponent } from './transactions/transaction-dialog/transaction-dialog.component';
-import { AcssErrorsComponent } from './acss-errors/acss-errors.component';
+import { ErrorsComponent } from './errors/errors.component';
+import { AccumulatedTransactionErrorsComponent } from './errors/accumulated-transaction-errors/accumulated-transaction-errors.component';
+import { ClearingErrorsComponent } from './errors/clearing-errors/clearing-errors.component';
 
 const routes: Routes = [
   {
-    path: '',
+    path: 'clearing',
     component: ACSSComponent,
   },
   {
-    path: 'acss-detail/:id',
-    component: ACSSDetailComponent,
+    path: 'clearing/:id',
+    component: ClearingDetailComponent,
   },
   {
-    path: 'acss-errors',
-    component: AcssErrorsComponent,
-  },
-  {
-    path: 'acss-detail/:id/accumulated-transaction-detail/:accumulatedTransactionId',
+    path: 'clearing/:id/accumulated-transaction-detail/:accumulatedTransactionId',
     component: TransactionsComponent,
+  },
+  {
+    path: 'settlement',
+    component: SettlementComponent,
+  },
+  {
+    path: 'errors',
+    component: ErrorsComponent,
   }
 ];
 
@@ -43,14 +49,16 @@ const routes: Routes = [
   entryComponents: [TransactionDialogComponent],
   declarations: [
     ACSSComponent,
-    ACSSDetailComponent,
+    ClearingDetailComponent,
     ClearingComponent,
     SettlementComponent,
     TransactionsComponent,
     TransactionDialogComponent,
-    AcssErrorsComponent
+    ErrorsComponent,
+    AccumulatedTransactionErrorsComponent,
+    ClearingErrorsComponent
   ],
-  providers: [ ACSSService, ACSSDetailService, ClearingService, DatePipe]
+  providers: [ ACSSService, ClearingDetailService, ClearingService, DatePipe]
 })
 
 export class ACSSModule {}

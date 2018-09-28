@@ -6,8 +6,7 @@ import {
   OnInit,
   ViewChild,
   ElementRef,
-  OnDestroy,
-  AfterViewInit
+  OnDestroy
 } from "@angular/core";
 import {
   FormBuilder,
@@ -61,10 +60,11 @@ export class ACSSComponent implements OnInit, OnDestroy {
     'timestamp',
     'lastUpdateTimestamp',
     'open',
-    'projected_balance'
+    'balance'
   ];
   // Table data
   dataSource = new MatTableDataSource();
+  myBusiness: any = null;
   businessForm: FormGroup;
   businessQuery$: Rx.Observable<any>;
   businessUserLogged: any = null;
@@ -143,11 +143,10 @@ export class ACSSComponent implements OnInit, OnDestroy {
           })
         )
         .subscribe(([businessData, clearings, selectedBusiness]) => {
-          console.log('businessData => ', businessData);
-          console.log('Clearings => ', clearings);
           this.isSystemAdmin = businessData[0];
-          this.selectedBusinessData = selectedBusiness;
+          this.myBusiness = businessData[1];
           this.allBusiness = businessData[2];
+          this.selectedBusinessData = selectedBusiness;          
           this.dataSource.data = clearings;
         })
     );

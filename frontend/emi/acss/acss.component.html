@@ -13,8 +13,8 @@
 
       <!-- APP TITLE -->
       <div class="logo my-12 m-sm-0" fxLayout="row" fxLayoutAlign="start start" fxFlex="60">
-        <mat-icon class="logo-icon mr-16" *fuseIfOnDom [@animate]="{value:'*',params:{delay:'50ms',scale:'0.2'}}">account_balance</mat-icon>
-        <span class="logo-text h1" *fuseIfOnDom [@animate]="{value:'*',params:{delay:'100ms',x:'-25px'}}">{{'ACSS.ACSS' | translate}}</span>
+        <mat-icon class="logo-icon mr-16" *fuseIfOnDom [@animate]="{value:'*',params:{delay:'50ms',scale:'0.2'}}">chrome_reader_mode</mat-icon>
+        <span class="logo-text h1" *fuseIfOnDom [@animate]="{value:'*',params:{delay:'100ms',x:'-25px'}}">{{'ACSS.CLEARING' | translate}}</span>
       </div>
       <!-- / APP TITLE -->
       <!-- BUSINESS FILTER -->
@@ -60,7 +60,7 @@
           </div>
 
           <div class="subtitle secondary-text">
-            <span>{{'ACSS.CLEARING_LIST' | translate}}</span>
+            <span>{{'ACSS.CLEARING_LIST' | translate}} {{myBusiness.name}}({{myBusiness._id}})</span>
           </div>
         </div>
       </div>
@@ -102,8 +102,8 @@
             </ng-container>
 
             <!-- projected balance Column -->
-            <ng-container cdkColumnDef="projected_balance">
-              <mat-header-cell *cdkHeaderCellDef>{{'ACSS.PROJECTED_BALANCE' | translate}}</mat-header-cell>
+            <ng-container cdkColumnDef="balance">
+              <mat-header-cell *cdkHeaderCellDef>{{'ACSS.BALANCE' | translate}}</mat-header-cell>
               <mat-cell *cdkCellDef="let clearing">
                 <p class="text-truncate">{{calculateProjectedBalance(clearing) | currency}}</p>
               </mat-cell>
@@ -114,7 +114,7 @@
             <mat-row *cdkRowDef="let clearing; columns: displayedColumns;"
               (click)="selectClearingRow(clearing)"
               [ngClass]="{'highlight': selectedClearing && selectedClearing._id == selectedClearing._id}"
-              matRipple [routerLink]="'acss-detail/'+clearing._id">
+              matRipple [routerLink]="clearing._id">
             </mat-row>
 
           </mat-table>

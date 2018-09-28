@@ -1,54 +1,161 @@
-      <!-- CONTENT CARD -->
+<div id="user" class="page-layout carded fullwidth" fusePerfectScrollbar>
 
-      <div class="content-card mat-white-bg">
-  
-        <div fxLayout="column" style="width: 100%; justify-content: space-between" fxLayout.gt-sm="row">
-          <div fxLayout="column" fxFlex="100" fxFlex.gt-sm="100" fxFlex.gt-md="100">
-            <mat-table id="settlement-table" class="item-table" #table [dataSource]="dataSource">
-  
-              <!-- Timestamp Column -->
-              <ng-container cdkColumnDef="timestamp">
-                <mat-header-cell *cdkHeaderCellDef>{{'ACSS.TIMESTAMP' | translate}}</mat-header-cell>
-                <mat-cell *cdkCellDef="let settlement">
-                  <p class="text-truncate">{{settlement.timestamp | date: 'd/MM/y HH:mm:ss'}}</p>
-                </mat-cell>
-              </ng-container>
-  
-              <!-- From Column -->
-              <ng-container cdkColumnDef="from">
-                <mat-header-cell *cdkHeaderCellDef>{{'ACSS.FROM' | translate}}</mat-header-cell>
-                <mat-cell *cdkCellDef="let settlement">
-                  <p class="text-truncate">{{settlement.fromBusinessName}}</p>
-                </mat-cell>
-              </ng-container>
-  
-              <!-- To Column -->
-              <ng-container cdkColumnDef="to">
-                <mat-header-cell *cdkHeaderCellDef>{{'ACSS.TO' | translate}}</mat-header-cell>
-                <mat-cell *cdkCellDef="let settlement">
-                  <p class="text-truncate">{{settlement.toBusinessName}}</p>
-                </mat-cell>
-              </ng-container>
-  
-              <!-- Amount Column -->
-              <ng-container cdkColumnDef="amount">
-                <mat-header-cell *cdkHeaderCellDef>{{'ACSS.AMOUNT' | translate}}</mat-header-cell>
-                <mat-cell *cdkCellDef="let settlement">
-                  <p class="text-truncate">{{settlement.amount | currency}}</p>
-                </mat-cell>
-              </ng-container>
-  
-              <mat-header-row *cdkHeaderRowDef="displayedColumns"></mat-header-row>
-  
-              <mat-row *cdkRowDef="let settlement; columns: displayedColumns;" class="product">
-              </mat-row>
-  
-            </mat-table>
-  
-            <mat-paginator #paginator [length]="tableSize" [pageIndex]="0" [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]">
-            </mat-paginator>
+  <!-- TOP BACKGROUND -->
+  <div class="top-bg mat-accent-bg"></div>
+  <!-- / TOP BACKGROUND -->
+
+  <!-- CENTER -->
+  <div class="center">
+
+    <!-- HEADER SYSTEM ADMIN -->
+    <div *ngIf="isSystemAdmin" class="header white-fg" fxLayout="column" fxLayoutAlign="center center" fxLayout.gt-xs="row"
+      fxLayoutAlign.gt-xs="space-between center">
+
+      <!-- APP TITLE -->
+      <div class="logo my-12 m-sm-0" fxLayout="row" fxLayoutAlign="start start" fxFlex="60">
+        <mat-icon class="logo-icon mr-16" *fuseIfOnDom [@animate]="{value:'*',params:{delay:'50ms',scale:'0.2'}}">money</mat-icon>
+        <span class="logo-text h1" *fuseIfOnDom [@animate]="{value:'*',params:{delay:'100ms',x:'-25px'}}">{{'ACSS.SETTLEMENT' | translate}}</span>
+      </div>
+      <!-- / APP TITLE -->
+      <!-- BUSINESS FILTER -->
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutAlign="start start" fxFlex="40">
+        <div class="search-input-wrapper mx-12 m-md-0" fxFlex="1 0 auto" fxLayout="row" fxLayoutAlign="start center">
+          <label for="search" style="margin-bottom: 10px" class="mr-20">
+            <span class="mat-title">{{'ACSS.BUSINESS' | translate}}</span>
+          </label>
+          <form name="businessForm" [formGroup]="businessForm" fxFlex>
+            <mat-form-field class="w-100-p">
+              <mat-select placeholder="{{'ACSS.SELECT_BUSINESS' | translate}}" [(value)]="selectedBusinessData" (selectionChange)="onSelectBusinessEvent($event.value)">
+
+                <mat-option *ngFor="let business of allBusiness" [value]="business">
+                  {{business.name}} - {{business._id}} 
+                </mat-option>
+
+              </mat-select>
+              <mat-error *ngIf="businessForm.hasError('required', ['business'])">
+                {{'ACSS.BUSINESS_REQUIRED' | translate}}
+              </mat-error>
+            </mat-form-field>
+          </form>
+        </div>
+      </div>
+      <!-- / BUSINESS FILTER -->
+    </div>
+    <!-- / HEADER SYSTEM ADMIN-->
+
+
+    <!-- HEADER BUSINESS-->
+    <div *ngIf="!isSystemAdmin" class="header white-fg" fxLayout="row" fxLayoutAlign="space-between center">
+
+      <!-- APP TITLE -->
+      <div fxLayout="row" fxLayoutAlign="start center">
+
+        <div fxLayout="column" fxLayoutAlign="start start" *fuseIfOnDom>
+          
+          <label for="search" style="margin-bottom: 10px" fxLayoutAlign="space-between start" class="mr-20">
+            <mat-icon class="logo-icon mr-16" *fuseIfOnDom [@animate]="{value:'*',params:{delay:'50ms',scale:'0.2'}}">money</mat-icon>
+            <span class="mat-title">{{'ACSS.SETTLEMENT' | translate}}</span>
+          </label>
+          <div class="subtitle" *ngIf="selectedBusiness">
+            {{selectedBusiness.name}}
+          </div>
+
+          <div class="subtitle secondary-text">
+            <span>{{'ACSS.SETTLEMENT_LIST' | translate}} {{myBusiness.name}}({{myBusiness._id}})</span>
           </div>
         </div>
       </div>
+      <!-- / APP TITLE -->
+    </div>
+    <!-- / HEADER BUSINESS-->
+
+    <!-- CONTENT CARD -->
+
+          <!-- CONTENT CARD -->
+
+          <div class="content-card mat-white-bg">
   
-      <!-- / CONTENT CARD -->
+            <div fxLayout="column" style="width: 100%; justify-content: space-between" fxLayout.gt-sm="row">
+              <div fxLayout="column" fxFlex="100" fxFlex.gt-sm="100" fxFlex.gt-md="100">
+                <mat-table id="settlement-table" class="item-table" #table [dataSource]="dataSource">
+      
+                  <!-- Timestamp Column -->
+                  <ng-container cdkColumnDef="timestamp">
+                    <mat-header-cell *cdkHeaderCellDef>{{'ACSS.DATE' | translate}}</mat-header-cell>
+                    <mat-cell *cdkCellDef="let settlement">
+                      <p class="text-truncate">{{settlement.timestamp | date: 'd/MM/y HH:mm:ss'}}</p>
+                    </mat-cell>
+                  </ng-container>
+      
+                  <!-- From Column -->
+                  <ng-container cdkColumnDef="from">
+                    <mat-header-cell *cdkHeaderCellDef>{{'ACSS.FROM' | translate}}</mat-header-cell>
+                    <mat-cell *cdkCellDef="let settlement">
+                      <p class="text-truncate">{{settlement.fromBusinessName}}</p>
+                    </mat-cell>
+                  </ng-container>
+      
+                  <!-- To Column -->
+                  <ng-container cdkColumnDef="to">
+                    <mat-header-cell *cdkHeaderCellDef>{{'ACSS.TO' | translate}}</mat-header-cell>
+                    <mat-cell *cdkCellDef="let settlement">
+                      <p class="text-truncate">{{settlement.toBusinessName}}</p>
+                    </mat-cell>
+                  </ng-container>
+      
+                  <!-- Amount Column -->
+                  <ng-container cdkColumnDef="amount">
+                    <mat-header-cell *cdkHeaderCellDef>{{'ACSS.AMOUNT' | translate}}</mat-header-cell>
+                    <mat-cell *cdkCellDef="let settlement">
+                      <p class="text-truncate">{{settlement.amount | currency}}</p>
+                    </mat-cell>
+                  </ng-container>
+
+                  <!-- From business state Column -->
+                  <ng-container cdkColumnDef="fromBusinessState">
+                    <mat-header-cell *cdkHeaderCellDef>{{'ACSS.FROM_BU_STATE' | translate}}</mat-header-cell>
+                    <mat-cell *cdkCellDef="let settlement">
+                        <p class="text-truncate">{{'ACSS.'+settlement.fromBusinessState | translate}}</p>
+                    </mat-cell>
+                  </ng-container>
+
+                  <!-- To business state Column -->
+                  <ng-container cdkColumnDef="toBusinessState">
+                    <mat-header-cell *cdkHeaderCellDef>{{'ACSS.TO_BU_STATE' | translate}}</mat-header-cell>
+                    <mat-cell *cdkCellDef="let settlement">
+                      <p class="text-truncate">{{'ACSS.'+settlement.toBusinessState | translate}}</p>
+                    </mat-cell>
+                  </ng-container>
+
+                  <ng-container cdkColumnDef="state">
+                    <mat-header-cell *cdkHeaderCellDef>{{'ACSS.STATE' | translate}}</mat-header-cell>
+                    <mat-cell *cdkCellDef="let settlement">
+
+                      <mat-select [(value)]="myBusiness._id == settlement.toBu ? settlement.toBusinessState: settlement.fromBusinessState" 
+                      placeholder="{{'ACSS.SELECT_ONE' | translate}}" (selectionChange)="onChangeSettlementState($event.value, settlement)">
+                        <mat-option>{{'ACSS.NONE' | translate}}</mat-option>
+                        <mat-option value="TO_PAY">{{'ACSS.TO_PAY' | translate}}</mat-option>
+                        <mat-option value="PAID_OUT">{{'ACSS.PAID_OUT' | translate}}</mat-option>
+                      </mat-select>
+                    </mat-cell>
+                  </ng-container>
+      
+                  <mat-header-row *cdkHeaderRowDef="displayedColumns"></mat-header-row>
+      
+                  <mat-row *cdkRowDef="let settlement; columns: displayedColumns;" class="product">
+                  </mat-row>
+      
+                </mat-table>
+      
+                <mat-paginator #paginator [length]="tableSize" [pageIndex]="0" [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]">
+                </mat-paginator>
+              </div>
+            </div>
+          </div>
+      
+          <!-- / CONTENT CARD -->
+
+    <!-- / CONTENT CARD -->
+  </div>
+  <!-- / CENTER -->
+</div>

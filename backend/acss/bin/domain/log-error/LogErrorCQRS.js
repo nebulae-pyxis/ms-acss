@@ -1,72 +1,50 @@
-"use strict";
-
 const Rx = require("rxjs");
-const ClearingDA = require("../data/ClearingDA");
-const AccumulatedTransactionDA = require("../data/AccumulatedTransactionDA");
-const SettlementDA = require("../data/SettlementDA");
-const TransactionDA = require("../data/TransactionsDA");
-const broker = require("../tools/broker/BrokerFactory")();
-const eventSourcing = require("../tools/EventSourcing")();
-const RoleValidator = require("../tools/RoleValidator");
-const Event = require("@nebulae/event-store").Event;
-const uuidv4 = require("uuid/v4");
+const broker = require("../../tools/broker/BrokerFactory")();
 const MATERIALIZED_VIEW_TOPIC = "materialized-view-updates";
-const { CustomError, DefaultError } = require("../tools/customError");
+const LogErrorDA = require("../../data/LogErrorDA");
+const AccumulatedTransactionDA = require("../../data/AccumulatedTransactionDA");
+const RoleValidator = require("../../tools/RoleValidator");
+const { CustomError, DefaultError } = require("../../tools/customError");
 const {
   PERMISSION_DENIED_ERROR_CODE,
   INTERNAL_SERVER_ERROR_CODE
-} = require("../tools/ErrorCodes");
+} = require("../../tools/ErrorCodes");
 
-/**
- * Singleton instance
- */
 let instance;
 
-class Clearing {
-  constructor() {}
+class LogErrorCQRS {
+  constructor() { }
+
+
 
   /**
-   * Gets the clearings of a business
+   * handle the cron job event - handleSettlementJobTriggeredEvent
    *
-   * @param args args
-   * @param args.businessId Id of the business (This values is taken into account if the user that perform the request has the role SYSADMIN)
+   * @param {*} settlementJobTriggered cron job event
+   * @returns {Rx.Observable}
    */
-  getClearingsFromBusiness$({ args }, authToken) {
-    return RoleValidator.checkPermissions$(
-      authToken.realm_access.roles,
-      "ACSS",
-      "getClearingsFromBusiness$()",
-      PERMISSION_DENIED_ERROR_CODE.code,
-      PERMISSION_DENIED_ERROR_CODE.description,
-      ["SYSADMIN", "business-owner"]
-    )
-      .mergeMap(roles =>{
-        args.businessId = roles.SYSADMIN ? args.businessId: null;
-        return ClearingDA.getAllClearingsFromBusiness$(args.page, args.count, args.businessId ? args.businessId : authToken.businessId);
-      })
-      .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
-      .catch(err => {
-        return this.handleError$(err);
-      });
+  handleSettlementJobTriggeredEvent$(settlementJobTriggered) {
+    return Rx.Observable.empty();
   }
 
-      /**
-   * Gets the clearing by id
+  /**
+   * Gets accumulated tx errors
    *
    * @param args args
-   * @param args.id Id of the clearing
+   * @param args.page Page number to recover
+   * @param args.count Amount of rows to recover
    */
-  getClearingById$({ args }, authToken) {
+  getAccumulatedTransactionErrors$({ args }, authToken) {
     return RoleValidator.checkPermissions$(
       authToken.realm_access.roles,
       "ACSS",
-      "getClearingsById$()",
+      "getAccumulatedTransactionError$()",
       PERMISSION_DENIED_ERROR_CODE.code,
       PERMISSION_DENIED_ERROR_CODE.description,
-      ["SYSADMIN", "business-owner"]
+      ["SYSADMIN"]
     )
-      .mergeMap(role => {
-        return ClearingDA.getClearingByClearingId$(args.id, role.SYSADMIN ? undefined: authToken.businessId);
+      .mergeMap(roles => {
+        return LogErrorDA.getAccumulatedTransactionErrors$(args.page, args.count)
       })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
       .catch(err => {
@@ -75,22 +53,23 @@ class Clearing {
   }
 
     /**
-   * Gets the accumulated transactions by ids
+   * Gets accumulated tx errors
    *
    * @param args args
-   * @param args.ids Ids of the accumulated transactions
+   * @param args.page Page number to recover
+   * @param args.count Amount of rows to recover
    */
-  getAccumulatedTransactionsByIds$({ args }, authToken) {
+  getAccumulatedTransactionErrorsCount$({ args }, authToken) {
     return RoleValidator.checkPermissions$(
       authToken.realm_access.roles,
       "ACSS",
-      "getAccumulatedTransactionsByIds$()",
+      "getAccumulatedTransactionErrorsCount$()",
       PERMISSION_DENIED_ERROR_CODE.code,
       PERMISSION_DENIED_ERROR_CODE.description,
-      ["SYSADMIN", "business-owner"]
+      ["SYSADMIN"]
     )
-      .mergeMap(role => {
-        return AccumulatedTransactionDA.getAccumulatedTransactionsByIds$(args.page, args.count, args.ids, role.SYSADMIN ? undefined: authToken.businessId)
+      .mergeMap(roles => {
+        return LogErrorDA.getAccumulatedTransactionErrorsCount$(args.page, args.count)
       })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
       .catch(err => {
@@ -98,23 +77,49 @@ class Clearing {
       });
   }
 
-  /**
-   * Gets the transactions by ids
+    /**
+   * Gets clearing errors
    *
    * @param args args
-   * @param args.ids Ids of the transactions
+   * @param args.page Page number to recover
+   * @param args.count Amount of rows to recover
    */
-  getTransactionsByIds$({ args }, authToken) {
+  getClearingErrors$({ args }, authToken) {
     return RoleValidator.checkPermissions$(
       authToken.realm_access.roles,
       "ACSS",
-      "getTransactionsByIds$()",
+      "getClearingErrors$()",
       PERMISSION_DENIED_ERROR_CODE.code,
       PERMISSION_DENIED_ERROR_CODE.description,
-      ["SYSADMIN", "business-owner"]
+      ["SYSADMIN"]
     )
       .mergeMap(roles => {
-        return TransactionDA.getTransactionsByIds$(args.page, args.count, args.ids, roles.SYSADMIN ? undefined:authToken.businessId)
+        return LogErrorDA.getClearingErrors$(args.page, args.count)
+      })
+      .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
+      .catch(err => {
+        return this.handleError$(err);
+      });
+  }
+
+      /**
+   * Gets clearing errors
+   *
+   * @param args args
+   * @param args.page Page number to recover
+   * @param args.count Amount of rows to recover
+   */
+  getClearingErrorsCount$({ args }, authToken) {
+    return RoleValidator.checkPermissions$(
+      authToken.realm_access.roles,
+      "ACSS",
+      "getClearingErrorsCount$()",
+      PERMISSION_DENIED_ERROR_CODE.code,
+      PERMISSION_DENIED_ERROR_CODE.description,
+      ["SYSADMIN"]
+    )
+      .mergeMap(roles => {
+        return LogErrorDA.getClearingErrorsCount$(args.page, args.count)
       })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
       .catch(err => {
@@ -151,16 +156,16 @@ class Clearing {
     });
   }
 
-  //#endregion
 }
 
 /**
- * @returns {Clearing}
+ * Log error
+ * @returns {LogErrorCQRS}
  */
 module.exports = () => {
   if (!instance) {
-    instance = new Clearing();
-    console.log(`${instance.constructor.name} Singleton created`);
+    instance = new LogErrorCQRS();
+    console.log("LogErrorCQRS Singleton created");
   }
   return instance;
 };

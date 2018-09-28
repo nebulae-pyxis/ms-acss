@@ -22,7 +22,7 @@
       </div>
 
       <div fxLayout="row" fxLayoutAlign="start center" fxFlex="25">
-        <span class="h2 title secondary-text">{{'ACSS.PROJECTED_BALANCE' | translate}}:</span>
+        <span class="h2 title secondary-text">{{'ACSS.BALANCE' | translate}}:</span>
         <span>&nbsp;&nbsp;</span>
         <div class="h3">
           <span [className]="projectedBalance < 0 ? 'red-fg':'green-fg'">{{projectedBalance | currency}}</span>
@@ -32,9 +32,9 @@
       <div fxLayout="row" fxLayoutAlign="start center" fxFlex="25">
         <span class="h2 title secondary-text">{{'ACSS.STATE' | translate}}:</span>
         <span>&nbsp;&nbsp;</span>
-        <span class="status text-truncate h3 p-4" ngClass="mat-green-900-bg" *ngIf="clearing.open">{{'ACSS.OPEN' |
+        <span class="status text-truncate h3 p-4" ngClass="mat-green-900-bg rounded-box" *ngIf="clearing.open">{{'ACSS.OPEN' |
           translate}}</span>
-        <span class="status text-truncate h3 p-4" ngClass="mat-red-900-bg" *ngIf="!clearing.open">{{'ACSS.CLOSE' |
+        <span class="status text-truncate h3 p-4" ngClass="mat-red-900-bg rounded-box" *ngIf="!clearing.open">{{'ACSS.CLOSE' |
           translate}}</span>
       </div>
     </div>

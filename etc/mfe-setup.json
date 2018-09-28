@@ -29,13 +29,13 @@
             {
                 "groupId": "SYSTEM",
                 "subgroupId": "ACSS",
-                "id": "ACSS",
-                "icon": "account_balance",
+                "id": "CLEARINGS",
+                "icon": "chrome_reader_mode",
                 "translate": {
-                    "en": "ACSS",
-                    "es": "ACSS"
+                    "en": "Clearing",
+                    "es": "Liquidación"
                 },
-                "navURL": "/acss",
+                "navURL": "/acss/clearing",
                 "path": "acss",
                 "loadChildren": "./main/content/acss/acss.module#ACSSModule",
                 "priority": 1000,
@@ -45,17 +45,33 @@
             {
                 "groupId": "SYSTEM",
                 "subgroupId": "ACSS",
-                "id": "ACSS-ERROR",
+                "id": "SETTLEMENTS",
+                "icon": "money",
+                "translate": {
+                    "en": "Settlement",
+                    "es": "Compensación"
+                },
+                "navURL": "/acss/settlement",
+                "path": "acss",
+                "loadChildren": "./main/content/acss/acss.module#ACSSModule",
+                "priority": 1000,
+                "roles" : ["business-owner", "SYSADMIN"],
+                "default" : false
+            },
+            {
+                "groupId": "SYSTEM",
+                "subgroupId": "ACSS",
+                "id": "ERRORS",
                 "icon": "error",
                 "translate": {
                     "en": "Errors",
                     "es": "Errores"
                 },
-                "navURL": "/acss/acss-errors",
+                "navURL": "/acss/errors",
                 "path": "acss",
                 "loadChildren": "./main/content/acss/acss.module#ACSSModule",
                 "priority": 1000,
-                "roles" : ["business-owner", "SYSADMIN"],
+                "roles" : ["SYSADMIN"],
                 "default" : false
             }       
         ],

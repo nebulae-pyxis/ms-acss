@@ -126,8 +126,10 @@ export const getSettlementsByClearingId = gql`
       amount
       fromBu
       fromBusinessName
+      fromBusinessState
       toBu
       toBusinessName
+      toBusinessState
       timestamp
       clearingId
     }
@@ -140,11 +142,66 @@ export const getSettlementsCountByClearingId = gql`
   }
 `;
 
-
-//Hello world sample, please remove
-export const ACSSHelloWorldSubscription = gql`
-  subscription{
-    ACSSHelloWorldSubscription{
-      sn
+export const getSettlementsByBusinessId = gql`
+  query getSettlementsByBusinessId($page: Int!, $count: Int!, $businessId: String!){
+    getSettlementsByBusinessId(page: $page, count: $count, businessId: $businessId){
+      _id
+      amount
+      fromBu
+      fromBusinessName
+      fromBusinessState
+      toBu
+      toBusinessName
+      toBusinessState
+      timestamp
+      clearingId
+    }
   }
-}`;
+`;
+
+export const getSettlementsCountByBusinessId = gql`
+  query getSettlementsCountByBusinessId($businessId: String!){
+    getSettlementsCountByBusinessId(businessId: $businessId)
+  }
+`;
+
+export const getAccumulatedTransactionErrors = gql`
+  query getAccumulatedTransactionErrors($page: Int!, $count: Int!){
+    getAccumulatedTransactionErrors(page: $page, count: $count){
+      timestamp
+      error
+      event
+    }
+  }
+`;
+
+export const getAccumulatedTransactionErrorsCount = gql`
+  query getAccumulatedTransactionErrorsCount{
+    getAccumulatedTransactionErrorsCount
+  }
+`;
+
+export const getClearingErrors = gql`
+  query getClearingErrors($page: Int!, $count: Int!){
+    getClearingErrors(page: $page, count: $count){
+      timestamp
+      error
+      event
+    }
+  }
+`;
+
+export const getClearingErrorsCount = gql`
+  query getClearingErrorsCount{
+    getClearingErrorsCount
+  }
+`;
+
+export const changeSettlementState = gql`
+  mutation changeSettlementState($settlementId: ID!, $settlementState: SettlementState!) {
+    changeSettlementState(settlementId: $settlementId, settlementState: $settlementState) {
+      code
+      message
+    }
+  }
+`;

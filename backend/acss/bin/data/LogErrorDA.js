@@ -21,6 +21,80 @@ class LogErrorDA {
   }
 
   /**
+   * Gets accumulated transaction errors
+   * @param {*} page Indicates the page number which will be returned
+   * @param {*} count Indicates the max amount of rows that will be return.
+   */
+  static getAccumulatedTransactionErrors$(page, count) {
+    return this.getLogError$(page, count, CollectionNameAccumulatedTransactionsError);
+  }
+
+  /**
+   * Gets clearing errors
+   * @param {*} page Indicates the page number which will be returned
+   * @param {*} count Indicates the max amount of rows that will be return.
+   */
+  static getClearingErrors$(page, count) {
+    return this.getLogError$(page, count, CollectionNameClearingError);
+  }
+
+  /**
+   * Gets errors 
+   * @param {*} page Indicates the page number which will be returned
+   * @param {*} count Indicates the max amount of rows that will be return.
+   * @param {*} collectionName 
+   */
+  static getLogError$(page, count, collectionName){
+    const collection = mongoDB.db.collection(collectionName);
+    return Rx.Observable.defer(() =>
+      collection
+        .find()
+        .sort({ timestamp: -1 })
+        .skip(count * page)
+        .limit(count)
+        .toArray()
+    )
+    .mergeMap(logErrors => {
+      return Rx.Observable.from(logErrors)
+    })
+    .map(log => {
+      return {
+        error: log.error,
+        timestamp: log.timestamp,
+        event: JSON.stringify(log.event)
+      }
+    })
+    .toArray();
+  }
+
+    /**
+   * Gets amount of accumulated transaction errors
+   */
+  static getAccumulatedTransactionErrorsCount$() {
+    return this.getLogErrorCount$(CollectionNameAccumulatedTransactionsError);
+  }
+
+  /**
+   * Gets amount of clearing errors
+   */
+  static getClearingErrorsCount$() {
+    return this.getLogErrorCount$(CollectionNameClearingError);
+  }
+
+  /**
+   * Gets errors count
+   * @param {*} collectionName 
+   */
+  static getLogErrorCount$(collectionName){
+    const collection = mongoDB.db.collection(collectionName);
+    return Rx.Observable.defer(() =>
+      collection
+        .countDocuments()
+    );
+  }
+
+
+  /**
    * Creates a clearing error
    * @param {*} log data to persist
    * @param {*} log.error Error detail

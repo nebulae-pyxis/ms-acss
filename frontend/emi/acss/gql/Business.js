@@ -22,3 +22,12 @@ export const getACSSBusinesses = gql`
 }
 `;
 
+export const getBusinessById = gql`
+  query getBusinessById($id: ID!){
+    getBusinessById(id: $id){
+    _id
+    name
+  }
+}
+`;
+

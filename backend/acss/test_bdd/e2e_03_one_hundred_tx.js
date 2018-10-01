@@ -71,6 +71,7 @@ describe("E2E - Simple transaction", function() {
       const TransactionsDA = require('../bin/data/TransactionsDA');
       const LogErrorDA = require('../bin/data/LogErrorDA');
       const AccumulatedTransactionDA = require('../bin/data/AccumulatedTransactionDA');
+      const Settlement = require('../bin/domain/settlement/SettlementES')();    
       // const graphQlService = require('../bin//services/gateway/GraphQlService')();
 
       Rx.Observable.concat(
@@ -84,6 +85,7 @@ describe("E2E - Simple transaction", function() {
         LogErrorDA.start$(),
         TransactionsDA.start$(),
         AccumulatedTransactionDA.start$(),
+        Settlement.start$()
         // graphQlService.start$()
       ).subscribe(
         (evt) => { },

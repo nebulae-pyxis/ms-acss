@@ -15,6 +15,7 @@ const TransactionsDA = require('./data/TransactionsDA');
 const LogErrorDA = require('./data/LogErrorDA');
 const AccumulatedTransactionDA = require('./data/AccumulatedTransactionDA');
 const graphQlService = require('./services/gateway/GraphQlService')();
+const settlement = require("./domain/settlement/");
 const Rx = require('rxjs');
 
 const start = () => {
@@ -29,7 +30,8 @@ const start = () => {
         LogErrorDA.start$(),
         TransactionsDA.start$(),
         AccumulatedTransactionDA.start$(),
-        graphQlService.start$()
+        graphQlService.start$(),
+        //settlement.eventSourcing.start$(),
     ).subscribe(
         (evt) => {
             console.log(evt)

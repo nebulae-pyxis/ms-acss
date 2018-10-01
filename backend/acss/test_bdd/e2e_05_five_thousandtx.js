@@ -270,9 +270,9 @@ describe("E2E - Simple transaction", function() {
   * CREATE 10K RELOADS
   */
 
-  describe("Create ten thousand AFCC reloads and check its transactions", function () {
+  describe("Create five thousand AFCC reloads and check its transactions", function () {
 
-    it("Create ten thousand AFCC reloads", function (done) {
+    it("Create five thousand AFCC reloads", function (done) {
       this.timeout(20000);
       const cardId = uuidv4();
       const reloadAmount = 2000;
@@ -495,160 +495,164 @@ describe("E2E - Simple transaction", function() {
         error => { console.log(error); return done(error); },
         () => { console.log(" [[################ 11 ################ Check the accumulated transactions done"); return done(); }
       )
-    });
-  //   it('verify inputs and outputs', function(done){      
-  //     const transactionsExpected = { 
-  //       "123456789_Metro_med": 9850000, 
-  //       "123456789_NebulaE_POS": 135000, 
-  //       "123456789_PlaceToPay": 6800,
-  //       "123456789_NebulaE": 8150,
-  //       "123456789_surplus": 50
-  //     };
+    }),
 
-  //     Rx.Observable.of({})
-  //     .delay(1000)
-  //     .mapTo(mongoDB.client.db(dbName).collection('Clearing'))
-  //     .mergeMap(collection => Rx.Observable.defer(() => collection.find().toArray()))
-  //     .mergeMap(clearings => Rx.Observable.from(clearings)
-  //       .do(clearing => {
-  //         switch(clearing.businessId){
-  //           case '123456789_Pasarela': {
-  //             expect(Object.keys(clearing.output)).to.be.lengthOf(5, 'Pasarela has 5 ouputs OK');
-  //             expect(clearing.accumulatedTransactionIds).to.be.lengthOf(5);
-  //             Object.keys(transactionsExpected).forEach(key => {
-  //               expect(clearing.output[key].amount).to.be.equals(transactionsExpected[key])
-  //             });
-  //             expect(clearing.open).to.be.deep.equals(true);
-  //             expect(clearing.input).to.be.deep.equals(undefined);
-  //             break;
-  //           };
-  //           case '123456789_PlaceToPay': {
-  //             expect(clearing.open).to.be.deep.equals(true);
-  //             expect(clearing.accumulatedTransactionIds).to.be.lengthOf(1);
-  //             expect(clearing.output).to.be.deep.equals(undefined);
-  //             expect(clearing.input['123456789_Pasarela']).to.be.deep.equals({ amount: transactionsExpected['123456789_PlaceToPay'] })
-  //             break;
-  //           };
-  //           case '123456789_Metro_med': {
-  //             expect(clearing.open).to.be.deep.equals(true);
-  //             expect(clearing.accumulatedTransactionIds).to.be.lengthOf(1);
-  //             expect(clearing.output).to.be.deep.equals(undefined);
-  //             expect(clearing.input['123456789_Pasarela']).to.be.deep.equals({ amount: transactionsExpected['123456789_Metro_med'] })
-  //             break;
-  //           };
-  //           case '123456789_NebulaE': {
-  //             expect(clearing.open).to.be.deep.equals(true);
-  //             expect(clearing.accumulatedTransactionIds).to.be.lengthOf(1);
-  //             expect(clearing.output).to.be.deep.equals(undefined);
-  //             expect(clearing.input['123456789_Pasarela']).to.be.deep.equals({ amount: transactionsExpected['123456789_NebulaE'] })
-  //             break;
-  //           };
-  //           case '123456789_NebulaE_POS': {
-  //             expect(clearing.open).to.be.deep.equals(true);
-  //             expect(clearing.accumulatedTransactionIds).to.be.lengthOf(1);
-  //             expect(clearing.output).to.be.deep.equals(undefined);
-  //             expect(clearing.input['123456789_Pasarela']).to.be.deep.equals({ amount: transactionsExpected['123456789_NebulaE_POS'] })
-  //             break;
-  //           };
-  //           case '123456789_surplus': {
-  //             expect(clearing.open).to.be.deep.equals(true);
-  //             expect(clearing.accumulatedTransactionIds).to.be.lengthOf(1);
-  //             expect(clearing.output).to.be.deep.equals(undefined);
-  //             expect(clearing.input['123456789_Pasarela']).to.be.deep.equals({ amount: transactionsExpected['123456789_surplus'] })
-  //             break;
-  //           };
-  //         }
-  //       })
-  //     )
-  //     .subscribe(
-  //       result => {  },
-  //       error => { console.log(error); return done(error); },
-  //       () => { console.log("[[################ 12 ################ verify inputs and outputs done"); return done(); }
-  //     )
-  //   })
-  // })
+    it('verify inputs and outputs', function(done){      
+      const transactionsExpected = { 
+        "123456789_Metro_med": 9850000, 
+        "123456789_NebulaE_POS": 135000, 
+        "123456789_PlaceToPay": 6800,
+        "123456789_NebulaE": 8150,
+        "123456789_surplus": 50
+      };
 
-  // /**
-  //  * trigger the task to close the clearings and do the settlements
-  //  */
-  // describe("test the settlements", function () {
-  //   it('send the cronjob event and Check settlement results', function (done) {
-  //     this.timeout(15000);
-  //     Rx.Observable.of({})
-  //       .mergeMap(() => Rx.Observable.from([
-  //         "123456789_PlaceToPay", "123456789_Metro_med", "123456789_NebulaE", "123456789_NebulaE_POS", "123456789_surplus"
-  //       ])
-  //         .concatMap(bu => {
-  //           return Rx.Observable.of({})
-  //             .delay(1000)
-  //             .mergeMap(() => {
-  //               console.log("Creating Settlement");
-  //               return broker.send$('Events', '', {
-  //                 et: "SettlementJobTriggered",
-  //                 etv: 1,
-  //                 at: "Cronjob",
-  //                 aid: bu._id,
-  //                 data: { businessId: bu },
-  //                 user: "juan.santa",
-  //                 timestamp: Date.now(),
-  //                 av: 164
-  //               })
-  //             })
-  //             }
-  //             )
-  //       )
-  //       .subscribe(
-  //         result => { },
-  //         error => { console.log(error); return done(error); },
-  //         () => { console.log("[[################ 13 ################send the cronjob event done"); return done(); }
-  //       )
-  //   }),
-  //   it('Check the closed clearings', function (done) {
-  //     this.timeout(15000);
-  //     const transactionsExpected = { 
-  //       "123456789_Metro_med": 19700000, 
-  //       "123456789_NebulaE_POS": 270000, 
-  //       "123456789_PlaceToPay": 13650,
-  //       "123456789_NebulaE": 16350
-  //     };
-  //     Rx.Observable.of({})
-  //     .delay(1000)
-  //     .mapTo(mongoDB.client.db(dbName).collection('ClosedClearing'))
-  //     .mergeMap((collection) => Rx.Observable.defer(() => collection.find().toArray()))
-  //     .do(result => expect(result).to.be.lengthOf(4))
-  //     .mergeMap(closedClearings => Rx.Observable.from(Object.keys(transactionsExpected))
-  //       .do( buId => {
-  //         const index =  closedClearings.findIndex(i => i.businessId == buId);
-  //         console.log(closedClearings[index]);
-  //         expect(closedClearings[index].input['123456789_Pasarela'].amount).to.be.equal(transactionsExpected[buId], "Checking the input in actors")
-  //         expect(closedClearings[index].open).to.be.equal(false);
-  //       })
-  //     )
-  //     .subscribe(
-  //       result => { },
-  //       error => { console.log(error); return done(error); },
-  //       () => { console.log(" [[################ 14 ################ Check the closed clearings"); return done(); }
-  //     )
-  //   }),
+      Rx.Observable.of({})
+      .delay(1000)
+      .mapTo(mongoDB.client.db(dbName).collection('Clearing'))
+      .mergeMap(collection => Rx.Observable.defer(() => collection.find().toArray()))
+      .mergeMap(clearings => Rx.Observable.from(clearings)
+        .do(clearing => {
+          switch(clearing.businessId){
+            case '123456789_Pasarela': {
+              expect(Object.keys(clearing.output)).to.be.lengthOf(5, 'Pasarela has 5 ouputs OK');
+              expect(clearing.accumulatedTransactionIds).to.be.lengthOf(5);
+              Object.keys(transactionsExpected).forEach(key => {
+                expect(clearing.output[key].amount).to.be.equals(transactionsExpected[key])
+              });
+              expect(clearing.open).to.be.equals(true);
+              expect(clearing.input).to.be.equals(undefined);
+              break;
+            };
+            case '123456789_PlaceToPay': {
+              expect(clearing.open).to.be.equals(true);
+              expect(clearing.accumulatedTransactionIds).to.be.lengthOf(1);
+              expect(clearing.output).to.be.deep.equals(undefined);
+              expect(clearing.input['123456789_Pasarela']).to.be.deep.equals({ amount: transactionsExpected['123456789_PlaceToPay'] })
+              break;
+            };
+            case '123456789_Metro_med': {
+              expect(clearing.open).to.be.equals(true);
+              expect(clearing.accumulatedTransactionIds).to.be.lengthOf(1);
+              expect(clearing.output).to.be.deep.equals(undefined);
+              expect(clearing.input['123456789_Pasarela']).to.be.deep.equals({ amount: transactionsExpected['123456789_Metro_med'] })
+              break;
+            };
+            case '123456789_NebulaE': {
+              expect(clearing.open).to.be.equals(true);
+              expect(clearing.accumulatedTransactionIds).to.be.lengthOf(1);
+              expect(clearing.output).to.be.deep.equals(undefined);
+              expect(clearing.input['123456789_Pasarela']).to.be.deep.equals({ amount: transactionsExpected['123456789_NebulaE'] })
+              break;
+            };
+            case '123456789_NebulaE_POS': {
+              expect(clearing.open).to.be.equals(true);
+              expect(clearing.accumulatedTransactionIds).to.be.lengthOf(1);
+              expect(clearing.output).to.be.deep.equals(undefined);
+              expect(clearing.input['123456789_Pasarela']).to.be.deep.equals({ amount: transactionsExpected['123456789_NebulaE_POS'] })
+              break;
+            };
+            case '123456789_surplus': {
+              expect(clearing.open).to.be.equals(true);
+              expect(clearing.accumulatedTransactionIds).to.be.lengthOf(1);
+              expect(clearing.output).to.be.deep.equals(undefined);
+              expect(clearing.input['123456789_Pasarela']).to.be.deep.equals({ amount: transactionsExpected['123456789_surplus'] })
+              break;
+            };
+          }
+        })
+      )
+      .subscribe(
+        result => {  },
+        error => { console.log(error); return done(error); },
+        () => { console.log("[[################ 12 ################ verify inputs and outputs done"); return done(); }
+      )
+    })
 
-  //   it('Check the opened clearings', function (done) {
-  //     this.timeout(15000);
-  //     Rx.Observable.of({})
-  //     .delay(1000)
-  //     .mapTo(mongoDB.client.db(dbName).collection('Clearing'))
-  //     .mergeMap((collection) => Rx.Observable.defer(() => collection.find().toArray()))
-  //     .do(result => expect(result).to.be.lengthOf(1))
-  //     .mergeMap(closedClearings => Rx.Observable.from(closedClearings)
-  //       .do( openedClearing => {
-  //         expect(openedClearing.open).to.be.equal(true);
-  //       })
-  //       )
-  //       .subscribe(
-  //         result => { },
-  //         error => { console.log(error); return done(error); },
-  //       () => { console.log(" [[################ 15 ################ Check the opened clearings"); return done(); }
-  //       )
-  //   })
+
+   })
+
+  /**
+   * trigger the task to close the clearings and do the settlements
+   */
+  describe("test the settlements", function () {
+    it('send the cronjob event and Check settlement results', function (done) {
+      this.timeout(15000);
+      Rx.Observable.of({})
+        .mergeMap(() => Rx.Observable.from([
+          "123456789_PlaceToPay", "123456789_Metro_med", "123456789_NebulaE", "123456789_NebulaE_POS", "123456789_surplus"
+        ])
+          .concatMap(bu => {
+            return Rx.Observable.of({})
+              .delay(1000)
+              .mergeMap(() => {
+                console.log("Creating Settlement");
+                return broker.send$('Events', '', {
+                  et: "SettlementJobTriggered",
+                  etv: 1,
+                  at: "Cronjob",
+                  aid: bu._id,
+                  data: { businessId: bu },
+                  user: "juan.santa",
+                  timestamp: Date.now(),
+                  av: 164
+                })
+              })
+          }
+          )
+        )
+        .subscribe(
+          result => { },
+          error => { console.log(error); return done(error); },
+          () => { console.log("[[################ 13 ################send the cronjob event done"); return done(); }
+        )
+    }),
+    it('Check the closed clearings', function (done) {
+      this.timeout(15000);
+      const transactionsExpected = { 
+        "123456789_Metro_med": 9850000, 
+        "123456789_NebulaE_POS": 135000, 
+        "123456789_PlaceToPay": 6800,
+        "123456789_NebulaE": 8150,
+        "123456789_surplus": 50
+      };
+      Rx.Observable.of({})
+      .delay(1000)
+      .mapTo(mongoDB.client.db(dbName).collection('ClosedClearing'))
+      .mergeMap((collection) => Rx.Observable.defer(() => collection.find().toArray()))
+      .do(result => expect(result).to.be.lengthOf(5))
+      .mergeMap(closedClearings => Rx.Observable.from(Object.keys(transactionsExpected))
+        .do( buId => {
+          const index =  closedClearings.findIndex(i => i.businessId == buId);
+          console.log(closedClearings[index]);
+          expect(closedClearings[index].input['123456789_Pasarela'].amount).to.be.equal(transactionsExpected[buId], "Checking the input in actors")
+          expect(closedClearings[index].open).to.be.equal(false);
+        })
+      )
+      .subscribe(
+        result => { },
+        error => { console.log(error); return done(error); },
+        () => { console.log(" [[################ 14 ################ Check the closed clearings"); return done(); }
+      )
+    })
+
+    it('Check the opened clearings', function (done) {
+      this.timeout(15000);
+      Rx.Observable.of({})
+      .delay(1000)
+      .mapTo(mongoDB.client.db(dbName).collection('Clearing'))
+      .mergeMap((collection) => Rx.Observable.defer(() => collection.find().toArray()))
+      .do(result => expect(result).to.be.lengthOf(1))
+      .mergeMap(closedClearings => Rx.Observable.from(closedClearings)
+        .do( openedClearing => {
+          expect(openedClearing.open).to.be.equal(true);
+        })
+        )
+        .subscribe(
+          result => { },
+          error => { console.log(error); return done(error); },
+        () => { console.log(" [[################ 15 ################ Check the opened clearings"); return done(); }
+        )
+    })
 
   })
  

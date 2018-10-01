@@ -16,6 +16,7 @@ import { TransactionDialogComponent } from './transactions/transaction-dialog/tr
 import { ErrorsComponent } from './errors/errors.component';
 import { AccumulatedTransactionErrorsComponent } from './errors/accumulated-transaction-errors/accumulated-transaction-errors.component';
 import { ClearingErrorsComponent } from './errors/clearing-errors/clearing-errors.component';
+import { SettlementErrorsComponent } from './errors/settlement-errors/settlement-errors.component';
 
 const routes: Routes = [
   {
@@ -56,7 +57,8 @@ const routes: Routes = [
     TransactionDialogComponent,
     ErrorsComponent,
     AccumulatedTransactionErrorsComponent,
-    ClearingErrorsComponent
+    ClearingErrorsComponent,
+    SettlementErrorsComponent
   ],
   providers: [ ACSSService, ClearingDetailService, ClearingService, DatePipe]
 })

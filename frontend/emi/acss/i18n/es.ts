@@ -42,6 +42,7 @@ export const locale = {
       ACSS_ERRORS: 'Errores',
       ACCUMULATED_TRANSACTIONS_ERRORS: 'Transacciones acumuladas',
       CLEARING_ERRORS: 'Liquidaciones',
+      SETTLEMENT_ERRORS: 'Compensaciones',
       ERROR: 'Error',
       EVENT: 'Evento',
       FROM_BU_STATE: 'Estado origen',

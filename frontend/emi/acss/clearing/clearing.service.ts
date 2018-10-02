@@ -54,7 +54,6 @@ export class ClearingService {
    * @param clearingId Clearing ID
    */
   getSettlementsByClearingId$(page, count, clearingId) {
-    console.log('settlement query => ', page, count, clearingId);
     return this.gateway.apollo.query<any>({
       query: getSettlementsByClearingId,
       variables: {
@@ -72,7 +71,6 @@ export class ClearingService {
    * @param id Clearing ID
    */
   getSettlementsCountByClearingId$(clearingId) {
-    console.log('settlement count query => ', clearingId);
     return this.gateway.apollo.query<any>({
       query: getSettlementsCountByClearingId,
       variables: {

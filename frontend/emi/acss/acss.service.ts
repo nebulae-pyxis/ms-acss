@@ -134,7 +134,6 @@ getClearingById$(clearingId) {
    * @param businessId business ID
    */
   getSettlementsByBusinessId$(page, count, businessId) {
-    console.log('settlement query => ', page, count, businessId);
     return this.gateway.apollo.query<any>({
       query: getSettlementsByBusinessId,
       variables: {

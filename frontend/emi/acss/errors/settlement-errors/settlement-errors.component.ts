@@ -101,7 +101,6 @@ export class SettlementErrorsComponent implements OnInit {
             .map(count => [clearingErrors, count.data.getClearingErrorsCount]))
           )
           .subscribe(([clearingErrors, count]) => {
-            console.log("clearingErrors => ", clearingErrors, count);
             this.dataSource = clearingErrors;
             this.tableSize = count;
           })

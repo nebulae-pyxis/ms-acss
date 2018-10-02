@@ -212,7 +212,6 @@ export class SettlementComponent implements OnInit, OnDestroy {
    * @param business  selected business
    */
   onChangeSettlementState(newState, settlement) {
-    console.log('onchangeSettlementState => ', newState, settlement);
 
     Rx.Observable.of({settlement, newState})
     .pipe(

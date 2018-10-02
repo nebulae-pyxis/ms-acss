@@ -69,7 +69,6 @@ export class ACSSDetailComponent implements OnInit, OnDestroy {
         mergeMap(params => this.aCSSDetailService.getClearingById$(params.id))
       )
       .subscribe(clearingData => {
-        console.log('selectedClearing => ', clearingData);
         this.selectedClearing = clearingData.data.getClearingById;
       }));
   }

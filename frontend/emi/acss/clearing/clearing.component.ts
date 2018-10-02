@@ -133,7 +133,6 @@ export class ClearingComponent implements OnInit, OnDestroy {
       .startWith({pageIndex: 0, pageSize: 10})
       .pipe(
         mergeMap(paginatorData => {
-          console.log('Paginator changed ', paginatorData);
           return this.clearingService.getAccumulatedTransactionsByIds$(paginatorData.pageIndex, paginatorData.pageSize, this.clearing.accumulatedTransactionIds);
         }),
         mergeMap(resp => this.graphQlAlarmsErrorHandler$(resp)),
@@ -149,9 +148,7 @@ export class ClearingComponent implements OnInit, OnDestroy {
    * @param cumulatedTransaction selected cumulated transaction
    */
   selectAccumulatedTransactionRow(accumulatedTransaction){
-    this.selectedaccumulatedTransaction = accumulatedTransaction;
-    console.log('selectedcumulatedTransactions1 => ', this.selectedaccumulatedTransaction);
-    
+    this.selectedaccumulatedTransaction = accumulatedTransaction;    
   }
 
   /**

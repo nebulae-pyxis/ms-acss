@@ -17,7 +17,7 @@ type Channel {
 
 type Event {
   "Event Id"
-  id: String!
+  id: String
   "Event type"
   type: String!
   "Event user"
@@ -183,7 +183,11 @@ type Query {
   "Gets the clearing with the indicated ID"
   getClearingById(id: ID!): Clearing
   "Gets the accumulated transactions by ids"
+  getAccumulatedTransactionsByClearingId(page: Int!, count: Int!, clearingId: ID!): [AccumulatedTransaction]
+  "Gets the accumulated transactions by ids"
   getAccumulatedTransactionsByIds(page: Int!, count: Int!, ids: [ID!]): [AccumulatedTransaction]
+  "Gets transactions by accumulated transaction id"
+  getTransactionsByAccumulatedTransactionId(page: Int!, count: Int!, filterType: String, accumulatedTransactionId: ID!): [Transaction]
   "Gets transactions by ids"
   getTransactionsByIds(page: Int!, count: Int!, filterType: String, ids: [ID!]): [Transaction]
   "Gets settlements associated with the specified clearing ID"

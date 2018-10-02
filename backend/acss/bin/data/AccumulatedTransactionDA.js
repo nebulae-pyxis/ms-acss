@@ -58,7 +58,7 @@ class AccumulatedTransactionDA {
    */
   static getAccumulatedTransactionsByIds$(page, count, ids, businessId) {
     const filter ={
-      _id: { $in: ids.map(id => new ObjectID.createFromHexString(id)) }
+      _id: { $in: ids.map(id => new ObjectID.createFromHexString(id.toString())) }
     };
     if(businessId){
       filter["$or"]= [{fromBu: businessId}, {toBu: businessId}]

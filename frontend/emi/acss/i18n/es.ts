@@ -3,12 +3,12 @@ export const locale = {
   data: {
     ACSS: {
       ACSS: 'Sistema automatizado de liquidación y compensación',
-      BUSINESS_DETAIL: 'Detalle de negocio',
+      BUSINESS_DETAIL: 'Detalle del agente',
       CLEARING: 'Liquidaciones',
       SETTLEMENT: 'Compensaciones',
       DATE: 'Fecha',
       STATE: 'Estado',
-      BUSINESS: 'Negocio',
+      BUSINESS: 'Agente',
       VALUE: 'Valor',
       INCOMES: 'Ingresos',
       OUTCOMES: 'Egresos',
@@ -28,7 +28,7 @@ export const locale = {
       TIMESTAMP: 'Fecha apertura',
       TRANSACTIONS: 'Transacciones',
       ACCUMULATED_TRANSACTION_DETAIL: 'Detalle de transacciones acumuladas',
-      SELECT_BUSINESS: 'Seleccione un negocio',
+      SELECT_BUSINESS: 'Seleccione un agente',
       AFCC_RELOAD: 'Recarga',
       CHANNEL: 'Canal',
       CHANNEL_ID: 'ID',

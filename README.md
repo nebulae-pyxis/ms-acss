@@ -1,7 +1,10 @@
 ![NebulaE](docs/images/nebula.png "Nebula Engineering SAS")
 
 # ACSS
-The general porpouse of this service is to ...
+
+"ACSS" is the abbreviation for Automatic Clearing and Settlement System. The general purpose of this service is generate clearings and settlement according to the differentes agents and the transactional configuration registered on the platform which indicates how the money is divided. 
+
+All of the transactions performed in the system, such as card reloads, sale transactions, payments, among others are processed, cleared and settled.
 
 _This MicroService is built on top of NebulaE MicroService Framework.  Please see the [FrameWork project](https://github.com/NebulaEngineering/nebulae) to understand the full concept_**.
 
@@ -28,19 +31,54 @@ _This MicroService is built on top of NebulaE MicroService Framework.  Please se
 ├── backend                             => Micro-BackEnds  
 │   ├── acss                     => Micro-BackEnd responsible for ...
 ├── etc                                 => Micro-Service config Files.  
+│   └── mapi-setup.json                 => Micro-API setup file  
+│   └── mfe-setup.json                  => Micro-Frontend setup file  
 ├── deployment                          => Automatic deployment strategies  
 │   ├── compose                         => Docker-Compose environment for local development  
 │   └── gke                             => Google Kubernetes Engine deployment file descriptors  
-│   └── mapi-setup.json                 => Micro-API setup file  
 ├── .circleci                           => CircleCI v2. config directory
 │   ├── config.yml
 │   └── scripts
 ├── docs                                => Documentation resources  
-│   └── images  
+│   └── images 
+│   └── drafts                          => Drafts where was defined the microservice
 ├── README.md                           => This doc
 ```
 # Frontend <a name="frontend"></a>
-...
+
+If you want to navigate to ACSS section, go to System > ACSS
+
+![Menu](docs/images/menu.png "Menu")
+
+Once you enter to enter to ACSS, you will see three subsections:
+
+- Clearing:
+
+Here you can see info related with the clearings of the system. If the role of the logged user is "SYS ADMIN", you will be able to see the clearings of all of the agents registered on the platforms. While if the role of the user is "Business owner" only will be able to see the clearing associated with the agent which it belongs.
+
+![clearing filter](docs/images/clearingFilter.png "clearing filter")
+Fig 1. You can filter the clearings by agent
+
+
+
+![clearing list](docs/images/clearingList.png "clearing list")
+
+- Setttlement:
+
+Here you can see info related with the settlements of the system. If the role of the logged user is "SYS ADMIN", you will be able to see the settlements of all of the agents registered on the platforms. While if the role of the user is "Business owner" only will be able to see the settlements associated with the agent which it belongs.
+
+![settlement filter](docs/images/settlementFilter.png "settlement filter")
+Fig 2. You can filter the settlements by agent
+
+
+
+
+- Errors:
+
+This subsections can only be see by an user with SYS ADMIN role.
+
+Here you can see the errors ocurred on the system while the transactions, clearings or settlements were being processed.
+
 
 
 # API <a name="api"></a>

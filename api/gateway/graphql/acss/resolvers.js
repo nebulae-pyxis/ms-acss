@@ -175,6 +175,26 @@ module.exports = {
               .mergeMap(response => getResponseFromBackEnd$(response))
               .toPromise();
         },
+        getAccumulatedTransactionsByClearingId(root, args, context) {
+          return RoleValidator.checkPermissions$(
+            context.authToken.realm_access.roles,
+            contextName,
+            "getAccumulatedTransactionsByClearingId",
+            PERMISSION_DENIED_ERROR_CODE,
+            "Permission denied",
+            ["SYSADMIN", "business-owner"]
+          ).mergeMap(response => {
+              return broker.forwardAndGetReply$(
+                "Clearing",
+                "gateway.graphql.query.getAccumulatedTransactionsByClearingId",
+                { root, args, jwt: context.encodedToken },
+                2000
+              );
+            })
+            .catch(err => handleError$(err, "getAccumulatedTransactionsByClearingId"))
+            .mergeMap(response => getResponseFromBackEnd$(response))
+            .toPromise();
+      },
         getTransactionsByIds(root, args, context) {
             return RoleValidator.checkPermissions$(
               context.authToken.realm_access.roles,
@@ -195,6 +215,26 @@ module.exports = {
               .mergeMap(response => getResponseFromBackEnd$(response))
               .toPromise();
         },
+        getTransactionsByAccumulatedTransactionId(root, args, context) {
+          return RoleValidator.checkPermissions$(
+            context.authToken.realm_access.roles,
+            contextName,
+            "getTransactionsByAccumulatedTransactionId",
+            PERMISSION_DENIED_ERROR_CODE,
+            "Permission denied",
+            ["SYSADMIN", "business-owner"]
+          ).mergeMap(response => {
+              return broker.forwardAndGetReply$(
+                "Clearing",
+                "gateway.graphql.query.getTransactionsByAccumulatedTransactionId",
+                { root, args, jwt: context.encodedToken },
+                2000
+              );
+            })
+            .catch(err => handleError$(err, "getTransactionsByAccumulatedTransactionId"))
+            .mergeMap(response => getResponseFromBackEnd$(response))
+            .toPromise();
+      },
         getSettlementsByClearingId(root, args, context) {
             return RoleValidator.checkPermissions$(
               context.authToken.realm_access.roles,

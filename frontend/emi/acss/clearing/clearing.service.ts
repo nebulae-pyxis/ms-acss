@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs/Observable";
 import { GatewayService } from "../../../../api/gateway.service";
-import { getAccumulatedTransactionsByIds, getTransactionsByIds, getSettlementsByClearingId, getSettlementsCountByClearingId } from "../gql/acss";
+import { getAccumulatedTransactionsByIds, getAccumulatedTransactionsByClearingId, getTransactionsByAccumulatedTransactionId, getSettlementsByClearingId, getSettlementsCountByClearingId } from "../gql/acss";
 
 @Injectable()
 export class ClearingService {
@@ -26,26 +26,67 @@ export class ClearingService {
     });
   }
 
-  /**
-   * Gets transactions by its ids
+    /**
+   * Gets the accumulated transactions by clearingId
    * @param page page number of the query
    * @param count Max amount of rows to be return
-   * @param filterType Filter by transaction type
-   * @param ids Ids of the accumulated transactions
+   * @param clearingId Clearing ID
    */
-  getTransactionsByIds$(page, count, filterType, ids) {
+  getAccumulatedTransactionsByClearingId$(page, count, clearingId) {
     return this.gateway.apollo.query<any>({
-      query: getTransactionsByIds,
+      query: getAccumulatedTransactionsByClearingId,
       variables: {
         page: page,
         count: count,
-        filterType: filterType,
-        ids: ids
+        clearingId
       },
       fetchPolicy: "network-only",
       errorPolicy: "all"
     });
   }
+
+  /**
+   * Gets transactions by accumulated transaction id
+   * @param page page number of the query
+   * @param count Max amount of rows to be return
+   * @param filterType Filter by transaction type (AFCC_RELOAD, ...)
+   * @param accumulatedTransactionId Id of the accumulated transaction
+   */
+  getTransactionsByAccumulatedTransactionId$(page, count, filterType, accumulatedTransactionId) {
+    return this.gateway.apollo.query<any>({
+      query: getTransactionsByAccumulatedTransactionId,
+      variables: {
+        page: page,
+        count: count,
+        filterType: filterType,
+        accumulatedTransactionId: accumulatedTransactionId
+      },
+      fetchPolicy: "network-only",
+      errorPolicy: "all"
+    });
+  }
+
+  // /**
+  //  * Gets transactions by its ids
+  //  * @param page page number of the query
+  //  * @param count Max amount of rows to be return
+  //  * @param filterType Filter by transaction type
+  //  * @param ids Ids of the accumulated transactions
+  //  */
+  // getTransactionsByIds$(page, count, filterType, ids) {
+  //   return this.gateway.apollo.query<any>({
+  //     query: getTransactionsByIds,
+  //     variables: {
+  //       page: page,
+  //       count: count,
+  //       filterType: filterType,
+  //       ids: ids
+  //     },
+  //     fetchPolicy: "network-only",
+  //     errorPolicy: "all"
+  //   });
+  // }
+
 
   /**
    * Gets settlements associated with the specified clearing Id

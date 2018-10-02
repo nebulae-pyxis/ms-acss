@@ -160,9 +160,7 @@ export class ClearingComponent implements OnInit, OnDestroy {
     if(!accumulatedTx || !accumulatedTx.transactionIds || !accumulatedTx.transactionIds){
       return 0;
     }
-
     const found = accumulatedTx.transactionIds.find(tx => tx.type == type);
-
     return found ? found.ids.length: 0;
   }
 

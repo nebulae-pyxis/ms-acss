@@ -102,27 +102,22 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   refreshTable(){
     this.subscriptions.push(
       Rx.Observable.combineLatest(
-        this.getTransactionsIds$(),
+        this.getAccumulatedTransactionId$(),
         this.getPaginator$()
       )
         .pipe(
-          mergeMap(([txIds, paginator]) => {
-            const txIdsArray = [];
-            txIds.forEach(tx => {
-              txIdsArray.push(...tx.ids);
-            });
-            this.tableSize = txIdsArray.length;
-
-            return this.clearingService.getTransactionsByIds$(
+          mergeMap(([accumulatedTx, paginator]) => {
+            this.tableSize = accumulatedTx.transactionIds.reduce((acc, tx) => {return acc + tx.ids.length}, 0);;
+            return this.clearingService.getTransactionsByAccumulatedTransactionId$(
               paginator.pageIndex,
               paginator.pageSize,
               null,
-              txIdsArray
+              accumulatedTx._id
             );
           }),
           mergeMap(resp => this.graphQlAlarmsErrorHandler$(resp)),          
           filter((resp: any) => !resp.errors || resp.errors.length === 0),
-          map(resp => resp.data.getTransactionsByIds)
+          map(resp => resp.data.getTransactionsByAccumulatedTransactionId)
         )
         .subscribe(transactions => {
           this.dataSource = transactions;
@@ -131,9 +126,9 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * get the transactions ids
+   * get the accumulated transaction ids
    */
-  getTransactionsIds$() {
+  getAccumulatedTransactionId$() {
     return this.activatedRouter.params.pipe(
       mergeMap(params =>
         this.clearingService.getAccumulatedTransactionsByIds$(
@@ -144,7 +139,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       ),
       map((res: any) => {
         //this.selectedAccumulatedTransaction = res.data.getAccumulatedTransactionsByIds[0];
-        return res.data.getAccumulatedTransactionsByIds[0].transactionIds;
+        return res.data.getAccumulatedTransactionsByIds[0];
       })
     );
   }

@@ -98,6 +98,31 @@ class Clearing {
       });
   }
 
+      /**
+   * Gets the accumulated transactions by clearing id
+   *
+   * @param args args
+   * @param args.clearingId Id of the clearing which the accumulated transactions belong
+   */
+  getAccumulatedTransactionsByClearingId$({ args }, authToken) {
+    return RoleValidator.checkPermissions$(
+      authToken.realm_access.roles,
+      "ACSS",
+      "getAccumulatedTransactionsByIds$()",
+      PERMISSION_DENIED_ERROR_CODE.code,
+      PERMISSION_DENIED_ERROR_CODE.description,
+      ["SYSADMIN", "business-owner"]
+    )
+      .mergeMap(roles => ClearingDA.getClearingByClearingId$(args.clearingId).map(clearing  => [roles, clearing]))
+      .mergeMap(([role, clearing]) => {
+        return AccumulatedTransactionDA.getAccumulatedTransactionsByIds$(args.page, args.count, clearing.accumulatedTransactionIds, role.SYSADMIN ? undefined: authToken.businessId)
+      })
+      .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
+      .catch(err => {
+        return this.handleError$(err);
+      });
+  }
+
   /**
    * Gets the transactions by ids
    *
@@ -122,6 +147,35 @@ class Clearing {
       });
   }
 
+    /**
+   * Gets the transactions by accumulated tyransaction id and transaction type
+   *
+   * @param args args
+   * @param args.accumulatedTransactionId accumualted transaction id
+   * @param args.filterType Transactions type (AFCC_RELOAD, ...)
+   */
+  getTransactionsByAccumulatedTransactionId$({ args }, authToken) {
+    console.log('getTransactionsByAccumulatedTransactionId args => ', args);
+    return RoleValidator.checkPermissions$(
+      authToken.realm_access.roles,
+      "ACSS",
+      "getTransactionsByAccumulatedTransactionId$()",
+      PERMISSION_DENIED_ERROR_CODE.code,
+      PERMISSION_DENIED_ERROR_CODE.description,
+      ["SYSADMIN", "business-owner"]
+    )
+      .mergeMap(roles => AccumulatedTransactionDA.getAccumulatedTransaction$(args.accumulatedTransactionId).map(accumulatedTx  => [roles, accumulatedTx]))
+      .mergeMap(([roles, accumulatedTransaction]) => {
+        const transactionIds = Object.keys(accumulatedTransaction.transactionIds)
+        .reduce((acc, key) => acc.concat(accumulatedTransaction.transactionIds[key]), [])
+        return TransactionDA.getTransactionsByIds$(args.page, args.count, transactionIds, roles.SYSADMIN ? undefined:authToken.businessId)
+      })
+      .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
+      .catch(err => {
+        return this.handleError$(err);
+      });
+  }
+  
   //#region  mappers for API responses
 
   handleError$(err) {

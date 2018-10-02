@@ -94,9 +94,52 @@ export const getAccumulatedTransactionsByIds = gql`
   }
 `;
 
+export const getAccumulatedTransactionsByClearingId = gql`
+  query getAccumulatedTransactionsByClearingId($page: Int!, $count: Int!, $clearingId: ID!){
+    getAccumulatedTransactionsByClearingId(page: $page, count: $count, clearingId: $clearingId){
+      _id
+      fromBu
+      fromBusinessName
+      toBu
+      toBusinessName
+      timestamp
+      transactionIds{
+        type
+        ids
+      }
+      amount
+    }
+  }
+`;
+
 export const getTransactionsByIds = gql`
   query getTransactionsByIds($page: Int!, $count: Int!, $filterType: String, $ids: [ID!]){
     getTransactionsByIds(page: $page, count: $count, filterType: $filterType, ids: $ids){
+      _id
+      amount
+      fromBu
+      fromBusinessName
+      toBu
+      toBusinessName
+      timestamp
+      type
+      channel{
+        id
+        v
+        c
+      }
+      evt{
+        id
+        type
+        user
+      }
+    }
+  }
+`;
+
+export const getTransactionsByAccumulatedTransactionId = gql`
+  query getTransactionsByAccumulatedTransactionId($page: Int!, $count: Int!, $filterType: String, $accumulatedTransactionId: ID!){
+    getTransactionsByAccumulatedTransactionId(page: $page, count: $count, filterType: $filterType, accumulatedTransactionId: $accumulatedTransactionId){
       _id
       amount
       fromBu

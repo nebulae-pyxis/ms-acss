@@ -64,9 +64,9 @@ class TransactionsDA {
    * @param {String} businessId indicates the business which will be used to filter the data
    */
   static getTransactionsByIds$(page, count, ids, businessId) {
-
+    console.log('getTransactionsByIds => ', ids);
     const filter = {
-      _id: { $in: ids.map(id => new ObjectID.createFromHexString(id)) }
+      _id: { $in: ids.map(id => new ObjectID.createFromHexString(id.toString())) }
     };
 
     if(businessId){

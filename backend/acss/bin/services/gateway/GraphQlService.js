@@ -166,10 +166,18 @@ class GraphQlService {
       {
         aggregateType: "Clearing",
         messageType: "gateway.graphql.query.getAccumulatedTransactionsByIds"
+      },      
+      {
+        aggregateType: "Clearing",
+        messageType: "gateway.graphql.query.getAccumulatedTransactionsByClearingId"
       },
       {
         aggregateType: "Clearing",
         messageType: "gateway.graphql.query.getTransactionsByIds"
+      },
+      {
+        aggregateType: "Clearing",
+        messageType: "gateway.graphql.query.getTransactionsByAccumulatedTransactionId"
       },
       {
         aggregateType: "Settlement",
@@ -247,8 +255,16 @@ class GraphQlService {
         fn: clearing.getAccumulatedTransactionsByIds$,
         obj: clearing
       },
+      'gateway.graphql.query.getAccumulatedTransactionsByClearingId': {
+        fn: clearing.getAccumulatedTransactionsByClearingId$,
+        obj: clearing
+      },
       'gateway.graphql.query.getTransactionsByIds': {
         fn: clearing.getTransactionsByIds$,
+        obj: clearing
+      },
+      'gateway.graphql.query.getTransactionsByAccumulatedTransactionId': {
+        fn: clearing.getTransactionsByAccumulatedTransactionId$,
         obj: clearing
       },
       'gateway.graphql.query.getSettlementsByClearingId': {

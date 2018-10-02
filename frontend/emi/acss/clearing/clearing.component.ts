@@ -133,12 +133,12 @@ export class ClearingComponent implements OnInit, OnDestroy {
       .startWith({pageIndex: 0, pageSize: 10})
       .pipe(
         mergeMap(paginatorData => {
-          return this.clearingService.getAccumulatedTransactionsByIds$(paginatorData.pageIndex, paginatorData.pageSize, this.clearing.accumulatedTransactionIds);
+          return this.clearingService.getAccumulatedTransactionsByClearingId$(paginatorData.pageIndex, paginatorData.pageSize, this.clearing._id);
         }),
         mergeMap(resp => this.graphQlAlarmsErrorHandler$(resp)),
         filter((resp: any) => !resp.errors || resp.errors.length === 0),        
       ).subscribe(model => {
-        this.accumulatedTransactionsDataSource.data = model.data.getAccumulatedTransactionsByIds;
+        this.accumulatedTransactionsDataSource.data = model.data.getAccumulatedTransactionsByClearingId;
       });
       this.subscriptions.push(accumulatedTxSubscription);
   }

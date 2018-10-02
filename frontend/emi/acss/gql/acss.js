@@ -197,6 +197,22 @@ export const getClearingErrorsCount = gql`
   }
 `;
 
+export const getSettlementErrors = gql`
+  query getSettlementErrors($page: Int!, $count: Int!){
+    getSettlementErrors(page: $page, count: $count){
+      timestamp
+      error
+      event
+    }
+  }
+`;
+
+export const getSettlementErrorsCount = gql`
+  query getSettlementErrorsCount{
+    getSettlementErrorsCount
+  }
+`;
+
 export const changeSettlementState = gql`
   mutation changeSettlementState($settlementId: ID!, $settlementState: SettlementState!) {
     changeSettlementState(settlementId: $settlementId, settlementState: $settlementState) {

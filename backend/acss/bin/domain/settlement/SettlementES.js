@@ -2,6 +2,7 @@ const Rx = require("rxjs");
 const SettlementHelper = require("./SettlementHelper");
 const ClearingDA = require("../../data/ClearingDA");
 const SettlementDA = require("../../data/SettlementDA");
+const LogErrorDA = require('../../data/LogErrorDA');
 const mongoDB = require("../../data/MongoDB").singleton();
 
 let instance;
@@ -37,7 +38,7 @@ class SettlementES {
   }
 
   /**
-   * Receives the settlement events and trigger to the subject.
+   * Receives the settlement events and trigger the event to the subject.
    * @param {*} settlementJobTriggered
    */
   handleSettlementJobTriggeredEvent$(settlementJobTriggered) {
@@ -53,7 +54,6 @@ class SettlementES {
    * @returns {Rx.Observable}
    */
   executeSettlementJobTriggered$(settlementJobTriggered) {
-    //return Rx.Observable.of('executeSettlementJobTriggered')
     return ClearingDA.closeClearing$(settlementJobTriggered.data.businessId)
       .filter(
         ({ found, closed, clearing }) => found && closed && clearing !== null
@@ -92,13 +92,26 @@ class SettlementES {
         ).toArray()
       )
       .mergeMap(statements => mongoDB.applyAll$(statements))
-      .map(
-        ([txs, txResult]) =>
-          `Settlement job trigger handling for business ${
-            settlementJobTriggered.businessId
-          }: ok:${txResult.ok}`
-      );
+      .map(([txs, txResult]) => `Settlement job trigger handling for business ${settlementJobTriggered.businessId}: ok:${txResult.ok}`)
+      .catch(error => {
+        console.log(`An error was generated while a settlementJobTriggered was being processed: ${error.stack}`);
+        return this.errorHandler$(error.stack, settlementJobTriggered);
+    });
   }
+
+
+  /**
+   * Handles and persist the errors generated while a settlementJobTriggered was being processed.
+   * @param {*} error Error
+   * @param {*} event settlementJobTriggered event
+   */
+  errorHandler$(error, event){
+    return Rx.Observable.of({error, event})
+    .mergeMap(log => LogErrorDA.persistAccumulatedTransactionsError$(log))
+  }
+
+
+
 }
 
 /**

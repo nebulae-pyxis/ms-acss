@@ -355,6 +355,46 @@ module.exports = {
             .mergeMap(response => getResponseFromBackEnd$(response))
             .toPromise();
       },
+      getSettlementErrors(root, args, context) {
+        return RoleValidator.checkPermissions$(
+          context.authToken.realm_access.roles,
+          contextName,
+          "getSettlementErrors",
+          PERMISSION_DENIED_ERROR_CODE,
+          "Permission denied",
+          ["SYSADMIN"]
+        ).mergeMap(response => {
+            return broker.forwardAndGetReply$(
+              "LogError",
+              "gateway.graphql.query.getSettlementErrors",
+              { root, args, jwt: context.encodedToken },
+              2000
+            );
+          })
+          .catch(err => handleError$(err, "getSettlementErrors"))
+          .mergeMap(response => getResponseFromBackEnd$(response))
+          .toPromise();
+      },
+      getSettlementErrorsCount(root, args, context) {
+        return RoleValidator.checkPermissions$(
+          context.authToken.realm_access.roles,
+          contextName,
+          "getSettlementErrorsCount",
+          PERMISSION_DENIED_ERROR_CODE,
+          "Permission denied",
+          ["SYSADMIN"]
+        ).mergeMap(response => {
+            return broker.forwardAndGetReply$(
+              "LogError",
+              "gateway.graphql.query.getSettlementErrorsCount",
+              { root, args, jwt: context.encodedToken },
+              2000
+            );
+          })
+          .catch(err => handleError$(err, "getSettlementErrorsCount"))
+          .mergeMap(response => getResponseFromBackEnd$(response))
+          .toPromise();
+      },
     },
 
     //// MUTATIONS ///////

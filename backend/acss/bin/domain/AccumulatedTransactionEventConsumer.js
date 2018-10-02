@@ -17,7 +17,6 @@ class TransactionAccumulatedEventConsumer {
    * @returns {Observable}
    */
   handleTransactionAccumulatedEvent$(transactionAccumulatedEvent) {
-    console.log("transactionAccumulatedEvent$", transactionAccumulatedEvent);
     const txIds = transactionAccumulatedEvent.data;
 
     //Iterates over the array of accumulated tx ids

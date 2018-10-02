@@ -39,7 +39,7 @@ class Business {
    * Gets the business by its id
    *
    * @param {*} args args that contain the business filter
-   * @param {*} args.id id of the business
+   * @param {*} args.id id of the business.
    */
   getBusinessById$({ args }, authToken) {
     return RoleValidator.checkPermissions$(

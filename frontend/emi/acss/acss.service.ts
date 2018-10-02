@@ -11,6 +11,8 @@ import {
   getAccumulatedTransactionErrorsCount,
   getClearingErrors,
   getClearingErrorsCount,
+  getSettlementErrors,
+  getSettlementErrorsCount,
   changeSettlementState
 } from './gql/acss';
 import {
@@ -132,7 +134,6 @@ getClearingById$(clearingId) {
    * @param businessId business ID
    */
   getSettlementsByBusinessId$(page, count, businessId) {
-    console.log('settlement query => ', page, count, businessId);
     return this.gateway.apollo.query<any>({
       query: getSettlementsByBusinessId,
       variables: {
@@ -209,12 +210,40 @@ getClearingById$(clearingId) {
     });
   }
 
-  /**
+    /**
    * Gets clearing errors count
    */
   getClearingErrorsCount$() {
     return this.gateway.apollo.query<any>({
       query: getClearingErrorsCount,
+      fetchPolicy: "network-only",
+      errorPolicy: "all"
+    });
+  }
+
+      /**
+   * Gets settlement errors
+   * @param page page
+   * @param count count
+   */
+  getSettlementErrors$(page, count) {
+    return this.gateway.apollo.query<any>({
+      query: getSettlementErrors,
+      variables: {
+        page: page,
+        count: count
+      },
+      fetchPolicy: "network-only",
+      errorPolicy: "all"
+    });
+  }
+
+  /**
+   * Gets clearing errors count
+   */
+  getSettlementErrorsCount$() {
+    return this.gateway.apollo.query<any>({
+      query: getSettlementErrorsCount,
       fetchPolicy: "network-only",
       errorPolicy: "all"
     });

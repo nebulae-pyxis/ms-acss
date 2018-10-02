@@ -18,19 +18,22 @@
 
   <!-- Expanded Content Column - The detail row is made up of this one column that spans across all columns -->
   <ng-container matColumnDef="expandedDetail">
-    <mat-cell flex="90" *matCellDef="let log" [attr.colspan]="displayedColumns.length">
-      <div fxLayout="column" [@detailExpand]="log == expandedElement ? 'expanded' : 'collapsed'">
+    <mat-cell *matCellDef="let log" [attr.colspan]="displayedColumns.length">
+      <div class="element-detail" [@detailExpand]="log == expandedElement ? 'expanded' : 'collapsed'">
+        <div fxLayout="column" fxLayoutAlign="space-between start">
           
-            <div> {{'ACSS.ERROR' | translate}} </div>
+            <div class="h2"> {{'ACSS.ERROR' | translate}} </div>
             <div> {{log.error}} </div>
 
             <div class="pb-12">
             </div>         
 
-            <div style="width: 80%;"> {{'ACSS.EVENT' | translate}} </div>
-            <div style="width: 80%;"> 
-            {{log.event}}
+            <div class="h2"> {{'ACSS.EVENT' | translate}} </div>
+            <div> 
+            <span> {{log.event}} </span>
             </div>         
+
+        </div>
       </div>
     </mat-cell>
   </ng-container>

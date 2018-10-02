@@ -4,6 +4,7 @@ let mongoDB = undefined;
 const Rx = require("rxjs");
 const CollectionNameClearingError = "ClearingError";
 const CollectionNameAccumulatedTransactionsError = "AccumulatedTransactionsError";
+const CollectionNameSettlementsError = "SettlementsError";
 
 class LogErrorDA {
 
@@ -36,6 +37,15 @@ class LogErrorDA {
    */
   static getClearingErrors$(page, count) {
     return this.getLogError$(page, count, CollectionNameClearingError);
+  }
+
+    /**
+   * Gets clearing errors
+   * @param {*} page Indicates the page number which will be returned
+   * @param {*} count Indicates the max amount of rows that will be return.
+   */
+  static getSettlementErrors$(page, count) {
+    return this.getLogError$(page, count, CollectionNameSettlementsError);
   }
 
   /**
@@ -82,6 +92,13 @@ class LogErrorDA {
   }
 
   /**
+   * Gets amount of settlement errors
+   */
+  static getSettlementErrorsCount$() {
+    return this.getLogErrorCount$(CollectionNameSettlementsError);
+  }
+
+  /**
    * Gets errors count
    * @param {*} collectionName 
    */
@@ -112,6 +129,16 @@ class LogErrorDA {
    */
   static persistAccumulatedTransactionsError$(log) {
     return this.persistLogError$(CollectionNameAccumulatedTransactionsError, log);
+  }
+
+  /**
+   * Creates a settlement error
+   * @param {*} log data to persist
+   * @param {*} log.error Error detail
+   * @param {*} log.event event where the error was generated 
+   */
+  static persistSettlementError$(log) {
+    return this.persistLogError$(CollectionNameSettlementsError, log);
   }
 
   /**

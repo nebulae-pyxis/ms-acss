@@ -127,6 +127,56 @@ class LogErrorCQRS {
       });
   }
 
+      /**
+   * Gets Settlement errors
+   *
+   * @param args args
+   * @param args.page Page number to recover
+   * @param args.count Amount of rows to recover
+   */
+  getSettlementErrors$({ args }, authToken) {
+    return RoleValidator.checkPermissions$(
+      authToken.realm_access.roles,
+      "ACSS",
+      "getSettlementErrors$()",
+      PERMISSION_DENIED_ERROR_CODE.code,
+      PERMISSION_DENIED_ERROR_CODE.description,
+      ["SYSADMIN"]
+    )
+      .mergeMap(roles => {
+        return LogErrorDA.getSettlementErrors$(args.page, args.count)
+      })
+      .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
+      .catch(err => {
+        return this.handleError$(err);
+      });
+  }
+
+      /**
+   * Gets settlement errors
+   *
+   * @param args args
+   * @param args.page Page number to recover
+   * @param args.count Amount of rows to recover
+   */
+  getSettlementErrorsCount$({ args }, authToken) {
+    return RoleValidator.checkPermissions$(
+      authToken.realm_access.roles,
+      "ACSS",
+      "getSettlementErrorsCount$()",
+      PERMISSION_DENIED_ERROR_CODE.code,
+      PERMISSION_DENIED_ERROR_CODE.description,
+      ["SYSADMIN"]
+    )
+      .mergeMap(roles => {
+        return LogErrorDA.getSettlementErrorsCount$(args.page, args.count)
+      })
+      .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
+      .catch(err => {
+        return this.handleError$(err);
+      });
+  }
+
   //#region  mappers for API responses
 
   handleError$(err) {

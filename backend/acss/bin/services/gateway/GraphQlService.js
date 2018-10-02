@@ -204,6 +204,14 @@ class GraphQlService {
         messageType: "gateway.graphql.query.getClearingErrorsCount"
       },
       {
+        aggregateType: "LogError",
+        messageType: "gateway.graphql.query.getSettlementErrors"
+      },
+      {
+        aggregateType: "LogError",
+        messageType: "gateway.graphql.query.getSettlementErrorsCount"
+      },
+      {
         aggregateType: "Settlement",
         messageType: "gateway.graphql.mutation.changeSettlementState"
       }
@@ -273,6 +281,14 @@ class GraphQlService {
       },
       'gateway.graphql.query.getClearingErrorsCount': {
         fn: logError.cqrs.getClearingErrorsCount$,
+        obj: logError.cqrs
+      },
+      'gateway.graphql.query.getSettlementErrors': {
+        fn: logError.cqrs.getSettlementErrors$,
+        obj: logError.cqrs
+      },
+      'gateway.graphql.query.getSettlementErrorsCount': {
+        fn: logError.cqrs.getSettlementErrorsCount$,
         obj: logError.cqrs
       },
       'gateway.graphql.mutation.changeSettlementState': {

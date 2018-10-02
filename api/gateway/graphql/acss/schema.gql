@@ -202,6 +202,10 @@ type Query {
   getClearingErrors(page: Int!, count: Int!): [Error]
   "Gets amount of errors ocurred during generation or update of clearing"
   getClearingErrorsCount: Int!
+  "Gets errors ocurred while the settlements were being processed"
+  getSettlementErrors(page: Int!, count: Int!): [Error]
+  "Gets amount of errors ocurred while the settlements were being processed"
+  getSettlementErrorsCount: Int!
 }
 
 type Mutation {

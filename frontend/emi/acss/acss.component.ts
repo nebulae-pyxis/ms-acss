@@ -187,14 +187,12 @@ export class ACSSComponent implements OnInit, OnDestroy {
     return Rx.Observable.of(this.keycloakService.getUserRoles(true)).pipe(
       mergeMap(userRoles => {
         const isAdmin = userRoles.some(role => role === 'SYSADMIN');
-        console.log('isAdmin => ', isAdmin);
         return Rx.Observable.forkJoin(
           Rx.Observable.of(isAdmin),
           this.getBusiness$(),
           isAdmin ? this.getAllBusiness$() : Rx.Observable.of([])
         );
-      }),
-      tap(val => console.log('loadBusinessData$ EMISSION => ', val))
+      })
     );
   }
 

@@ -72,7 +72,6 @@ export class ClearingDetailComponent implements OnInit, OnDestroy {
         mergeMap(clearing => this.getBusinessById$(clearing.businessId).map(business => [clearing, business]))
       )
       .subscribe(([clearing, business]) => {
-        console.log('selectedClearing => ', clearing, business);
         this.selectedClearing = clearing;
         this.selectedBusiness = business;
       }));
@@ -104,7 +103,6 @@ export class ClearingDetailComponent implements OnInit, OnDestroy {
    * @returns {Observable}
    */
   getBusinessById$(id){
-    console.log('getBusinessById => ', id);
     return this.acssService.getBusinessById$(id)
     .pipe(map((res: any) => res.data.getBusinessById));
   }

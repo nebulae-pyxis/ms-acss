@@ -125,7 +125,6 @@ export class TransactionsComponent implements OnInit, OnDestroy {
           map(resp => resp.data.getTransactionsByIds)
         )
         .subscribe(transactions => {
-          console.log("transactions => ", transactions);
           this.dataSource = transactions;
         })
     );

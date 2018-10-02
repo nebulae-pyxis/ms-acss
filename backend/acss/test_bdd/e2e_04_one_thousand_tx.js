@@ -339,7 +339,7 @@ describe("E2E - Simple transaction", function() {
         .mergeMap((collection) => Rx.Observable.defer(() => collection.find().toArray()))
         .mergeMap(transactionArray => Rx.Observable.from(transactionArray)          
           .do(tr => {
-            expect(transactionArray).to.be.lengthOf(4000)
+            expect(transactionArray).to.be.lengthOf(Object.keys(transactionsExpected).length * 1000)
             switch (tr.toBu){
               case '123456789_Metro_med':{
                 expect(tr.amount).to.be.equal(19700);
@@ -502,8 +502,8 @@ describe("E2E - Simple transaction", function() {
         .do(clearing => {
           switch(clearing.businessId){
             case '123456789_Pasarela': {
-              expect(Object.keys(clearing.output)).to.be.lengthOf(4, 'Pasarela has 5 ouputs OK');
-              expect(clearing.accumulatedTransactionIds).to.be.lengthOf(4);
+              expect(Object.keys(clearing.output)).to.be.lengthOf(Object.keys(transactionsExpected).length, 'Pasarela has 5 ouputs OK');
+              expect(clearing.accumulatedTransactionIds).to.be.lengthOf(Object.keys(transactionsExpected).length);
               Object.keys(transactionsExpected).forEach(key => {
                 expect(clearing.output[key].amount).to.be.equals(transactionsExpected[key])
               });

@@ -280,16 +280,25 @@ describe("E2E - Simple transaction", function() {
     it("Create ten thousand AFCC reloads", function (done) {
       this.timeout(7200000);
       const cardId = uuidv4();
-      const reloadAmount = 4000;
-      Rx.Observable.range(0, 10000)
-        .mergeMap(() => broker.send$('Events', '', {
+      const reloadAmount12_5K = 12500;
+      const reloadAmount8k = 8000;
+      const reloadAmount10k = 10000;
+      const reloadAmount1k = 1000;
+      const reloadAmount4k = 4000;
+
+      const nebulaReloader = '123456789_NebulaE_POS';
+      const ganaReloader = '123456789_Gana';
+      const reloadsEmitter = function(qty, amount, buId){
+        const cardId = uuidv4();
+        return Rx.Observable.range(0, qty)
+        .concatMap(() => broker.send$('Events', '', {
           et: "AfccReloadSold",
           etv: 1,
           at: "Afcc",
           aid: cardId,
           data: {
-            amount: reloadAmount,
-            businessId: '123456789_NebulaE_POS',
+            amount: amount,
+            businessId: buId,
             afcc: {
               data: {
                 before: {},
@@ -299,7 +308,7 @@ describe("E2E - Simple transaction", function() {
               cardId: cardId,
               balance: {
                 before: 0,
-                after: reloadAmount
+                after: amount
               }
             },
             source: {
@@ -311,28 +320,55 @@ describe("E2E - Simple transaction", function() {
           user: "juan.santa",
           timestamp: Date.now(),
           av: 1
-        }))
-        .first()
-        .subscribe(
-          ok => { console.log("##### RELOADS MADE ==> ", ok); },
-          error => { console.log(error); return done(error); },
-          () => { console.log("[[################ 06 ################ Create ten AFCC reloads DONE ]]"); return done(); }
-        )
+        })
+      )
+      }
+
+      Rx.Observable.concat(
+        // 1K NEBULA reloads by 12.5K 
+        reloadsEmitter(1000, reloadAmount12_5K, nebulaReloader),
+        // 1K GANA reloads by 12.5K 
+        reloadsEmitter(1000, reloadAmount12_5K, ganaReloader),
+        // 1K NEBULA reloads by 8K 
+        reloadsEmitter(1000, reloadAmount8k, nebulaReloader),        
+        // 1K GANA reloads by 8K
+        reloadsEmitter(1000, reloadAmount8k, ganaReloader),
+        // 1K NEBULA reloads by 10K 
+        reloadsEmitter(1000, reloadAmount10k, nebulaReloader),
+        // 1K GANA reloads by 10K 
+        reloadsEmitter(1000, reloadAmount10k, ganaReloader),
+        // 1K NEBULA reloads by 1K 
+        reloadsEmitter(1000, reloadAmount1k, nebulaReloader),
+        // 1K GANA reloads by 1K 
+        reloadsEmitter(1000, reloadAmount1k, ganaReloader),
+        // 1K NEBULA reloads by 4K 
+        reloadsEmitter(1000, reloadAmount4k, nebulaReloader),
+        // 1K GANA reloads by 4K 
+        reloadsEmitter(1000, reloadAmount4k, ganaReloader),
+
+      )
+      .toArray()
+      .subscribe(
+        ok => { console.log("##### RELOADS MADE ==> ", ok.length); },
+        error => { console.log(error); return done(error); },
+        () => { console.log("[[################ 06 ################ Create ten AFCC reloads DONE ]]"); return done(); }
+      )
     })
 
     it('Check all transactions amounts', function (done) {
       this.timeout(7200000);
 
       const transactionsExpected = { 
-        "123456789_Metro_med": 39400000, 
-        "123456789_NebulaE_POS": 540000, 
-        "123456789_PlaceToPay": 27300,
-        "123456789_NebulaE": 32700,
-        "total": 40000000
+        "123456789_Metro_med": 69935000,
+        "123456789_Gana": 426000,
+        "123456789_NebulaE_POS": 479250, 
+        "123456789_PlaceToPay": 72670,
+        "123456789_NebulaE": 87030,
+        "total": 71000000
       };
 
       const collection = mongoDB.client.db(dbName).collection('Transactions');
-      const expectedTransactions = 40000;
+      const expectedTransactions = 45000;
       let count = 0;
       Rx.Observable.interval(1000)
         .do(() => console.log("Waiting for all transactions creation...", count))
@@ -344,9 +380,20 @@ describe("E2E - Simple transaction", function() {
           .reduce((accumulatedTransactions, tr) => {
             accumulatedTransactions.total += tr.amount * 1000;
             switch (tr.toBu){
-              case '123456789_Metro_med':{
-                expect(tr.amount).to.be.equal(3940);
+              case '123456789_Metro_med': {
+                (tr.amount == 12500)
+                  ? expect(tr.amount).to.be.equal(12312.5)
+                  : (tr.amount == 8000)
+                    ? expect(tr.amount).to.be.equal(7880)
+                    : (tr.amount == 10000)
+                      ? expect(tr.amount).to.be.equal(9850)
+                      : (tr.amount == 1000)
+                        ? expect(tr.amount).to.be.equal(985)
+                        : (tr.amount == 4000)
+                          ? expect(tr.amount).to.be.equal(3940)
+                          : expect(1).to.be.equal(1)
                 accumulatedTransactions['123456789_Metro_med'] += Math.floor(tr.amount * 1000);
+
                 break;
               };
               case '123456789_NebulaE_POS': {
@@ -661,39 +708,40 @@ describe("E2E - Simple transaction", function() {
   * DE-PREAPARE
   */
 
- describe('de-prepare test DB', function () {
-   it('delete mongoDB', function (done) {
-     const closeClearingCollection = mongoDB.client.db(dbName).collection('ClosedClearing');
-     this.timeout(7200000);
-     Rx.Observable.interval(1000)
-       .mergeMap(() => Rx.Observable.defer(() => closeClearingCollection.find().toArray()))
-       .filter((result) => { console.log("Waiting to close MONGO", result.length); return result.length == 4 })
-       .take(1)
-       .mergeMap(() => mongoDB.dropDB$())
-       .subscribe(
-         (evt) => console.log(`${evt}`),
-         (error) => {
-           console.error(`Mongo DropDB failed: ${error}`);
-           return done(error);
-         },
-         () => { return done(); }
-       );
-   });
-   it('stop mongo', function (done) {
-     this.timeout(20000);
-     Rx.Observable.of({})
-       .delay(2000)
-       .mergeMap(() => mongoDB.stop$())
-       .subscribe(
-         (evt) => console.log(`Mongo Stop: ${evt}`),
-         (error) => {
-           console.error(`Mongo Stop failed: ${error}`);
-           return done(error);
-         },
-         () => { return done(); }
-       );
-   });
-});
+//  describe('de-prepare test DB', function () {
+//    it('delete mongoDB', function (done) {
+//      this.timeout(7200000);
+//      Rx.Observable.of({})
+//        .delay(5000)
+//        .mergeMap(() => mongoDB.dropDB$())
+//        .subscribe(
+//          (evt) => console.log(`${evt}`),
+//          (error) => {
+//            console.error(`Mongo DropDB failed: ${error}`);
+//            return done(error);
+//          },
+//          () => { return done(); }
+//        );
+//    });
+//    it('stop mongo', function (done) {
+//      this.timeout(7200000);
+//      Rx.Observable.interval(2000)
+//      .do(() => console.log("Waiting for all operations..."))
+//      .filter(() => {
+//        const collection = mongoDB.client.db(dbName).collection('Transactions');
+//        return Rx.Observable.defer(() => collection.count()) >= 2000;
+//      })
+//        .mergeMap(() => mongoDB.stop$())
+//        .subscribe(
+//          (evt) => console.log(`Mongo Stop: ${evt}`),
+//          (error) => {
+//            console.error(`Mongo Stop failed: ${error}`);
+//            return done(error);
+//          },
+//          () => { return done(); }
+//        );
+//    });
+// });
 
 
 

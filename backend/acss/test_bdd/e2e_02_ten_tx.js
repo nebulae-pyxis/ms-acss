@@ -71,6 +71,7 @@ describe("E2E - Simple transaction", function() {
       const TransactionsDA = require('../bin/data/TransactionsDA');
       const LogErrorDA = require('../bin/data/LogErrorDA');
       const AccumulatedTransactionDA = require('../bin/data/AccumulatedTransactionDA');
+      const Settlement = require('../bin/domain/settlement/SettlementES')();
       // const graphQlService = require('../bin//services/gateway/GraphQlService')();
 
       Rx.Observable.concat(
@@ -80,6 +81,7 @@ describe("E2E - Simple transaction", function() {
         BusinessDA.start$(),
         ClearingDA.start$(),
         SettlementDA.start$(),
+        Settlement.start$(),
         TransactionsCursorDA.start$(),
         LogErrorDA.start$(),
         TransactionsDA.start$(),
@@ -547,7 +549,7 @@ describe("E2E - Simple transaction", function() {
         ])
           .concatMap(bu => {
             return Rx.Observable.of({})
-              .delay(1000)
+              .delay(100)
               .mergeMap(() => {
                 console.log("Creating Settlement");
                 return broker.send$('Events', '', {
@@ -571,7 +573,7 @@ describe("E2E - Simple transaction", function() {
         )
     }),
     it('Check the closed clearings', function (done) {
-      this.timeout(15000);
+      this.timeout(40000);
       const transactionsExpected = { 
         "123456789_Metro_med": 123125, 
         "123456789_NebulaE_POS": 1687.5, 
@@ -580,7 +582,7 @@ describe("E2E - Simple transaction", function() {
         "123456789_surplus": 0.1
       };
       Rx.Observable.of({})
-      .delay(1000)
+      .delay(30000)
       .mapTo(mongoDB.client.db(dbName).collection('ClosedClearing'))
       .mergeMap((collection) => Rx.Observable.defer(() => collection.find().toArray()))
       .do(result => expect(result).to.be.lengthOf(5))

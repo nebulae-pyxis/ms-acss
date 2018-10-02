@@ -71,7 +71,7 @@ describe("E2E - Simple transaction", function() {
       const TransactionsDA = require('../bin/data/TransactionsDA');
       const LogErrorDA = require('../bin/data/LogErrorDA');
       const AccumulatedTransactionDA = require('../bin/data/AccumulatedTransactionDA');
-      const Settlement = require('../bin/domain/settlement/SettlementES')();    
+      const Settlement = require('../bin/domain/settlement/SettlementES')();
       // const graphQlService = require('../bin//services/gateway/GraphQlService')();
 
       Rx.Observable.concat(
@@ -269,17 +269,17 @@ describe("E2E - Simple transaction", function() {
 });
 
   /*
-  * CREATE 100 RELOADS
+  * CREATE 1K RELOADS
   */
 
-  describe("Create one hundred AFCC reloads and check its transactions", function () {
+  describe("Create one thousand AFCC reloads and check its transactions", function () {
 
-    it("Create one hundred AFCC reloads", function (done) {
+    it("Create one thousand AFCC reloads", function (done) {
       this.timeout(1000);
       const cardId = uuidv4();
-      const reloadAmount = 5000;
+      const reloadAmount = 20000;
 
-      Rx.Observable.range(0, 100)
+      Rx.Observable.range(0, 1000)
         .mergeMap(() => broker.send$('Events', '', {
           et: "AfccReloadSold",
           etv: 1,
@@ -320,42 +320,63 @@ describe("E2E - Simple transaction", function() {
     }),
 
     it('Check all transactions amounts', function (done) {
-      this.timeout(6000);
+      this.timeout(15000);
+      const accumulatedTransactions = {
+        "123456789_Metro_med": 0, 
+        "123456789_NebulaE_POS": 0, 
+        "123456789_PlaceToPay": 0,
+        "123456789_NebulaE": 0
+      };
+      const transactionsExpected = { 
+        "123456789_Metro_med": 19700000, 
+        "123456789_NebulaE_POS": 270000, 
+        "123456789_PlaceToPay": 13650,
+        "123456789_NebulaE": 16350
+      };
       Rx.Observable.of({})
-        .delay(4000)
+        .delay(10000)
         .mapTo(mongoDB.client.db(dbName).collection("Transactions"))
         .mergeMap((collection) => Rx.Observable.defer(() => collection.find().toArray()))
-        .mergeMap(transactionArray => Rx.Observable.from(transactionArray)
+        .mergeMap(transactionArray => Rx.Observable.from(transactionArray)          
           .do(tr => {
+            expect(transactionArray).to.be.lengthOf(4000)
             switch (tr.toBu){
               case '123456789_Metro_med':{
-                expect(tr.amount).to.be.equal(4925);
+                expect(tr.amount).to.be.equal(19700);
+                accumulatedTransactions['123456789_Metro_med'] += Math.floor(tr.amount * 1000);
                 break;
               };
               case '123456789_NebulaE_POS': {
-                expect(tr.amount).to.be.equal(67.5)
+                expect(tr.amount).to.be.equal(270)
+                accumulatedTransactions['123456789_NebulaE_POS'] +=  Math.floor(tr.amount * 1000);
                 break;
               };
               case '123456789_PlaceToPay':{
-                expect(tr.amount).to.be.equal(3.41)
+                expect(tr.amount).to.be.equal(13.65)
+                accumulatedTransactions['123456789_PlaceToPay'] +=  Math.floor(tr.amount * 1000);
                 break;
               };
               case '123456789_NebulaE':{
-                expect(tr.amount).to.be.equal(4.08)
+                expect(tr.amount).to.be.equal(16.35)
+                accumulatedTransactions['123456789_NebulaE'] +=  Math.floor(tr.amount * 1000);
                 break;
               };
-              case '123456789_surplus': {
-                expect(tr.amount).to.be.equal(0.01)
-                break;
+              default: {
+                expect(1).to.be.equal(0);
               }
-            }
+            };
           })
           .toArray()
+          .do(() => {
+              Object.keys(accumulatedTransactions).forEach(e => { accumulatedTransactions[e] = accumulatedTransactions[e]/1000 });
+              console.log("###############################################################", accumulatedTransactions);
+             expect(accumulatedTransactions).to.be.deep.equals(transactionsExpected);
+          })
           .mapTo(transactionArray)
         )
         .do(transactionArray => {
           const totalAmount = transactionArray.reduce((acc, transaction) => acc +  transaction.amount * 1000, 0);
-          expect(totalAmount / 1000).to.be.equals(500000);
+          expect(totalAmount / 1000).to.be.equals(20000000);
         })
         .subscribe(
           ok => {},
@@ -386,9 +407,9 @@ describe("E2E - Simple transaction", function() {
   describe("Trigger task to create the ccumulated transactions", function()  {
     
     it("Send the cronjob task to create the accumulated transactions", function(done) {
-      this.timeout(10000);
+      this.timeout(20000);
       Rx.Observable.of({})
-      .delay(6000)
+      .delay(10000)
       .mergeMap(() => broker.send$('Events', '', {
         et: "ClearingJobTriggered",
         etv: 1,
@@ -409,13 +430,12 @@ describe("E2E - Simple transaction", function() {
 
     it('Check the accumulated transactionis', function(done) {
 
-      AcumulatedTransactionAmountExpected = 500000;
+      AcumulatedTransactionAmountExpected = 20000000;
         const transactionsExpected = { 
-          "123456789_Metro_med": 492500, 
-          "123456789_NebulaE_POS": 6750, 
-          "123456789_PlaceToPay": 341,
-          "123456789_NebulaE": 408, 
-          "123456789_surplus": 1
+          "123456789_Metro_med": 19700000, 
+          "123456789_NebulaE_POS": 270000, 
+          "123456789_PlaceToPay": 13650,
+          "123456789_NebulaE": 16350
         };
 
       Rx.Observable.of({})
@@ -427,7 +447,7 @@ describe("E2E - Simple transaction", function() {
             const index = accTransactions.findIndex(t => t.toBu == buId);
             // console.log(buId, "Expected: ", transactionsExpected[buId], "Actual: ", accTransactions[index].amount);
             expect(accTransactions[index].amount).to.be.equals(transactionsExpected[buId]);
-            expect(accTransactions).to.be.lengthOf(5);
+            expect(accTransactions).to.be.lengthOf(4);
           })
           .map(buId => {
             const index = accTransactions.findIndex(t => t.toBu == buId);
@@ -452,12 +472,13 @@ describe("E2E - Simple transaction", function() {
    */
   describe("Verify clearing", function(){
     it("verify clearing documents quantity", function(done){
+      const clearingsExpected = 5;
       Rx.Observable.of({})
       .delay(1000)
       .mapTo(mongoDB.client.db(dbName).collection('Clearing'))
       .mergeMap(collection => Rx.Observable.defer(() => collection.count()))
       .do(count => {
-        expect(count).to.be.equals(6);
+        expect(count).to.be.equals(clearingsExpected);
       })
       .subscribe(
         result => {  },
@@ -467,11 +488,10 @@ describe("E2E - Simple transaction", function() {
     });
     it('verify inputs and outputs', function(done){      
       const transactionsExpected = { 
-        "123456789_Metro_med": 492500, 
-        "123456789_NebulaE_POS": 6750, 
-        "123456789_PlaceToPay": 341,
-        "123456789_NebulaE": 408, 
-        "123456789_surplus": 1
+        "123456789_Metro_med": 19700000, 
+        "123456789_NebulaE_POS": 270000, 
+        "123456789_PlaceToPay": 13650,
+        "123456789_NebulaE": 16350
       };
 
       Rx.Observable.of({})
@@ -482,8 +502,8 @@ describe("E2E - Simple transaction", function() {
         .do(clearing => {
           switch(clearing.businessId){
             case '123456789_Pasarela': {
-              expect(Object.keys(clearing.output)).to.be.lengthOf(5, 'Pasarela has 5 ouputs OK');
-              expect(clearing.accumulatedTransactionIds).to.be.lengthOf(5);
+              expect(Object.keys(clearing.output)).to.be.lengthOf(4, 'Pasarela has 5 ouputs OK');
+              expect(clearing.accumulatedTransactionIds).to.be.lengthOf(4);
               Object.keys(transactionsExpected).forEach(key => {
                 expect(clearing.output[key].amount).to.be.equals(transactionsExpected[key])
               });
@@ -575,21 +595,19 @@ describe("E2E - Simple transaction", function() {
     it('Check the closed clearings', function (done) {
       this.timeout(40000);
       const transactionsExpected = { 
-        "123456789_Metro_med": 492500, 
-        "123456789_NebulaE_POS": 6750, 
-        "123456789_PlaceToPay": 341,
-        "123456789_NebulaE": 408, 
-        "123456789_surplus": 1
+        "123456789_Metro_med": 19700000, 
+        "123456789_NebulaE_POS": 270000, 
+        "123456789_PlaceToPay": 13650,
+        "123456789_NebulaE": 16350
       };
       Rx.Observable.of({})
       .delay(30000)
       .mapTo(mongoDB.client.db(dbName).collection('ClosedClearing'))
       .mergeMap((collection) => Rx.Observable.defer(() => collection.find().toArray()))
-      .do(result => expect(result).to.be.lengthOf(5))
+      .do(result => expect(result).to.be.lengthOf(4))
       .mergeMap(closedClearings => Rx.Observable.from(Object.keys(transactionsExpected))
         .do( buId => {
           const index =  closedClearings.findIndex(i => i.businessId == buId);
-          console.log(closedClearings[index]);
           expect(closedClearings[index].input['123456789_Pasarela'].amount).to.be.equal(transactionsExpected[buId], "Checking the input in actors")
           expect(closedClearings[index].open).to.be.equal(false);
         })

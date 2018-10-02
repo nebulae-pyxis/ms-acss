@@ -50,8 +50,8 @@ class Clearing {
       });
   }
 
-      /**
-   * Gets the clearing by id
+  /**
+   * Gets the clearing by id.
    *
    * @param args args
    * @param args.id Id of the clearing

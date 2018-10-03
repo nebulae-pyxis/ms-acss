@@ -264,7 +264,7 @@ describe("E2E - Simple transaction", function() {
           timestamp: Date.now(),
           av: 1
         })
-        .do(i => console.log(`${buId} Sending Reload by ${amount}, ${i} of ${qty}`))
+        .do(() => console.log(`${buId} Sending Reload by ${amount}, ${i} of ${qty}`))
         .delay(300)
       )
       }

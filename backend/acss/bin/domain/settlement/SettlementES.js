@@ -92,7 +92,7 @@ class SettlementES {
         ).toArray()
       )
       .mergeMap(statements => mongoDB.applyAll$(statements))
-      .map(([txs, txResult]) => `Settlement job trigger handling for business ${settlementJobTriggered.businessId}: ok:${txResult.ok}`)
+      .map(([txs, txResult]) => `Settlement job trigger handling for business ${settlementJobTriggered.businessId}: ok:${txResult.result.ok}`)
       .catch(error => {
         console.log(`An error was generated while a settlementJobTriggered was being processed: ${error.stack}`);
         return this.errorHandler$(error.stack, settlementJobTriggered);

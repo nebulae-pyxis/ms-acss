@@ -699,6 +699,7 @@ describe("E2E - Simple transaction", function() {
  describe('de-prepare test DB', function () {
    it('delete mongoDB', function (done) {
      this.timeout(7200000);
+     const closeClearingCollection = mongoDB.client.db(dbName).collection('ClosedClearing');
      Rx.Observable.interval(1000)
        .mergeMap(() => Rx.Observable.defer(() => closeClearingCollection.find().toArray()))
        .filter((result) => { console.log("Waiting to close MONGO", result.length); return result.length == 4 })

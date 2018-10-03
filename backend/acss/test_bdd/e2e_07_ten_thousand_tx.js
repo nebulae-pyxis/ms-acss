@@ -702,7 +702,7 @@ describe("E2E - Simple transaction", function() {
      const closeClearingCollection = mongoDB.client.db(dbName).collection('ClosedClearing');
      Rx.Observable.interval(1000)
        .mergeMap(() => Rx.Observable.defer(() => closeClearingCollection.find().toArray()))
-       .filter((result) => { console.log("Waiting to close MONGO", result.length); return result.length == 4 })
+       .filter((result) => { console.log("Waiting to close MONGO", result.length); return result.length == 6 })
        .take(1)
        .mergeMap(() => mongoDB.dropDB$())
        .subscribe(

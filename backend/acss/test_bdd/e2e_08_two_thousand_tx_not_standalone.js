@@ -222,9 +222,21 @@ describe("E2E - Simple transaction", function() {
 
     it("Create ten thousand AFCC reloads", function (done) {
       this.timeout(7200000);
+      const amount_12_5K = 12500;
+      const amount_8K = 8000;
+      const amount_10K = 10000;
+      const amount_1K = 1000;
+      const amount_4K = 4000;
+      const amount_15K = 15000;
+      const amount_13K = 13000;
+      const amount_17K = 17000;
+      const amount_2K = 2000;
+      const amount_5K = 5000;
+
+
       const nebulaReloader = '123456789_NebulaE_POS';
       const ganaReloader = '123456789_Gana';
-      const reloadsEmitter = function(qty, amount, buId){
+      const reloadsEmitter = function(qty, amount, buId, delay = 0){
         const cardId = uuidv4();
         return Rx.Observable.range(0, qty)
         .concatMap((i) => broker.send$('Events', '', {
@@ -257,55 +269,54 @@ describe("E2E - Simple transaction", function() {
           timestamp: Date.now(),
           av: 1
         })
-        .do(() => console.log(`${buId} Sending Reload by ${amount}, ${i} of ${qty}`))
-        .delay(300)
+        .do(() => console.log(`${buId.replace('123456789_', '')} Sending Reload by ${amount}, ${i} of ${qty}`))
+        .delay(delay)
       )
       }
 
       Rx.Observable.concat(
-        reloadsEmitter(1, 12500, nebulaReloader).delay(1000),
+        reloadsEmitter(1, amount_12_5K, nebulaReloader).delay(1000),
         Rx.Observable.forkJoin(
           // 1K NEBULA reloads by 12.5K 
-          reloadsEmitter(99, 12500, nebulaReloader),
+          reloadsEmitter(99, amount_12_5K, nebulaReloader, 300),
           // 1K GANA reloads by 12.5K 
-          reloadsEmitter(100, 12500, ganaReloader),
+          reloadsEmitter(100, amount_12_5K, ganaReloader, 300),
           // 1K NEBULA reloads by 8K 
-          reloadsEmitter(100, 8000, nebulaReloader),
+          reloadsEmitter(100, amount_8K, nebulaReloader, 300),
           // 1K GANA reloads by 8K
-          reloadsEmitter(100, 8000, ganaReloader),
+          reloadsEmitter(100, amount_8K, ganaReloader, 300),
           // 1K NEBULA reloads by 10K
-          reloadsEmitter(100, 10000, nebulaReloader),
+          reloadsEmitter(100, amount_10K, nebulaReloader, 300),
           // 1K GANA reloads by 10K 
-          reloadsEmitter(100, 10000, ganaReloader),
+          reloadsEmitter(100, amount_10K, ganaReloader, 300),
           // 1K NEBULA reloads by 1K
-          reloadsEmitter(100, 1000, nebulaReloader),
+          reloadsEmitter(100, amount_1K, nebulaReloader, 300),
           // 1K GANA reloads by 1K
-          reloadsEmitter(100, 1000, ganaReloader),
+          reloadsEmitter(100, amount_1K, ganaReloader, 300),
           // 1K NEBULA reloads by 4K
-          reloadsEmitter(100, 4000, nebulaReloader),
+          reloadsEmitter(100, amount_4K, nebulaReloader, 300),
           // 1K GANA reloads by 4K
-          reloadsEmitter(100, 4000, ganaReloader),          
-          // ----------------------------
+          reloadsEmitter(100, amount_4K, ganaReloader, 300),
           // 1K NEBULA reloads by 15K 
-          reloadsEmitter(100, 15000, nebulaReloader),
-          // 1K GANA reloads by 15K 
-          reloadsEmitter(100, 15000, ganaReloader),
-          // 1K NEBULA reloads by 13K 
-          reloadsEmitter(100, 13000, nebulaReloader),
-          // 1K GANA reloads by 13K
-          reloadsEmitter(100, 13000, ganaReloader),
-          // 1K NEBULA reloads by 17K
-          reloadsEmitter(100, 17000, nebulaReloader),
-          // 1K GANA reloads by 17K 
-          reloadsEmitter(100, 17000, ganaReloader),
-          // 1K NEBULA reloads by 2K
-          reloadsEmitter(100, 2000, nebulaReloader),
-          // 1K GANA reloads by 2K
-          reloadsEmitter(100, 2000, ganaReloader),
-          // 1K NEBULA reloads by 5K
-          reloadsEmitter(100, 5000, nebulaReloader),
-          // 1K GANA reloads by 5K
-          reloadsEmitter(100, 5000, ganaReloader),   
+          reloadsEmitter(100, amount_15K, nebulaReloader, 300),
+          // 1K GANA reloads by 12.5K 
+          reloadsEmitter(100, amount_15K, ganaReloader, 300),
+          // 1K NEBULA reloads by 8K 
+          reloadsEmitter(100, amount_13K, nebulaReloader, 300),
+          // 1K GANA reloads by 8K
+          reloadsEmitter(100, amount_13K, ganaReloader, 300),
+          // 1K NEBULA reloads by 10K
+          reloadsEmitter(100, amount_17K, nebulaReloader, 300),
+          // 1K GANA reloads by 10K 
+          reloadsEmitter(100, amount_17K, ganaReloader, 300),
+          // 1K NEBULA reloads by 1K
+          reloadsEmitter(100, amount_2K, nebulaReloader, 300),
+          // 1K GANA reloads by 1K
+          reloadsEmitter(100, amount_2K, ganaReloader, 300),
+          // 1K NEBULA reloads by 4K
+          reloadsEmitter(100, amount_5K, nebulaReloader, 300),
+          // 1K GANA reloads by 4K
+          reloadsEmitter(100, amount_5K, ganaReloader, 300)
         )
       )
       .toArray()
@@ -342,6 +353,42 @@ describe("E2E - Simple transaction", function() {
           .reduce((accumulatedTransactions, tr) => {
             accumulatedTransactions.total += tr.amount * 1000;
             accumulatedTransactions[tr.toBu] += Math.floor(tr.amount * 1000);
+            switch (tr.toBu) {
+              case "123456789_Metro_med"  : {
+                expect([12312.5, 7880, 9850, 985, 3940, 14775, 12805, 16745, 1970, 4925 ]).to.include(tr.amount);
+                break;
+              }
+              case "123456789_NebulaE_POS": {
+                expect([168.75, 108, 135, 13.5, 54, 202.5, 175.5, 229.5, 27, 67.5 ]).to.include(tr.amount);
+                break;
+              }
+              case "123456789_Gana": {
+                expect([150, 96, 120, 12, 48, 180, 156, 204, 24, 60 ]).to.include(tr.amount);
+                break;
+              }
+              case "123456789_PlaceToPay": {
+                // when NebulaE sells the reload
+                const toPlaceWhenNebulaSells = [8.53, 5.46, 6.82, 0.68, 2.73, 10.23, 8.87, 11.6, 1.36, 3.41];
+                // when Gana Sells the reload
+                const toPlaceWhenGanaSells = [17.06, 10.92, 13.65, 1.36, 5.46, 20.47, 17.74, 23.2, 2.73, 6.82]
+                expect([...toPlaceWhenNebulaSells, ...toPlaceWhenGanaSells]).to.include(tr.amount);
+                break;
+              }
+              case "123456789_NebulaE": {
+                // when NebulaE sells the reload
+                const toNebulaWhenNebulaSells = [10.21, 6.54, 8.17, 0.81, 3.27, 12.26, 10.62, 13.89, 1.63, 4.08 ];
+                // when Gana Sells the reload
+                const toNebulaWhenGanaSells = [20.43, 13.08, 16.35, 1.63, 6.54, 24.52, 21.25, 27.79, 3.27, 8.17 ];
+                expect([...toNebulaWhenNebulaSells, ...toNebulaWhenGanaSells]).to.include(tr.amount);
+                break;
+              }
+              case '123456789_surplus': {
+                expect(tr.amount).to.be.equal(0.01)
+                break;
+              }
+              default: { expect(1).to.be.equals(0); }
+              
+            }
             return accumulatedTransactions;            
           }, {
             "123456789_Metro_med": 0, 
@@ -428,6 +475,7 @@ describe("E2E - Simple transaction", function() {
           return accTransactions.length >= Object.keys(transactionsExpected).length
         })
         .take(1)
+        .delay(3000)
         .mergeMap(accTransactions => Rx.Observable.from(Object.keys(transactionsExpected))
           .do(buId => {
             const index = accTransactions.findIndex(t => t.toBu == buId);
@@ -657,39 +705,39 @@ describe("E2E - Simple transaction", function() {
   * DE-PREAPARE
   */
 
- describe('de-prepare test DB', function () {
-   it('delete mongoDB', function (done) {
-     this.timeout(7200000);
-     const closeClearingCollection = mongoDB.client.db(dbName).collection('ClosedClearing');
-     Rx.Observable.interval(1000)
-       .mergeMap(() => Rx.Observable.defer(() => closeClearingCollection.find().toArray()))
-       .filter((result) => { console.log("Waiting to close MONGO", result.length); return result.length == 6 })
-       .take(1)
-       .mergeMap(() => mongoDB.dropDB$())
-       .subscribe(
-         (evt) => console.log(`${evt}`),
-         (error) => {
-           console.error(`Mongo DropDB failed: ${error}`);
-           return done(error);
-         },
-         () => { return done(); }
-       );
-   });
-   it('stop mongo', function (done) {
-     this.timeout(7200000);
-     Rx.Observable.of({})
-       .delay(2000)
-       .mergeMap(() => mongoDB.stop$())
-       .subscribe(
-         (evt) => console.log(`Mongo Stop: ${evt}`),
-         (error) => {
-           console.error(`Mongo Stop failed: ${error}`);
-           return done(error);
-         },
-         () => { return done(); }
-       );
-   });
-});
+//  describe('de-prepare test DB', function () {
+//    it('delete mongoDB', function (done) {
+//      this.timeout(7200000);
+//      const closeClearingCollection = mongoDB.client.db(dbName).collection('ClosedClearing');
+//      Rx.Observable.interval(1000)
+//        .mergeMap(() => Rx.Observable.defer(() => closeClearingCollection.find().toArray()))
+//        .filter((result) => { console.log("Waiting to close MONGO", result.length); return result.length == 6 })
+//        .take(1)
+//        .mergeMap(() => mongoDB.dropDB$())
+//        .subscribe(
+//          (evt) => console.log(`${evt}`),
+//          (error) => {
+//            console.error(`Mongo DropDB failed: ${error}`);
+//            return done(error);
+//          },
+//          () => { return done(); }
+//        );
+//    });
+//    it('stop mongo', function (done) {
+//      this.timeout(7200000);
+//      Rx.Observable.of({})
+//        .delay(2000)
+//        .mergeMap(() => mongoDB.stop$())
+//        .subscribe(
+//          (evt) => console.log(`Mongo Stop: ${evt}`),
+//          (error) => {
+//            console.error(`Mongo Stop failed: ${error}`);
+//            return done(error);
+//          },
+//          () => { return done(); }
+//        );
+//    });
+// });
 
 
 

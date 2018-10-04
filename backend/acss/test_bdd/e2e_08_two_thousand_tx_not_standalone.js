@@ -321,7 +321,7 @@ describe("E2E - Simple transaction", function() {
 
       const transactionsExpected = { 
         "123456789_Metro_med": 17237500,
-        "123456789_Gana": 10500,
+        "123456789_Gana": 105000,
         "123456789_NebulaE_POS": 118125, 
         "123456789_PlaceToPay": 17910,
         "123456789_NebulaE": 21451,
@@ -413,7 +413,7 @@ describe("E2E - Simple transaction", function() {
       const acumulatedTransactionAmountExpected = 17500000;
       const transactionsExpected = { 
         "123456789_Metro_med": 17237500,
-        "123456789_Gana": 10500,
+        "123456789_Gana": 105000,
         "123456789_NebulaE_POS": 118125, 
         "123456789_PlaceToPay": 17910,
         "123456789_NebulaE": 21451,
@@ -479,7 +479,7 @@ describe("E2E - Simple transaction", function() {
       const clearingCollection = mongoDB.client.db(dbName).collection('Clearing');
       const transactionsExpected = { 
         "123456789_Metro_med": 17237500,
-        "123456789_Gana": 10500,
+        "123456789_Gana": 105000,
         "123456789_NebulaE_POS": 118125, 
         "123456789_PlaceToPay": 17910,
         "123456789_NebulaE": 21451,
@@ -603,7 +603,7 @@ describe("E2E - Simple transaction", function() {
       this.timeout(7200000);
       const transactionsExpected = { 
         "123456789_Metro_med": 17237500,
-        "123456789_Gana": 10500,
+        "123456789_Gana": 105000,
         "123456789_NebulaE_POS": 118125, 
         "123456789_PlaceToPay": 17910,
         "123456789_NebulaE": 21451,

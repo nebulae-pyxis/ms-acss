@@ -222,24 +222,32 @@ describe("E2E - Simple transaction", function() {
 
     it("Create ten thousand AFCC reloads", function (done) {
       this.timeout(7200000);
-      const amount_12_5K = 12500;
-      const amount_8K = 8000;
-      const amount_10K = 10000;
-      const amount_1K = 1000;
-      const amount_4K = 4000;
-      const amount_15K = 15000;
+      const amount_7K = 7000;
+      const amount_12K = 12000;
       const amount_13K = 13000;
-      const amount_17K = 17000;
-      const amount_2K = 2000;
+      const amount_4K = 4000;
       const amount_5K = 5000;
+      const amount_11K = 11000;
+      const amount_1_5K = 1500;
+      const amount_1_8K = 1800;
+      const amount_6_5K = 6500;
+      const amount_3_5K = 3500;
 
 
       const nebulaReloader = '123456789_NebulaE_POS';
       const ganaReloader = '123456789_Gana';
+      /**
+       * 
+       * @param {number} qty quantity of times to send the reload} 
+       * @param {number} amount Reload amount
+       * @param {string} buId Business unit who create the reload
+       * @param {number} delay  delay between each event emition
+       */
       const reloadsEmitter = function(qty, amount, buId, delay = 0){
         const cardId = uuidv4();
         return Rx.Observable.range(0, qty)
         .concatMap((i) => broker.send$('Events', '', {
+          _id: uuidv4(),
           et: "AfccReloadSold",
           etv: 1,
           at: "Afcc",
@@ -275,48 +283,28 @@ describe("E2E - Simple transaction", function() {
       }
 
       Rx.Observable.concat(
-        reloadsEmitter(1, amount_12_5K, nebulaReloader).delay(1000),
+        reloadsEmitter(1, amount_7K, nebulaReloader).delay(1000),
         Rx.Observable.forkJoin(
-          // 1K NEBULA reloads by 12.5K 
-          reloadsEmitter(99, amount_12_5K, nebulaReloader, 300),
-          // 1K GANA reloads by 12.5K 
-          reloadsEmitter(100, amount_12_5K, ganaReloader, 300),
-          // 1K NEBULA reloads by 8K 
-          reloadsEmitter(100, amount_8K, nebulaReloader, 300),
-          // 1K GANA reloads by 8K
-          reloadsEmitter(100, amount_8K, ganaReloader, 300),
-          // 1K NEBULA reloads by 10K
-          reloadsEmitter(100, amount_10K, nebulaReloader, 300),
-          // 1K GANA reloads by 10K 
-          reloadsEmitter(100, amount_10K, ganaReloader, 300),
-          // 1K NEBULA reloads by 1K
-          reloadsEmitter(100, amount_1K, nebulaReloader, 300),
-          // 1K GANA reloads by 1K
-          reloadsEmitter(100, amount_1K, ganaReloader, 300),
-          // 1K NEBULA reloads by 4K
-          reloadsEmitter(100, amount_4K, nebulaReloader, 300),
-          // 1K GANA reloads by 4K
-          reloadsEmitter(100, amount_4K, ganaReloader, 300),
-          // 1K NEBULA reloads by 15K 
-          reloadsEmitter(100, amount_15K, nebulaReloader, 300),
-          // 1K GANA reloads by 12.5K 
-          reloadsEmitter(100, amount_15K, ganaReloader, 300),
-          // 1K NEBULA reloads by 8K 
-          reloadsEmitter(100, amount_13K, nebulaReloader, 300),
-          // 1K GANA reloads by 8K
-          reloadsEmitter(100, amount_13K, ganaReloader, 300),
-          // 1K NEBULA reloads by 10K
-          reloadsEmitter(100, amount_17K, nebulaReloader, 300),
-          // 1K GANA reloads by 10K 
-          reloadsEmitter(100, amount_17K, ganaReloader, 300),
-          // 1K NEBULA reloads by 1K
-          reloadsEmitter(100, amount_2K, nebulaReloader, 300),
-          // 1K GANA reloads by 1K
-          reloadsEmitter(100, amount_2K, ganaReloader, 300),
-          // 1K NEBULA reloads by 4K
-          reloadsEmitter(100, amount_5K, nebulaReloader, 300),
-          // 1K GANA reloads by 4K
-          reloadsEmitter(100, amount_5K, ganaReloader, 300)
+          reloadsEmitter(4999, amount_7K, nebulaReloader, 200),
+          reloadsEmitter(5000, amount_7K, ganaReloader, 200),
+          reloadsEmitter(5000, amount_12K, nebulaReloader, 200),
+          reloadsEmitter(5000, amount_12K, ganaReloader, 200),
+          reloadsEmitter(5000, amount_13K, nebulaReloader, 200),
+          reloadsEmitter(5000, amount_13K, ganaReloader, 200),
+          reloadsEmitter(5000, amount_4K, nebulaReloader, 200),
+          reloadsEmitter(5000, amount_4K, ganaReloader, 200),
+          reloadsEmitter(5000, amount_5K, nebulaReloader, 200),
+          reloadsEmitter(5000, amount_5K, ganaReloader, 200),
+          reloadsEmitter(5000, amount_11K, nebulaReloader, 200),
+          reloadsEmitter(5000, amount_11K, ganaReloader, 200),
+          reloadsEmitter(5000, amount_1_5K, nebulaReloader, 200),
+          reloadsEmitter(5000, amount_1_5K, ganaReloader, 200),
+          reloadsEmitter(5000, amount_1_8K, nebulaReloader, 200),
+          reloadsEmitter(5000, amount_1_8K, ganaReloader, 200),
+          reloadsEmitter(5000, amount_6_5K, nebulaReloader, 200),
+          reloadsEmitter(5000, amount_6_5K, ganaReloader, 200),
+          reloadsEmitter(5000, amount_3_5K, nebulaReloader, 200),
+          reloadsEmitter(5000, amount_3_5K, ganaReloader, 200)
         )
       )
       .toArray()
@@ -331,17 +319,17 @@ describe("E2E - Simple transaction", function() {
       this.timeout(7200000);
 
       const transactionsExpected = { 
-        "123456789_Metro_med": 17237500,
-        "123456789_Gana": 105000,
-        "123456789_NebulaE_POS": 118125, 
-        "123456789_PlaceToPay": 17910,
-        "123456789_NebulaE": 21451,
-        "123456789_surplus": 14,
-        "total": 17500000
+        "123456789_Metro_med": 643205000,
+        "123456789_Gana": 3918000,
+        "123456789_NebulaE_POS": 4407750, 
+        "123456789_PlaceToPay": 668050,
+        "123456789_NebulaE": 800400,
+        "123456789_surplus": 800,
+        "total": 653000000
       };
 
       const collection = mongoDB.client.db(dbName).collection('Transactions');
-      const expectedTransactions = 9400;
+      const expectedTransactions = 96;
       let count = 0;
       Rx.Observable.interval(1000)
         .do(() => console.log("Waiting for all transactions creation...", count))
@@ -350,45 +338,45 @@ describe("E2E - Simple transaction", function() {
         .take(1)
         .mergeMap(() => Rx.Observable.bindNodeCallback(collection.find.bind(collection))({})
           .mergeMap(cursor => Rx.Observable.defer(() => MongoDB.extractAllFromMongoCursor$(cursor)))
-          .reduce((accumulatedTransactions, tr) => {
+          .reduce((accumulatedTransactions, tr) => {      
             accumulatedTransactions.total += tr.amount * 1000;
-            accumulatedTransactions[tr.toBu] += Math.floor(tr.amount * 1000);
-            switch (tr.toBu) {
-              case "123456789_Metro_med"  : {
-                expect([12312.5, 7880, 9850, 985, 3940, 14775, 12805, 16745, 1970, 4925 ]).to.include(tr.amount);
-                break;
-              }
-              case "123456789_NebulaE_POS": {
-                expect([168.75, 108, 135, 13.5, 54, 202.5, 175.5, 229.5, 27, 67.5 ]).to.include(tr.amount);
-                break;
-              }
-              case "123456789_Gana": {
-                expect([150, 96, 120, 12, 48, 180, 156, 204, 24, 60 ]).to.include(tr.amount);
-                break;
-              }
-              case "123456789_PlaceToPay": {
-                // when NebulaE sells the reload
-                const toPlaceWhenNebulaSells = [8.53, 5.46, 6.82, 0.68, 2.73, 10.23, 8.87, 11.6, 1.36, 3.41];
-                // when Gana Sells the reload
-                const toPlaceWhenGanaSells = [17.06, 10.92, 13.65, 1.36, 5.46, 20.47, 17.74, 23.2, 2.73, 6.82]
-                expect([...toPlaceWhenNebulaSells, ...toPlaceWhenGanaSells]).to.include(tr.amount);
-                break;
-              }
-              case "123456789_NebulaE": {
-                // when NebulaE sells the reload
-                const toNebulaWhenNebulaSells = [10.21, 6.54, 8.17, 0.81, 3.27, 12.26, 10.62, 13.89, 1.63, 4.08 ];
-                // when Gana Sells the reload
-                const toNebulaWhenGanaSells = [20.43, 13.08, 16.35, 1.63, 6.54, 24.52, 21.25, 27.79, 3.27, 8.17 ];
-                expect([...toNebulaWhenNebulaSells, ...toNebulaWhenGanaSells]).to.include(tr.amount);
-                break;
-              }
-              case '123456789_surplus': {
-                expect(tr.amount).to.be.equal(0.01)
-                break;
-              }
-              default: { expect(1).to.be.equals(0); }
+            accumulatedTransactions[tr.toBu] += tr.amount * 1000;
+            // switch (tr.toBu) {
+            //   case "123456789_Metro_med"  : {
+            //     expect([6895, 11820, 12805, 3940, 4925, 10835, 1477.5, 1773, 6402.5, 3447.5]).to.include(tr.amount);
+            //     break;
+            //   }
+            //   case "123456789_NebulaE_POS": {
+            //     expect([94.5, 162, 175.5, 54, 67.5, 148.5, 20.25, 24.3, 87.75, 47.25]).to.include(tr.amount);
+            //     break;
+            //   }
+            //   case "123456789_Gana": {
+            //     expect([84, 144, 156, 48, 60, 132, 18, 21.6, 78, 42]).to.include(tr.amount);
+            //     break;
+            //   }
+            //   case "123456789_PlaceToPay": {
+            //     // when NebulaE sells the reload
+            //     const toPlaceWhenNebulaSells = [4.77, 8.19, 8.87, 2.73, 3.41, 0.68, 1.02, 1.22, 4.43, 2.38];
+            //     // when Gana Sells the reload
+            //     const toPlaceWhenGanaSells = [9.55, 16.37, 17.74, 5.45, 6.82, 1.36, 2.04, 2.45, 8.87, 4.77]
+            //     expect([...toPlaceWhenNebulaSells, ...toPlaceWhenGanaSells]).to.include(tr.amount);
+            //     break;
+            //   }
+            //   case "123456789_NebulaE": {
+            //     // when NebulaE sells the reload
+            //     const toNebulaWhenNebulaSells = [5.72, 9.81, 10.62, 3.27, 4.08, 0.81, 1.22, 1.47, 5.31, 2.86];
+            //     // when Gana Sells the reload
+            //     const toNebulaWhenGanaSells = [11.44, 19.61, 21.25, 6.53, 8.17, 1.63, 2.45, 2.94, 10.62, 5.72];
+            //     expect([...toNebulaWhenNebulaSells, ...toNebulaWhenGanaSells]).to.include(tr.amount);
+            //     break;
+            //   }
+            //   case '123456789_surplus': {
+            //     expect(tr.amount).to.be.equal(0.01)
+            //     break;
+            //   }
+            //   default: { expect(1).to.be.equals(0); }
               
-            }
+            // }
             return accumulatedTransactions;            
           }, {
             "123456789_Metro_med": 0, 
@@ -457,14 +445,14 @@ describe("E2E - Simple transaction", function() {
 
     it('Check the accumulated transactions', function(done) {
       this.timeout(7200000); 
-      const acumulatedTransactionAmountExpected = 17500000;
+      const acumulatedTransactionAmountExpected = 653000000;
       const transactionsExpected = { 
-        "123456789_Metro_med": 17237500,
-        "123456789_Gana": 105000,
-        "123456789_NebulaE_POS": 118125, 
-        "123456789_PlaceToPay": 17910,
-        "123456789_NebulaE": 21451,
-        "123456789_surplus": 14
+        "123456789_Metro_med": 643205000,
+        "123456789_Gana": 3918000,
+        "123456789_NebulaE_POS": 4407750, 
+        "123456789_PlaceToPay": 668050,
+        "123456789_NebulaE": 800400,
+        "123456789_surplus": 800
       };
       const AccTransactionsCollection = mongoDB.client.db(dbName).collection("AccumulatedTransactions"); 
 
@@ -526,12 +514,12 @@ describe("E2E - Simple transaction", function() {
       this.timeout(7200000);
       const clearingCollection = mongoDB.client.db(dbName).collection('Clearing');
       const transactionsExpected = { 
-        "123456789_Metro_med": 17237500,
-        "123456789_Gana": 105000,
-        "123456789_NebulaE_POS": 118125, 
-        "123456789_PlaceToPay": 17910,
-        "123456789_NebulaE": 21451,
-        "123456789_surplus": 14
+        "123456789_Metro_med": 643205000,
+        "123456789_Gana": 3918000,
+        "123456789_NebulaE_POS": 4407750, 
+        "123456789_PlaceToPay": 668050,
+        "123456789_NebulaE": 800400,
+        "123456789_surplus": 800
       };
 
       Rx.Observable.interval(1000)
@@ -650,12 +638,12 @@ describe("E2E - Simple transaction", function() {
     it('Check the closed clearings', function (done) {
       this.timeout(7200000);
       const transactionsExpected = { 
-        "123456789_Metro_med": 17237500,
-        "123456789_Gana": 105000,
-        "123456789_NebulaE_POS": 118125, 
-        "123456789_PlaceToPay": 17910,
-        "123456789_NebulaE": 21451,
-        "123456789_surplus": 14
+        "123456789_Metro_med": 643205000,
+        "123456789_Gana": 3918000,
+        "123456789_NebulaE_POS": 4407750, 
+        "123456789_PlaceToPay": 668050,
+        "123456789_NebulaE": 800400,
+        "123456789_surplus": 800
       };
       const closeClearingCollection = mongoDB.client.db(dbName).collection('ClosedClearing');
       Rx.Observable.interval(1000)
@@ -699,45 +687,45 @@ describe("E2E - Simple transaction", function() {
     })
 
   })
- 
 
    /*
   * DE-PREAPARE
   */
 
- describe('de-prepare test DB', function () {
-   it('delete mongoDB', function (done) {
-     this.timeout(7200000);
-     const closeClearingCollection = mongoDB.client.db(dbName).collection('ClosedClearing');
-     Rx.Observable.interval(1000)
-       .mergeMap(() => Rx.Observable.defer(() => closeClearingCollection.find().toArray()))
-       .filter((result) => { console.log("Waiting to close MONGO", result.length); return result.length == 6 })
-       .take(1)
-       .mergeMap(() => mongoDB.dropDB$())
-       .subscribe(
-         (evt) => console.log(`${evt}`),
-         (error) => {
-           console.error(`Mongo DropDB failed: ${error}`);
-           return done(error);
-         },
-         () => { return done(); }
-       );
-   });
-   it('stop mongo', function (done) {
-     this.timeout(7200000);
-     Rx.Observable.of({})
-       .delay(2000)
-       .mergeMap(() => mongoDB.stop$())
-       .subscribe(
-         (evt) => console.log(`Mongo Stop: ${evt}`),
-         (error) => {
-           console.error(`Mongo Stop failed: ${error}`);
-           return done(error);
-         },
-         () => { return done(); }
-       );
-   });
-});
+//  describe('de-prepare test DB', function () {
+//    it('delete mongoDB', function (done) {
+//      this.timeout(7200000);
+//      const closeClearingCollection = mongoDB.client.db(dbName).collection('ClosedClearing');
+//      Rx.Observable.interval(1000)
+//        .mergeMap(() => Rx.Observable.defer(() => closeClearingCollection.find().toArray()))
+//        .filter((result) => { console.log("Waiting to close MONGO", result.length); return result.length == 6 })
+//        .take(1)
+//        .mergeMap(() => mongoDB.dropDB$())
+//        .subscribe(
+//          (evt) => console.log(`${evt}`),
+//          (error) => {
+//            console.error(`Mongo DropDB failed: ${error}`);
+//            return done(error);
+//          },
+//          () => { return done(); }
+//        );
+//    });
+   
+//    it('stop mongo', function (done) {
+//      this.timeout(7200000);
+//      Rx.Observable.of({})
+//        .delay(2000)
+//        .mergeMap(() => mongoDB.stop$())
+//        .subscribe(
+//          (evt) => console.log(`Mongo Stop: ${evt}`),
+//          (error) => {
+//            console.error(`Mongo Stop failed: ${error}`);
+//            return done(error);
+//          },
+//          () => { return done(); }
+//        );
+//    });
+// });
 
 
 

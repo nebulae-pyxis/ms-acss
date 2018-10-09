@@ -274,29 +274,31 @@ describe("E2E - Simple transaction", function() {
       )
       }
 
+      const timesToMakeReload = 1000;
+      const delayToSendEachPackage = 100;
       Rx.Observable.concat(
         reloadsEmitter(1, amount_12_5K, nebulaReloader).delay(1000),
-        Rx.Observable.concat(
-          reloadsEmitter(999, amount_12_5K, nebulaReloader, 100),
-          reloadsEmitter(1000, amount_12_5K, ganaReloader, 100),
-          reloadsEmitter(1000, amount_8K, nebulaReloader, 100),
-          reloadsEmitter(1000, amount_8K, ganaReloader, 100),
-          reloadsEmitter(1000, amount_10K, nebulaReloader, 100),
-          reloadsEmitter(1000, amount_10K, ganaReloader, 100),
-          reloadsEmitter(1000, amount_1K, nebulaReloader, 100),
-          reloadsEmitter(1000, amount_1K, ganaReloader, 100),
-          reloadsEmitter(1000, amount_4K, nebulaReloader, 100),
-          reloadsEmitter(1000, amount_4K, ganaReloader, 100),
-          reloadsEmitter(1000, amount_15K, nebulaReloader, 300),
-          reloadsEmitter(1000, amount_15K, ganaReloader, 300),
-          reloadsEmitter(1000, amount_13K, nebulaReloader, 300),
-          reloadsEmitter(1000, amount_13K, ganaReloader, 300),
-          reloadsEmitter(1000, amount_17K, nebulaReloader, 300),
-          reloadsEmitter(1000, amount_17K, ganaReloader, 300),
-          reloadsEmitter(1000, amount_2K, nebulaReloader, 300),
-          reloadsEmitter(1000, amount_2K, ganaReloader, 300),
-          reloadsEmitter(1000, amount_5K, nebulaReloader, 300),
-          reloadsEmitter(1000, amount_5K, ganaReloader, 300)
+        Rx.Observable.forkJoin(
+          reloadsEmitter(timesToMakeReload - 1, amount_12_5K, nebulaReloader, delayToSendEachPackage),
+          reloadsEmitter(timesToMakeReload, amount_12_5K, ganaReloader, delayToSendEachPackage),
+          reloadsEmitter(timesToMakeReload, amount_8K, nebulaReloader, delayToSendEachPackage),
+          reloadsEmitter(timesToMakeReload, amount_8K, ganaReloader, delayToSendEachPackage),
+          reloadsEmitter(timesToMakeReload, amount_10K, nebulaReloader, delayToSendEachPackage),
+          reloadsEmitter(timesToMakeReload, amount_10K, ganaReloader, delayToSendEachPackage),
+          reloadsEmitter(timesToMakeReload, amount_1K, nebulaReloader, delayToSendEachPackage),
+          reloadsEmitter(timesToMakeReload, amount_1K, ganaReloader, delayToSendEachPackage),
+          reloadsEmitter(timesToMakeReload, amount_4K, nebulaReloader, delayToSendEachPackage),
+          reloadsEmitter(timesToMakeReload, amount_4K, ganaReloader, delayToSendEachPackage),
+          reloadsEmitter(timesToMakeReload, amount_15K, nebulaReloader, delayToSendEachPackage),
+          reloadsEmitter(timesToMakeReload, amount_15K, ganaReloader, delayToSendEachPackage),
+          reloadsEmitter(timesToMakeReload, amount_13K, nebulaReloader, delayToSendEachPackage),
+          reloadsEmitter(timesToMakeReload, amount_13K, ganaReloader, delayToSendEachPackage),
+          reloadsEmitter(timesToMakeReload, amount_17K, nebulaReloader, delayToSendEachPackage),
+          reloadsEmitter(timesToMakeReload, amount_17K, ganaReloader, delayToSendEachPackage),
+          reloadsEmitter(timesToMakeReload, amount_2K, nebulaReloader, delayToSendEachPackage),
+          reloadsEmitter(timesToMakeReload, amount_2K, ganaReloader, delayToSendEachPackage),
+          reloadsEmitter(timesToMakeReload, amount_5K, nebulaReloader, delayToSendEachPackage),
+          reloadsEmitter(timesToMakeReload, amount_5K, ganaReloader, delayToSendEachPackage)
         )
       )
       .toArray()

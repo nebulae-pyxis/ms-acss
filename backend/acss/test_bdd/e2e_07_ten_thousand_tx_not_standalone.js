@@ -222,16 +222,15 @@ describe("E2E - Simple transaction", function() {
 
     it("Create ten thousand AFCC reloads", function (done) {
       this.timeout(7200000);
-      const cardId = uuidv4();
-      const reloadAmount12_5K = 12500;
-      const reloadAmount8k = 8000;
-      const reloadAmount10k = 10000;
-      const reloadAmount1k = 1000;
-      const reloadAmount4k = 4000;
+      const amount_12_5K = 12500;
+      const amount_8K = 8000;
+      const amount_10K = 10000;
+      const amount_1K = 1000;
+      const amount_4K = 4000;
 
       const nebulaReloader = '123456789_NebulaE_POS';
       const ganaReloader = '123456789_Gana';
-      const reloadsEmitter = function(qty, amount, buId){
+      const reloadsEmitter = function(qty, amount, buId, delay = 0){
         const cardId = uuidv4();
         return Rx.Observable.range(0, qty)
         .concatMap((i) => broker.send$('Events', '', {
@@ -265,43 +264,43 @@ describe("E2E - Simple transaction", function() {
           av: 1
         })
         .do(() => console.log(`${buId} Sending Reload by ${amount}, ${i} of ${qty}`))
-        .delay(300)
+        .delay(delay)
       )
       }
 
       Rx.Observable.concat(
-        reloadsEmitter(1, reloadAmount12_5K, nebulaReloader),
+        reloadsEmitter(1, amount_12_5K, nebulaReloader).delay(1000),
         Rx.Observable.forkJoin(
           // 1K NEBULA reloads by 12.5K 
-          Rx.Observable.of({}).do(() => console.log("1K NEBULA reloads by 12.5K")).delay(100),
-          reloadsEmitter(999, reloadAmount12_5K, nebulaReloader),
+          // Rx.Observable.of({}).do(() => console.log("1K NEBULA reloads by 12.5K")).delay(100),
+          reloadsEmitter(999, amount_12_5K, nebulaReloader),
           // 1K GANA reloads by 12.5K 
-          Rx.Observable.of({}).do(() => console.log("1K GANA reloads by 12.5K")).delay(100),
-          reloadsEmitter(1000, reloadAmount12_5K, ganaReloader),
+          // Rx.Observable.of({}).do(() => console.log("1K GANA reloads by 12.5K")).delay(100),
+          reloadsEmitter(1000, amount_12_5K, ganaReloader),
           // 1K NEBULA reloads by 8K 
-          Rx.Observable.of({}).do(() => console.log("1K NEBULA reloads by 8K")).delay(100),
-          reloadsEmitter(1000, reloadAmount8k, nebulaReloader),
+          // Rx.Observable.of({}).do(() => console.log("1K NEBULA reloads by 8K")).delay(100),
+          reloadsEmitter(1000, amount_8K, nebulaReloader),
           // 1K GANA reloads by 8K
-          Rx.Observable.of({}).do(() => console.log("1K GANA reloads by 8K")).delay(100),
-          reloadsEmitter(1000, reloadAmount8k, ganaReloader),
+          // Rx.Observable.of({}).do(() => console.log("1K GANA reloads by 8K")).delay(100),
+          reloadsEmitter(1000, amount_8K, ganaReloader),
           // 1K NEBULA reloads by 10K
-          Rx.Observable.of({}).do(() => console.log("1K NEBULA reloads by 10K")).delay(100),
-          reloadsEmitter(1000, reloadAmount10k, nebulaReloader),
+          // Rx.Observable.of({}).do(() => console.log("1K NEBULA reloads by 10K")).delay(100),
+          reloadsEmitter(1000, amount_10K, nebulaReloader),
           // 1K GANA reloads by 10K 
-          Rx.Observable.of({}).do(() => console.log("1K GANA reloads by 10K")).delay(100),
-          reloadsEmitter(1000, reloadAmount10k, ganaReloader),
+          // Rx.Observable.of({}).do(() => console.log("1K GANA reloads by 10K")).delay(100),
+          reloadsEmitter(1000, amount_10K, ganaReloader),
           // 1K NEBULA reloads by 1K
-          Rx.Observable.of({}).do(() => console.log("1K NEBULA reloads by 1K")).delay(100),
-          reloadsEmitter(1000, reloadAmount1k, nebulaReloader),
+          // Rx.Observable.of({}).do(() => console.log("1K NEBULA reloads by 1K")).delay(100),
+          reloadsEmitter(1000, amount_1K, nebulaReloader),
           // 1K GANA reloads by 1K
-          Rx.Observable.of({}).do(() => console.log("1K GANA reloads by 1K")).delay(100),
-          reloadsEmitter(1000, reloadAmount1k, ganaReloader),
+          // Rx.Observable.of({}).do(() => console.log("1K GANA reloads by 1K")).delay(100),
+          reloadsEmitter(1000, amount_1K, ganaReloader),
           // 1K NEBULA reloads by 4K
-          Rx.Observable.of({}).do(() => console.log("1K NEBULA reloads by 4K")).delay(100),
-          reloadsEmitter(1000, reloadAmount4k, nebulaReloader),
+          // Rx.Observable.of({}).do(() => console.log("1K NEBULA reloads by 4K")).delay(100),
+          reloadsEmitter(1000, amount_4K, nebulaReloader),
           // 1K GANA reloads by 4K
-          Rx.Observable.of({}).do(() => console.log("1K GANA reloads by 4K")).delay(100),
-          reloadsEmitter(1000, reloadAmount4k, ganaReloader)
+          // Rx.Observable.of({}).do(() => console.log("1K GANA reloads by 4K")).delay(100),
+          reloadsEmitter(1000, amount_4K, ganaReloader)
         )
       )
       .toArray()

@@ -31,7 +31,7 @@ const start = () => {
         TransactionsDA.start$(),
         AccumulatedTransactionDA.start$(),
         graphQlService.start$(),
-        //settlement.eventSourcing.start$(),
+        settlement.eventSourcing.start$(),
     ).subscribe(
         (evt) => {
             console.log(evt)

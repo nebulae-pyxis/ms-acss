@@ -20,7 +20,7 @@ class SettlementES {
     return Rx.Observable.create(obs => {
       this.settlementEventSubscription = this.settlementEvent$
         .concatMap(settlement => {
-          return this.executeSettlementJobTriggered$(settlement).delay(5000);
+          return this.executeSettlementJobTriggered$(settlement).delay(3000);
         })
         .subscribe(
           evt => {

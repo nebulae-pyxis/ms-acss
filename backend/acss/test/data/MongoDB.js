@@ -118,8 +118,7 @@ describe("MongoDB", function() {
 
       Rx.Observable.defer(() => mongo.createCollection$(collectionName))
         .mergeMap(res => Rx.Observable.from(collectionVsOperationCommand))
-        .concatMap(operations => Rx.Observable.of({}).do(console.log('-------- ENTRO APPLY --------')).concat(mongo.applyAll$(operations)).delay(5000).do(console.log('-------- SALIO APPLY --------')))
-        //.do(res => console.log('AppliAll ================> ', JSON.stringify(res)))
+        .concatMap(operations => Rx.Observable.of({}).concat(mongo.applyAll$(operations)).delay(5000))
         .toArray()
         .mergeMap(() =>
           Rx.Observable.defer(() =>

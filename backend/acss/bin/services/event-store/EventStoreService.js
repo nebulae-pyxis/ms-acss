@@ -175,7 +175,9 @@ class EventStoreService {
 }
 
 
-
+/**
+ * @returns {EventStoreService}
+ */
 module.exports = () => {
   if (!instance) {
     instance = new EventStoreService();

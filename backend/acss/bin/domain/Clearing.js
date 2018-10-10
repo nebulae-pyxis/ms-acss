@@ -155,7 +155,6 @@ class Clearing {
    * @param args.filterType Transactions type (AFCC_RELOAD, ...)
    */
   getTransactionsByAccumulatedTransactionId$({ args }, authToken) {
-    console.log('getTransactionsByAccumulatedTransactionId args => ', args);
     return RoleValidator.checkPermissions$(
       authToken.realm_access.roles,
       "ACSS",

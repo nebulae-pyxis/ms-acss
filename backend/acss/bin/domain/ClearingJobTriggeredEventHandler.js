@@ -22,7 +22,6 @@ class ClearingJobTriggeredEventHandler {
      * @param {ClearingJobTriggeredEvent} clearingJobTriggeredEvent 
      */
     handleClearingJobTriggeredEvent$(clearingJobTriggeredEvent) {
-        console.log('handleClearingJobTriggeredEvent => ', clearingJobTriggeredEvent);
         const cursorLimitTimestamp = Date.now() - 5000;
         return TransactionsCursorDA.getCursor$()
             .mergeMap(cursor =>

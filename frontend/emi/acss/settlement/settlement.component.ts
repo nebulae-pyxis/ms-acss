@@ -227,9 +227,6 @@ export class SettlementComponent implements OnInit, OnDestroy {
           error => {
             console.log('Error cambiando estado de compensación ==> ', error);
           });
-
-
-
   }
 
 

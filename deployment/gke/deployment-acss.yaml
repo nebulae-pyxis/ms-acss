@@ -13,7 +13,7 @@ spec:
         app: acss
     spec:      
       containers:
-      - image: nebulaepyxis/acss.backend.acss:0.0.9
+      - image: nebulaepyxis/acss.backend.acss:0.0.10
         name: acss
         volumeMounts:
         - name: google-application-credentials
@@ -53,7 +53,7 @@ spec:
           value: PUBSUB
         # RESET LOCK INITIALIZE BACKED
         - name: LOCKVERSION
-          value: "initial_lock"
+          value: "0.0.0"
         resources:
           requests:
             cpu: "50m"

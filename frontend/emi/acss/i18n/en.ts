@@ -36,8 +36,8 @@ export const locale = {
       VERS_CHANNEL_BACKEND: 'Version backend',
       EVT: 'Event',
       EVT_ID: 'ID',
-      EVT_TYPE: 'tipo',
-      USER: 'Usuario',
+      EVT_TYPE: 'type',
+      USER: 'User',
       TX_TYPE: 'Transaction types',
       ACSS_ERRORS: 'Errors',
       ACCUMULATED_TRANSACTIONS_ERRORS: 'Accumulated transactions',
@@ -61,7 +61,7 @@ export const locale = {
       17012: 'invalid username, the username must contain at least 8 characters and be composed of at least one (1) number and one (1) lowercase letter.',
       17014: 'The email is already used',
       17015: 'Permission denied, it is not possible to update your own users information',
-      17016: 'Usuario no encontrado'
+      17016: 'User not found'
     }
   }
 };

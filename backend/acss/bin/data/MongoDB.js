@@ -19,7 +19,6 @@ class MongoDB {
    * @returns {Rx.Observable} Obserable that resolve to the DB client
    */
   start$() {
-    console.log("MongoDB.start$()... ");
     return Rx.Observable.bindNodeCallback(MongoClient.connect)(this.url).map(
       client => {
         console.log(this.url);
@@ -50,7 +49,9 @@ class MongoDB {
   createIndexes$() {
     return Rx.Observable.create(async observer => {
       //observer.next('Creating index for DB_NAME.COLLECTION_NAME => ({ xxxx: 1 })  ');
-      //await this.db.collection('COLLECTION_NAME').createIndex( { xxxx: 1});
+      await this.db.collection('Clearing').createIndex( { businessId: 1});
+
+      // await this.db.collection('Clearing').createIndex( { businessId: 1});
 
       observer.next("All indexes created");
       observer.complete();

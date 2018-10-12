@@ -59,7 +59,7 @@
             {{selectedBusiness.name}}
           </div>
 
-          <div class="subtitle secondary-text">
+          <div class="subtitle secondary-text" *ngIf="myBusiness">
             <span>{{'ACSS.CLEARING_LIST' | translate}} {{myBusiness.name}}({{myBusiness._id}})</span>
           </div>
         </div>

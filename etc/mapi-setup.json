@@ -1,8 +1,8 @@
 [
     {
         "name": "acss",
-        "type": "graphql",        
-        "src": "apigatewayraphql/acss",
+        "type": "graphql",
+        "src": "api/gateway/graphql/acss", 
         "preBuildCommands": []
     }
 ]

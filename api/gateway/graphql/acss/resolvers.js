@@ -521,7 +521,7 @@ eventDescriptors.forEach(descriptor => {
 
             () =>
                 console.log(
-                    `${descriptor.gqlSubscriptionName} listener STOPED`
+                    `${descriptor.gqlSubscriptionName} listener STOPPED`
                 )
         );
 });

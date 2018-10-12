@@ -27,7 +27,7 @@ class TransactionAccumulatedEventConsumer {
         .toArray()
         //at the end these operations will be executed in only one transaction.
         .mergeMap(mongoOperations => ClearingDA.executeOperations$(mongoOperations))
-        .map(val => `Clearings updated; ok:${val}`)
+        .map(val => `Clearings updated ; ok:${val}`)
         .catch(error => {
           console.log(`An error was generated while a clearing was being updated: ${error.stack}`);
           return this.errorHandler$(error.stack, transactionAccumulatedEvent);

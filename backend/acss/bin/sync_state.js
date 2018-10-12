@@ -5,6 +5,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 const mongoDB = require('./data/MongoDB').singleton();
+const BusinessDA = require('./data/BusinessDA');
 const eventSourcing = require('./tools/EventSourcing')();
 const eventStoreService = require('./services/event-store/EventStoreService')();
 const Rx = require('rxjs');
@@ -13,6 +14,7 @@ const start = () => {
     Rx.Observable.concat(
         // initializing needed resources
         mongoDB.start$(),
+        BusinessDA.start$(),
         eventSourcing.eventStore.start$(),
         
         // // executing maintenance tasks

@@ -13,7 +13,7 @@ spec:
         app: acss
     spec:      
       containers:
-      - image: nebulaepyxis/acss.backend.acss:0.0.11
+      - image: nebulaepyxis/acss.backend.acss:0.0.12
         name: acss
         volumeMounts:
         - name: google-application-credentials

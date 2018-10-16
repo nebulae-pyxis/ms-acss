@@ -34,7 +34,7 @@ const start = () => {
         settlement.eventSourcing.start$(),
     ).subscribe(
         (evt) => {
-            console.log(evt)
+            // console.log(evt)
         },
         (error) => {
             console.error('Failed to start', error);

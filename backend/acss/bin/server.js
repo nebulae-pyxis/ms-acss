@@ -14,7 +14,7 @@ const TransactionsCursorDA = require('./data/TransactionsCursorDA');
 const TransactionsDA = require('./data/TransactionsDA');
 const LogErrorDA = require('./data/LogErrorDA');
 const AccumulatedTransactionDA = require('./data/AccumulatedTransactionDA');
-const graphQlService = require('./services/gateway/GraphQlService')();
+const graphQlService = require('./services/emi-gateway/GraphQlService')();
 const settlement = require("./domain/settlement/");
 const Rx = require('rxjs');
 

@@ -21,7 +21,7 @@ const environment = {
   NODE_ENV: "production",
   BROKER_TYPE: "MQTT",
   REPLY_TIMEOUT: 2000,
-  GATEWAY_REPLIES_TOPIC_SUBSCRIPTION: "gateway-replies-topic-mbe-acss",
+  GATEWAY_REPLIES_TOPIC_SUBSCRIPTION: "emi-gateway-replies-topic-mbe-acss",
   MQTT_SERVER_URL: "mqtt://192.168.188.147:1883",
   MONGODB_URL: "mongodb://192.168.188.147:27017,192.168.188.147:27018,192.168.188.147:27019?replicaSet=rs0",
   MONGODB_DB_NAME: dbName ,
@@ -63,7 +63,7 @@ describe("E2E - Simple transaction", function() {
       });
       
       mongoDB = require('../bin/data/MongoDB').singleton();
-      // const graphQlService = require('../bin//services/gateway/GraphQlService')();
+      // const graphQlService = require('../bin//services/emi-gateway/GraphQlService')();
 
       Rx.Observable.concat(
         mongoDB.start$(),

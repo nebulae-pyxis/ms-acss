@@ -2,7 +2,7 @@
     {
         "name": "acss",
         "type": "graphql",
-        "src": "api/gateway/graphql/acss", 
+        "src": "api/emi-gateway/graphql/acss", 
         "preBuildCommands": []
     }
 ]

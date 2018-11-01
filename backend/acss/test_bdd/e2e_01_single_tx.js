@@ -20,7 +20,7 @@ const environment = {
   NODE_ENV: "production",
   BROKER_TYPE: "MQTT",
   REPLY_TIMEOUT: 2000,
-  GATEWAY_REPLIES_TOPIC_SUBSCRIPTION: "gateway-replies-topic-mbe-acss",
+  GATEWAY_REPLIES_TOPIC_SUBSCRIPTION: "emi-gateway-replies-topic-mbe-acss",
   MQTT_SERVER_URL: "mqtt://localhost:1883",
   MONGODB_URL: "mongodb://localhost:27017,localhost:27018,localhost:27019?replicaSet=rs0",
   MONGODB_DB_NAME: dbName ,
@@ -73,7 +73,7 @@ describe("E2E - Simple transaction", function() {
       const TransactionsDA = require('../bin//data/TransactionsDA');
       const LogErrorDA = require('../bin//data/LogErrorDA');
       const AccumulatedTransactionDA = require('../bin//data/AccumulatedTransactionDA');
-      // const graphQlService = require('../bin//services/gateway/GraphQlService')();
+      // const graphQlService = require('../bin//services/emi-gateway/GraphQlService')();
 
       Rx.Observable.concat(
         eventSourcing.eventStore.start$(),
@@ -112,7 +112,7 @@ describe("E2E - Simple transaction", function() {
         const AfccReloadsDA = require('../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload/bin/data/AfccReloadsDA');
         const TransactionsDA = require('../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload/bin/data/TransactionsDA');
         const TransactionsErrorsDA = require('../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload/bin/data/TransactionsErrorsDA');
-        // const graphQlService = require('./services/gateway/GraphQlService')();
+        // const graphQlService = require('./services/emi-gateway/GraphQlService')();
         const Rx = require('rxjs');
 
         Rx.Observable.concat(

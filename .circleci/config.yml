@@ -89,9 +89,9 @@ jobs:
             gitChanged api || export PATH=~/.npm-global/bin:$PATH
             gitChanged api || source ~/.profile
             gitChanged api || npm install -g @nebulae/cli
-            gitChanged api || nebulae register microapi --microservice-id=acss --api-id=gateway --setup-file=/home/circleci/nebulae/repo/etc/mapi-setup.json --store-type=GCP_DATASTORE --gcp-service-account-token=/tmp/gcloud-service-key.json            
-            gitChanged api || nebulae compose-api production --api-type=NEBULAE_GATEWAY --api-repo=https://github.com/nebulae-pyxis/gateway.git --api-id=gateway --output-dir=/home/circleci/nebulae/api/gateway/ --store-type=GCP_DATASTORE --gcp-service-account-token=/tmp/gcloud-service-key.json      
-            gitChanged api || ls /home/circleci/nebulae/api/gateway/
+            gitChanged api || nebulae register microapi --microservice-id=acss --api-id=emi-gateway --setup-file=/home/circleci/nebulae/repo/etc/mapi-setup.json --store-type=GCP_DATASTORE --gcp-service-account-token=/tmp/gcloud-service-key.json            
+            gitChanged api || nebulae compose-api production --api-type=NEBULAE_GATEWAY --api-repo=https://github.com/nebulae-pyxis/emi-gateway.git --api-id=emi-gateway --output-dir=/home/circleci/nebulae/api/emi-gateway/ --store-type=GCP_DATASTORE --gcp-service-account-token=/tmp/gcloud-service-key.json      
+            gitChanged api || ls /home/circleci/nebulae/api/emi-gateway/
       - setup_remote_docker
       - run:
           name: Build docker image and push it to hub
@@ -99,9 +99,9 @@ jobs:
             source ~/nebulae/repo/.circleci/scripts/gitChanged.sh
             cd ~/nebulae/repo/
             mkdir -p ~/nebulae/api
-            gitChanged api || ( cd  ~/nebulae/api/ && git clone --depth=1 https://github.com/nebulae-pyxis/gateway  ~/nebulae/api/shell )      
+            gitChanged api || ( cd  ~/nebulae/api/ && git clone --depth=1 https://github.com/nebulae-pyxis/emi-gateway  ~/nebulae/api/shell )      
             gitChanged api || ls ~/nebulae/api/shell
-            gitChanged api || export DOCKERHUB_IMAGE=gateway
+            gitChanged api || export DOCKERHUB_IMAGE=emigateway
             gitChanged api || export API_SHELL_PATH=/home/circleci/nebulae/api/
             gitChanged api || ( cd ~/nebulae/api/shell && sh ~/nebulae/api/shell/deployment/docker/build-docker-hub.sh  && cd ~/nebulae/repo/ )
             gitChanged api || echo $DOCKERHUB_NAMESPACE/$DOCKERHUB_IMAGE@$(docker pull $DOCKERHUB_NAMESPACE/$DOCKERHUB_IMAGE:latest | grep sha256 | cut -c 9-) > ~/nebulae/api/DOCKERHUB_GENERATED_IMAGE_DIGEST
@@ -187,10 +187,10 @@ jobs:
               (ls ~/nebulae/frontend/DOCKERHUB_GENERATED_IMAGE_DIGEST && echo docker image DIGEST to set $(< ~/nebulae/frontend/DOCKERHUB_GENERATED_IMAGE_DIGEST) ) || echo frontend not found
               (ls ~/nebulae/frontend/DOCKERHUB_GENERATED_IMAGE_DIGEST && kubectl set image deployment/frontend-emi frontend-emi=$(< ~/nebulae/frontend/DOCKERHUB_GENERATED_IMAGE_DIGEST) ) || echo frontend not found
         - run:
-            name: Deploy gateway API
+            name: Deploy emi-gateway API
             command: |
               (ls ~/nebulae/api/DOCKERHUB_GENERATED_IMAGE_DIGEST && echo docker image DIGEST to set $(< ~/nebulae/api/DOCKERHUB_GENERATED_IMAGE_DIGEST) ) || echo api not found
-              (ls ~/nebulae/api/DOCKERHUB_GENERATED_IMAGE_DIGEST && kubectl set image deployment/api-gateway api-gateway=$(< ~/nebulae/api/DOCKERHUB_GENERATED_IMAGE_DIGEST) ) || echo api not found
+              (ls ~/nebulae/api/DOCKERHUB_GENERATED_IMAGE_DIGEST && kubectl set image deployment/api-emi-gateway api-emi-gateway=$(< ~/nebulae/api/DOCKERHUB_GENERATED_IMAGE_DIGEST) ) || echo api not found
         - run:
             name: Deploy ACSS replicaset persistence 
             command: |

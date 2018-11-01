@@ -24,19 +24,19 @@ class GraphQlService {
    */
   start$() {
 
-      //default on error handler
-      const onErrorHandler = error => {
-        console.error("Error handling  GraphQl incoming event", error);
-        process.exit(1);
-      };
-  
-      //default onComplete handler
-      const onCompleteHandler = () => {
-        () => console.log("GraphQlService incoming event subscription completed");
-      };
+    //default on error handler
+    const onErrorHandler = error => {
+      console.error("Error handling  GraphQl incoming event", error);
+      process.exit(1);
+    };
+
+    //default onComplete handler
+    const onCompleteHandler = () => {
+      () => console.log("GraphQlService incoming event subscription completed");
+    };
     return Rx.Observable.from(this.getSubscriptionDescriptors())
-    .map(aggregateEvent => {return { ...aggregateEvent, onErrorHandler, onCompleteHandler }})
-    .map(params => this.subscribeEventHandler(params));
+      .map(aggregateEvent => { return { ...aggregateEvent, onErrorHandler, onCompleteHandler } })
+      .map(params => this.subscribeEventHandler(params));
   }
 
   /**
@@ -52,42 +52,18 @@ class GraphQlService {
     const handler = this.functionMap[messageType];
     const subscription = broker
       .getMessageListener$([aggregateType], [messageType])
-      //decode and verify the jwt token
-      .mergeMap(message => {        
-        return Rx.Observable.of(
-          {
-            authToken: jsonwebtoken.verify(message.data.jwt, jwtPublicKey),
-            message
-          }
-        )
-        .catch(err => {
-          return Rx.Observable.of(
-            {
-              response,
-              correlationId: message.id,
-              replyTo: message.attributes.replyTo 
-            }
+      .mergeMap(message => this.verifyRequest$(message))
+      .mergeMap(request => (request.failedValidations.length > 0)
+        ? Rx.Observable.of(request.errorResponse)
+        : Rx.Observable.of(request)
+          //ROUTE MESSAGE TO RESOLVER
+          .mergeMap(({ authToken, message }) =>
+            handler.fn
+              .call(handler.obj, message.data, authToken)
+              .map(response => ({ response, correlationId: message.id, replyTo: message.attributes.replyTo }))
           )
-          .mergeMap(msg => this.sendResponseBack$(msg))
-        })
-      })
-      //ROUTE MESSAGE TO RESOLVER
-      .mergeMap(({ authToken, message }) =>
-        handler.fn
-          .call(handler.obj, message.data, authToken)
-          .map(response => {
-            return {
-              response,
-              correlationId: message.id,
-              replyTo: message.attributes.replyTo
-            };
-          })
       )
-      //send response back if neccesary
       .mergeMap(msg => this.sendResponseBack$(msg))
-      .catch(error => {
-        return Rx.Observable.of(null) // CUSTOM ERROR MISSING HERE 
-      })
       .subscribe(
         msg => {
           // console.log(`GraphQlService: ${messageType} process: ${msg}`);
@@ -108,21 +84,56 @@ class GraphQlService {
     };
   }
 
-  // send response back if neccesary
+  /**
+   * Verify the message if the request is valid.
+   * @param {any} request request message
+   * @returns { Rx.Observable< []{request: any, failedValidations: [] }>}  Observable object that containg the original request and the failed validations
+   */
+  verifyRequest$(request) {
+    return Rx.Observable.of(request)
+      //decode and verify the jwt token
+      .mergeMap(message =>
+        Rx.Observable.of(message)
+          .map(message => ({ authToken: jsonwebtoken.verify(message.data.jwt, jwtPublicKey), message, failedValidations: [] }))
+          .catch(err =>
+            this.handleError$(err)
+              .map(response => ({
+                errorResponse: { response, correlationId: message.id, replyTo: message.attributes.replyTo },
+                failedValidations: ['JWT']
+              }
+              ))
+          )
+      )
+  }
+
+  handleError$(err) {
+    return Rx.Observable.of(err).map(err => {
+      const exception = { data: null, result: {}};
+      const isCustomError = err instanceof CustomError;
+      if (!isCustomError) {
+        err = new DefaultError(err);
+      }
+      exception.result = {
+        code: err.code,
+        error: { ...err.getContent() }
+      };
+      return exception;
+    });
+  }
+
+  /**
+   * 
+   * @param {any} msg Object with data necessary  to send response
+   */
   sendResponseBack$(msg) {
-    return Rx.Observable.of(msg)
-      .mergeMap(({ response, correlationId, replyTo }) => {
-        if (replyTo) {
-          return broker.send$(
-            replyTo,
-            "gateway.graphql.Query.response",
-            response,
-            { correlationId }
-          );
-        } else {
-          return Rx.Observable.of(undefined);
-        }
-      })
+    return Rx.Observable.of(msg).mergeMap(
+      ({ response, correlationId, replyTo }) =>
+        replyTo
+          ? broker.send$(replyTo, "emigateway.graphql.Query.response", response, {
+            correlationId
+          })
+          : Rx.Observable.of(undefined)
+    );
   }
 
   stop$() {
@@ -145,83 +156,83 @@ class GraphQlService {
     return [
       {
         aggregateType: "Business",
-        messageType: "gateway.graphql.query.getACSSBusiness"
+        messageType: "emigateway.graphql.query.getACSSBusiness"
       },
       {
         aggregateType: "Business",
-        messageType: "gateway.graphql.query.getACSSBusinesses"
+        messageType: "emigateway.graphql.query.getACSSBusinesses"
       },
       {
         aggregateType: "Business",
-        messageType: "gateway.graphql.query.getBusinessById"
+        messageType: "emigateway.graphql.query.getBusinessById"
       },
       {
         aggregateType: "Clearing",
-        messageType: "gateway.graphql.query.getAllClearingsFromBusiness"
+        messageType: "emigateway.graphql.query.getAllClearingsFromBusiness"
       },
       {
         aggregateType: "Clearing",
-        messageType: "gateway.graphql.query.getClearingById"
+        messageType: "emigateway.graphql.query.getClearingById"
       },
       {
         aggregateType: "Clearing",
-        messageType: "gateway.graphql.query.getAccumulatedTransactionsByIds"
-      },      
-      {
-        aggregateType: "Clearing",
-        messageType: "gateway.graphql.query.getAccumulatedTransactionsByClearingId"
+        messageType: "emigateway.graphql.query.getAccumulatedTransactionsByIds"
       },
       {
         aggregateType: "Clearing",
-        messageType: "gateway.graphql.query.getTransactionsByIds"
+        messageType: "emigateway.graphql.query.getAccumulatedTransactionsByClearingId"
       },
       {
         aggregateType: "Clearing",
-        messageType: "gateway.graphql.query.getTransactionsByAccumulatedTransactionId"
+        messageType: "emigateway.graphql.query.getTransactionsByIds"
+      },
+      {
+        aggregateType: "Clearing",
+        messageType: "emigateway.graphql.query.getTransactionsByAccumulatedTransactionId"
       },
       {
         aggregateType: "Settlement",
-        messageType: "gateway.graphql.query.getSettlementsByClearingId"
+        messageType: "emigateway.graphql.query.getSettlementsByClearingId"
       },
       {
         aggregateType: "Settlement",
-        messageType: "gateway.graphql.query.getSettlementsCountByClearingId"
+        messageType: "emigateway.graphql.query.getSettlementsCountByClearingId"
       },
       {
         aggregateType: "Settlement",
-        messageType: "gateway.graphql.query.getSettlementsByBusinessId"
+        messageType: "emigateway.graphql.query.getSettlementsByBusinessId"
       },
       {
         aggregateType: "Settlement",
-        messageType: "gateway.graphql.query.getSettlementsCountByBusinessId"
+        messageType: "emigateway.graphql.query.getSettlementsCountByBusinessId"
       },
       {
         aggregateType: "LogError",
-        messageType: "gateway.graphql.query.getAccumulatedTransactionErrors"
+        messageType: "emigateway.graphql.query.getAccumulatedTransactionErrors"
       },
       {
         aggregateType: "LogError",
-        messageType: "gateway.graphql.query.getAccumulatedTransactionErrorsCount"
+        messageType: "emigateway.graphql.query.getAccumulatedTransactionErrorsCount"
       },
       {
         aggregateType: "LogError",
-        messageType: "gateway.graphql.query.getClearingErrors"
+        messageType: "emigateway.graphql.query.getClearingErrors"
       },
       {
         aggregateType: "LogError",
-        messageType: "gateway.graphql.query.getClearingErrorsCount"
+        messageType: "emigateway.graphql.query.getClearingErrorsCount"
       },
       {
         aggregateType: "LogError",
-        messageType: "gateway.graphql.query.getSettlementErrors"
+        messageType: "emigateway.graphql.query.getSettlementErrors"
       },
       {
         aggregateType: "LogError",
-        messageType: "gateway.graphql.query.getSettlementErrorsCount"
+        messageType: "emigateway.graphql.query.getSettlementErrorsCount"
       },
       {
         aggregateType: "Settlement",
-        messageType: "gateway.graphql.mutation.changeSettlementState"
+        messageType: "emigateway.graphql.mutation.changeSettlementState"
       }
     ];
   }
@@ -229,85 +240,85 @@ class GraphQlService {
   /**
    * returns a map that assocs GraphQL request with its processor
    */
-  generateFunctionMap() {    
+  generateFunctionMap() {
     return {
-      'gateway.graphql.query.getACSSBusiness': {
+      'emigateway.graphql.query.getACSSBusiness': {
         fn: business.getACSSBusiness$,
         obj: business
       },
-      'gateway.graphql.query.getACSSBusinesses': {
+      'emigateway.graphql.query.getACSSBusinesses': {
         fn: business.getACSSBusinesses$,
         obj: business
       }, 
-      'gateway.graphql.query.getBusinessById': {
+      'emigateway.graphql.query.getBusinessById': {
         fn: business.getBusinessById$,
         obj: business
       }, 
-      'gateway.graphql.query.getAllClearingsFromBusiness': {
+      'emigateway.graphql.query.getAllClearingsFromBusiness': {
         fn: clearing.getClearingsFromBusiness$,
         obj: clearing
       },    
-      'gateway.graphql.query.getClearingById': {
+      'emigateway.graphql.query.getClearingById': {
         fn: clearing.getClearingById$,
         obj: clearing
       },
-      'gateway.graphql.query.getAccumulatedTransactionsByIds': {
+      'emigateway.graphql.query.getAccumulatedTransactionsByIds': {
         fn: clearing.getAccumulatedTransactionsByIds$,
         obj: clearing
       },
-      'gateway.graphql.query.getAccumulatedTransactionsByClearingId': {
+      'emigateway.graphql.query.getAccumulatedTransactionsByClearingId': {
         fn: clearing.getAccumulatedTransactionsByClearingId$,
         obj: clearing
       },
-      'gateway.graphql.query.getTransactionsByIds': {
+      'emigateway.graphql.query.getTransactionsByIds': {
         fn: clearing.getTransactionsByIds$,
         obj: clearing
       },
-      'gateway.graphql.query.getTransactionsByAccumulatedTransactionId': {
+      'emigateway.graphql.query.getTransactionsByAccumulatedTransactionId': {
         fn: clearing.getTransactionsByAccumulatedTransactionId$,
         obj: clearing
       },
-      'gateway.graphql.query.getSettlementsByClearingId': {
+      'emigateway.graphql.query.getSettlementsByClearingId': {
         fn: settlement.cqrs.getSettlementsByClearingId$,
         obj: settlement.cqrs
       },
-      'gateway.graphql.query.getSettlementsCountByClearingId': {
+      'emigateway.graphql.query.getSettlementsCountByClearingId': {
         fn: settlement.cqrs.getSettlementsCountByClearingId$,
         obj: settlement.cqrs
       },
-      'gateway.graphql.query.getSettlementsByBusinessId': {
+      'emigateway.graphql.query.getSettlementsByBusinessId': {
         fn: settlement.cqrs.getSettlementsByBusinessId$,
         obj: settlement.cqrs
       },
-      'gateway.graphql.query.getSettlementsCountByBusinessId': {
+      'emigateway.graphql.query.getSettlementsCountByBusinessId': {
         fn: settlement.cqrs.getSettlementsCountByClearingId$,
         obj: settlement.cqrs
       },
-      'gateway.graphql.query.getAccumulatedTransactionErrors': {
+      'emigateway.graphql.query.getAccumulatedTransactionErrors': {
         fn: logError.cqrs.getAccumulatedTransactionErrors$,
         obj: logError.cqrs
       },
-      'gateway.graphql.query.getAccumulatedTransactionErrorsCount': {
+      'emigateway.graphql.query.getAccumulatedTransactionErrorsCount': {
         fn: logError.cqrs.getAccumulatedTransactionErrorsCount$,
         obj: logError.cqrs
       },
-      'gateway.graphql.query.getClearingErrors': {
+      'emigateway.graphql.query.getClearingErrors': {
         fn: logError.cqrs.getClearingErrors$,
         obj: logError.cqrs
       },
-      'gateway.graphql.query.getClearingErrorsCount': {
+      'emigateway.graphql.query.getClearingErrorsCount': {
         fn: logError.cqrs.getClearingErrorsCount$,
         obj: logError.cqrs
       },
-      'gateway.graphql.query.getSettlementErrors': {
+      'emigateway.graphql.query.getSettlementErrors': {
         fn: logError.cqrs.getSettlementErrors$,
         obj: logError.cqrs
       },
-      'gateway.graphql.query.getSettlementErrorsCount': {
+      'emigateway.graphql.query.getSettlementErrorsCount': {
         fn: logError.cqrs.getSettlementErrorsCount$,
         obj: logError.cqrs
       },
-      'gateway.graphql.mutation.changeSettlementState': {
+      'emigateway.graphql.mutation.changeSettlementState': {
         fn: settlement.cqrs.changeSettlementState$,
         obj: settlement.cqrs
       },

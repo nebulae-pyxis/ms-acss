@@ -64,7 +64,7 @@ module.exports = {
               .mergeMap(response => {
                 return broker.forwardAndGetReply$(
                   "Business",
-                  "gateway.graphql.query.getACSSBusiness",
+                  "emigateway.graphql.query.getACSSBusiness",
                   { root, args, jwt: context.encodedToken },
                   2000
                 );
@@ -85,7 +85,7 @@ module.exports = {
               .mergeMap(response => {
                 return broker.forwardAndGetReply$(
                   "Business",
-                  "gateway.graphql.query.getACSSBusinesses",
+                  "emigateway.graphql.query.getACSSBusinesses",
                   { root, args, jwt: context.encodedToken },
                   2000
                 );
@@ -106,7 +106,7 @@ module.exports = {
             .mergeMap(response => {
               return broker.forwardAndGetReply$(
                 "Business",
-                "gateway.graphql.query.getBusinessById",
+                "emigateway.graphql.query.getBusinessById",
                 { root, args, jwt: context.encodedToken },
                 2000
               );
@@ -126,7 +126,7 @@ module.exports = {
             ).mergeMap(response => {
                 return broker.forwardAndGetReply$(
                   "Clearing",
-                  "gateway.graphql.query.getAllClearingsFromBusiness",
+                  "emigateway.graphql.query.getAllClearingsFromBusiness",
                   { root, args, jwt: context.encodedToken },
                   2000
                 );
@@ -146,7 +146,7 @@ module.exports = {
             ).mergeMap(response => {
                 return broker.forwardAndGetReply$(
                   "Clearing",
-                  "gateway.graphql.query.getClearingById",
+                  "emigateway.graphql.query.getClearingById",
                   { root, args, jwt: context.encodedToken },
                   2000
                 );
@@ -166,7 +166,7 @@ module.exports = {
             ).mergeMap(response => {
                 return broker.forwardAndGetReply$(
                   "Clearing",
-                  "gateway.graphql.query.getAccumulatedTransactionsByIds",
+                  "emigateway.graphql.query.getAccumulatedTransactionsByIds",
                   { root, args, jwt: context.encodedToken },
                   2000
                 );
@@ -186,7 +186,7 @@ module.exports = {
           ).mergeMap(response => {
               return broker.forwardAndGetReply$(
                 "Clearing",
-                "gateway.graphql.query.getAccumulatedTransactionsByClearingId",
+                "emigateway.graphql.query.getAccumulatedTransactionsByClearingId",
                 { root, args, jwt: context.encodedToken },
                 2000
               );
@@ -206,7 +206,7 @@ module.exports = {
             ).mergeMap(response => {
                 return broker.forwardAndGetReply$(
                   "Clearing",
-                  "gateway.graphql.query.getTransactionsByIds",
+                  "emigateway.graphql.query.getTransactionsByIds",
                   { root, args, jwt: context.encodedToken },
                   2000
                 );
@@ -226,7 +226,7 @@ module.exports = {
           ).mergeMap(response => {
               return broker.forwardAndGetReply$(
                 "Clearing",
-                "gateway.graphql.query.getTransactionsByAccumulatedTransactionId",
+                "emigateway.graphql.query.getTransactionsByAccumulatedTransactionId",
                 { root, args, jwt: context.encodedToken },
                 2000
               );
@@ -246,7 +246,7 @@ module.exports = {
             ).mergeMap(response => {
                 return broker.forwardAndGetReply$(
                   "Settlement",
-                  "gateway.graphql.query.getSettlementsByClearingId",
+                  "emigateway.graphql.query.getSettlementsByClearingId",
                   { root, args, jwt: context.encodedToken },
                   2000
                 );
@@ -266,7 +266,7 @@ module.exports = {
             ).mergeMap(response => {
                 return broker.forwardAndGetReply$(
                   "Settlement",
-                  "gateway.graphql.query.getSettlementsCountByClearingId",
+                  "emigateway.graphql.query.getSettlementsCountByClearingId",
                   { root, args, jwt: context.encodedToken },
                   2000
                 );
@@ -286,7 +286,7 @@ module.exports = {
             ).mergeMap(response => {
                 return broker.forwardAndGetReply$(
                   "Settlement",
-                  "gateway.graphql.query.getSettlementsByBusinessId",
+                  "emigateway.graphql.query.getSettlementsByBusinessId",
                   { root, args, jwt: context.encodedToken },
                   2000
                 );
@@ -306,7 +306,7 @@ module.exports = {
             ).mergeMap(response => {
                 return broker.forwardAndGetReply$(
                   "Settlement",
-                  "gateway.graphql.query.getSettlementsCountByBusinessId",
+                  "emigateway.graphql.query.getSettlementsCountByBusinessId",
                   { root, args, jwt: context.encodedToken },
                   2000
                 );
@@ -326,7 +326,7 @@ module.exports = {
           ).mergeMap(response => {
               return broker.forwardAndGetReply$(
                 "LogError",
-                "gateway.graphql.query.getAccumulatedTransactionErrors",
+                "emigateway.graphql.query.getAccumulatedTransactionErrors",
                 { root, args, jwt: context.encodedToken },
                 2000
               );
@@ -346,7 +346,7 @@ module.exports = {
         ).mergeMap(response => {
             return broker.forwardAndGetReply$(
               "LogError",
-              "gateway.graphql.query.getAccumulatedTransactionErrorsCount",
+              "emigateway.graphql.query.getAccumulatedTransactionErrorsCount",
               { root, args, jwt: context.encodedToken },
               2000
             );
@@ -366,7 +366,7 @@ module.exports = {
             ).mergeMap(response => {
                 return broker.forwardAndGetReply$(
                   "LogError",
-                  "gateway.graphql.query.getClearingErrors",
+                  "emigateway.graphql.query.getClearingErrors",
                   { root, args, jwt: context.encodedToken },
                   2000
                 );
@@ -386,7 +386,7 @@ module.exports = {
           ).mergeMap(response => {
               return broker.forwardAndGetReply$(
                 "LogError",
-                "gateway.graphql.query.getClearingErrorsCount",
+                "emigateway.graphql.query.getClearingErrorsCount",
                 { root, args, jwt: context.encodedToken },
                 2000
               );
@@ -406,7 +406,7 @@ module.exports = {
         ).mergeMap(response => {
             return broker.forwardAndGetReply$(
               "LogError",
-              "gateway.graphql.query.getSettlementErrors",
+              "emigateway.graphql.query.getSettlementErrors",
               { root, args, jwt: context.encodedToken },
               2000
             );
@@ -426,7 +426,7 @@ module.exports = {
         ).mergeMap(response => {
             return broker.forwardAndGetReply$(
               "LogError",
-              "gateway.graphql.query.getSettlementErrorsCount",
+              "emigateway.graphql.query.getSettlementErrorsCount",
               { root, args, jwt: context.encodedToken },
               2000
             );
@@ -451,7 +451,7 @@ module.exports = {
           .mergeMap(roles => {
             return context.broker.forwardAndGetReply$(
               "Settlement",
-              "gateway.graphql.mutation.changeSettlementState",
+              "emigateway.graphql.mutation.changeSettlementState",
               { root, args, jwt: context.encodedToken },
               2000
             );

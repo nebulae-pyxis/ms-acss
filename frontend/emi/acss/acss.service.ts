@@ -27,7 +27,6 @@ export class ACSSService {
   private selectedBusinessSubject = new BehaviorSubject(null);
 
   constructor(private gateway: GatewayService) {
-
   }
 
   /**

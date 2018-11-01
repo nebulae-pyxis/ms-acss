@@ -13,12 +13,15 @@ spec:
         app: acss
     spec:      
       containers:
-      - image: nebulaepyxis/acss.backend.acss:0.0.12
+      - image: nebulaepyxis/acss.backend.acss:0.0.13
         name: acss
         volumeMounts:
         - name: google-application-credentials
           mountPath: "/etc/GOOGLE_APPLICATION_CREDENTIALS"
           readOnly: true
+        resources:
+          requests:
+            cpu: "50m"
         env:     
         # EVENT STORE CONFIG 
         - name: GOOGLE_APPLICATION_CREDENTIALS
@@ -37,7 +40,7 @@ spec:
           value: EventStore
         # INTERNAL MONGO DB CONFIG
         - name: MONGODB_URL
-          value: mongodb://acss-mongo:27017
+          #value: mongodb://acss-mongo:27017
           value: mongodb://dbacss-0.dbacss:27017,dbacss-1.dbacss:27017,dbacss-2.dbacss:27017?replicaSet=rs0
         - name: MONGODB_DB_NAME
           value: acss
@@ -53,10 +56,7 @@ spec:
           value: PUBSUB
         # RESET LOCK INITIALIZE BACKED
         - name: LOCKVERSION
-          value: "0.0.1"
-        resources:
-          requests:
-            cpu: "50m"
+          value: "0.0.1"        
         
       volumes:
       - name: google-application-credentials

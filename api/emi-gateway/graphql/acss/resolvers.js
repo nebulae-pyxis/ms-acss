@@ -520,9 +520,7 @@ eventDescriptors.forEach(descriptor => {
             },
 
             () =>
-                console.log(
-                    `${descriptor.gqlSubscriptionName} listener STOPPED.`
-                )
+                console.log(`${descriptor.gqlSubscriptionName} listener STOPPED.`)
         );
 });
 

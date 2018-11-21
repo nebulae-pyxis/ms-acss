@@ -99,53 +99,53 @@ describe("E2E - Simple transaction", function() {
         () => { console.log('acss started'); return done(); }
       );
 
-    }),
+    });
 
-      it("start acss-channel server", function (done) {
-        this.timeout(3000);
+    it("start acss-channel server", function (done) {
+      this.timeout(3000);
 
 
-        const eventSourcing = require('../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload/bin/tools/EventSourcing')();
-        const eventStoreService = require('../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload/bin/services/event-store/EventStoreService')();
-        const mongoDB = require('../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload//bin/data/MongoDB').singleton();
-        const AfccReloadChannelDA = require('../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload/bin/data/AfccReloadChannelDA');
-        const AfccReloadsDA = require('../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload/bin/data/AfccReloadsDA');
-        const TransactionsDA = require('../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload/bin/data/TransactionsDA');
-        const TransactionsErrorsDA = require('../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload/bin/data/TransactionsErrorsDA');
-        // const graphQlService = require('./services/emi-gateway/GraphQlService')();
-        const Rx = require('rxjs');
+      const eventSourcing = require('../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload/bin/tools/EventSourcing')();
+      const eventStoreService = require('../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload/bin/services/event-store/EventStoreService')();
+      const mongoDB = require('../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload//bin/data/MongoDB').singleton();
+      const AfccReloadChannelDA = require('../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload/bin/data/AfccReloadChannelDA');
+      const AfccReloadsDA = require('../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload/bin/data/AfccReloadsDA');
+      const TransactionsDA = require('../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload/bin/data/TransactionsDA');
+      const TransactionsErrorsDA = require('../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload/bin/data/TransactionsErrorsDA');
+      // const graphQlService = require('./services/emi-gateway/GraphQlService')();
+      const Rx = require('rxjs');
 
-        Rx.Observable.concat(
-          eventSourcing.eventStore.start$(),
-          eventStoreService.start$(),
-          mongoDB.start$(),
-          Rx.Observable.forkJoin(
-              AfccReloadChannelDA.start$(),
-              AfccReloadsDA.start$(),
-              TransactionsDA.start$(),
-              TransactionsErrorsDA.start$()
-          ),
-          // graphQlService.start$()
-      ).subscribe(
-          (evt) => {
-              // console.log(evt)
-          },
-          (error) => {
-              console.error('Failed to start', error);
-              // process.exit(1);
-              return done(error);
-          },
-          () => {console.log('acss-channel-afcc-reload started'); return done();}
-      );
+      Rx.Observable.concat(
+        eventSourcing.eventStore.start$(),
+        eventStoreService.start$(),
+        mongoDB.start$(),
+        Rx.Observable.forkJoin(
+            AfccReloadChannelDA.start$(),
+            AfccReloadsDA.start$(),
+            TransactionsDA.start$(),
+            TransactionsErrorsDA.start$()
+        ),
+        // graphQlService.start$()
+    ).subscribe(
+        (evt) => {
+            // console.log(evt)
+        },
+        (error) => {
+            console.error('Failed to start', error);
+            // process.exit(1);
+            return done(error);
+        },
+        () => {console.log('acss-channel-afcc-reload started'); return done();}
+    );
 
-      }),
-      it("start MQTT broker", function (done) {
-        broker = new MqttBroker({
-          mqttServerUrl: process.env.MQTT_SERVER_URL,
-          replyTimeout: process.env.REPLY_TIMEOUT || 2000
-        });
-        done();
-      })
+    });
+    it("start MQTT broker", function (done) {
+      broker = new MqttBroker({
+        mqttServerUrl: process.env.MQTT_SERVER_URL,
+        replyTimeout: process.env.REPLY_TIMEOUT || 2000
+      });
+      done();
+    });
   });
 
 
@@ -157,18 +157,9 @@ describe("E2E - Simple transaction", function() {
    it("Create one busines unit", function (done) {
 
      Rx.Observable.from([
-       {
-         _id: "123456789_Metro_med",
-         name: "Metro de Medellin"
-       },
-       {
-        _id: "123456789_Gana",
-         name: "Gana Medellin"
-       },
-       {
-        _id: "123456789_NebulaE_POS",
-         name: "NebulaE_POS"
-       },
+       { _id: "123456789_Metro_med", name: "Metro de Medellin" },
+       { _id: "123456789_Gana", name: "Gana Medellin" },
+       { _id: "123456789_NebulaE_POS", name: "NebulaE_POS" },
        {
          _id: "123456789_PlaceToPay",
          name: "Place to Play"
@@ -235,18 +226,6 @@ describe("E2E - Simple transaction", function() {
           buId: "123456789_Metro_med",
           percentage: 98.5
         }],
-        reloadNetworks:[
-          {
-            fromBu: "123456789_Pasarela",
-            buId: "123456789_Gana",
-            percentage: 1.2
-          },
-          {
-            fromBu: "123456789_Pasarela",
-            buId: "123456789_NebulaE_POS",
-            percentage: 1.35
-          }
-        ],
         parties:[
           {
             fromBu: "123456789_Pasarela",
@@ -296,30 +275,30 @@ describe("E2E - Simple transaction", function() {
       this.timeout(1000);
       const cardId = uuidv4();
       broker.send$('Events', '', {
-        et: "AfccReloadSold",
+        et: "WalletTransactionExecuted",
         etv: 1,
-        at: "Afcc",
+        at: "Wallet",
         aid: cardId,
         data: {
-          amount: 11000,
           businessId:  '123456789_NebulaE_POS',
-          afcc: {
-            data: {
-              before: {},
-              after: {}
-            },
-            uId: cardId,
-            cardId: cardId,
-            balance: {
-              before: 0,
-              after: 11000
+          transactionType: "SALE",
+          transactionConcept: "RECARGA_CIVICA",
+          transactions:[
+            {
+              id: uuidv4(),
+              pocket: "MAIN",
+              value: -11000,
+              user: "juan.vendedor",
+              location: {},
+              notes: "notas de la recarga de 5000",
+              terminal: {
+                id: uuidv4(),
+                userId: "juan.user_de_terminal",
+                username: "JUAN.SANTA",
+                associatedTransactionIds: []
+              }
             }
-          },
-          source: {
-            machine: "Nesas-12",
-            ip: "192.168.1.15"
-          }
-
+          ]
         },
         user: "juan.santa",
         timestamp: Date.now(),
@@ -339,7 +318,6 @@ describe("E2E - Simple transaction", function() {
       this.timeout(4000);
       const transactionsExpected = { 
         "123456789_Metro_med": 10835, 
-        "123456789_NebulaE_POS": 148.5, 
         "123456789_PlaceToPay": 7.5,
         "123456789_NebulaE": 8.99, 
         "123456789_surplus": 0.01 };
@@ -350,6 +328,7 @@ describe("E2E - Simple transaction", function() {
         .mergeMap(transactions => Rx.Observable.from(Object.keys(transactionsExpected))
           .map(buId => { 
             const index = transactions.findIndex(t => t.toBu == buId);
+            console.log("##############",JSON.stringify(t), "#######################");
             return { match: transactions[index].amount == transactionsExpected[buId], amount: transactions[index].amount }
           })
           .toArray()
@@ -381,36 +360,36 @@ describe("E2E - Simple transaction", function() {
   * DE-PREAPARE
   */
 
- describe('de-prepare test DB', function () {
-   it('delete mongoDB', function (done) {
-     this.timeout(8000);
-     Rx.Observable.of({})
-       .delay(5000)
-       .mergeMap(() => mongoDB.dropDB$())
-       .subscribe(
-         (evt) => console.log(`${evt}`),
-         (error) => {
-           console.error(`Mongo DropDB failed: ${error}`);
-           return done(error);
-         },
-         () => { return done(); }
-       );
-   });
-   it('stop mongo', function (done) {
-     this.timeout(4000);
-     Rx.Observable.of({})
-       .delay(1000)
-       .mergeMap(() => mongoDB.stop$())
-       .subscribe(
-         (evt) => console.log(`Mongo Stop: ${evt}`),
-         (error) => {
-           console.error(`Mongo Stop failed: ${error}`);
-           return done(error);
-         },
-         () => { return done(); }
-       );
-   });
-});
+//  describe('de-prepare test DB', function () {
+//    it('delete mongoDB', function (done) {
+//      this.timeout(8000);
+//      Rx.Observable.of({})
+//        .delay(5000)
+//        .mergeMap(() => mongoDB.dropDB$())
+//        .subscribe(
+//          (evt) => console.log(`${evt}`),
+//          (error) => {
+//            console.error(`Mongo DropDB failed: ${error}`);
+//            return done(error);
+//          },
+//          () => { return done(); }
+//        );
+//    });
+//    it('stop mongo', function (done) {
+//      this.timeout(4000);
+//      Rx.Observable.of({})
+//        .delay(1000)
+//        .mergeMap(() => mongoDB.stop$())
+//        .subscribe(
+//          (evt) => console.log(`Mongo Stop: ${evt}`),
+//          (error) => {
+//            console.error(`Mongo Stop failed: ${error}`);
+//            return done(error);
+//          },
+//          () => { return done(); }
+//        );
+//    });
+// });
 
 
 

@@ -4,7 +4,6 @@
 
 # Builds and distros
 dist/
-playground/
 
 # IDE Files
 .history/

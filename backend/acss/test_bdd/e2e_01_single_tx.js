@@ -7,6 +7,8 @@ const expect = require("chai").expect;
 //LIBS FOR TESTING
 const MqttBroker = require("../bin/tools/broker/MqttBroker");
 const MongoDB = require('../bin/data/MongoDB').MongoDB;
+const NumberDecimal = require('mongodb').Decimal128;
+
 
 
 
@@ -63,16 +65,16 @@ describe("E2E - Simple transaction", function() {
         // console.log(`env var set => ${envKey}:${process.env[envKey]}`);
       });
 
-      const eventSourcing = require('../bin//tools/EventSourcing')();
-      const eventStoreService = require('../bin//services/event-store/EventStoreService')();
-      mongoDB = require('../bin//data/MongoDB').singleton();
-      const ClearingDA = require('../bin//data/ClearingDA');
-      const SettlementDA = require('../bin//data/SettlementDA');
-      const BusinessDA = require('../bin//data/BusinessDA');
-      const TransactionsCursorDA = require('../bin//data/TransactionsCursorDA');
-      const TransactionsDA = require('../bin//data/TransactionsDA');
-      const LogErrorDA = require('../bin//data/LogErrorDA');
-      const AccumulatedTransactionDA = require('../bin//data/AccumulatedTransactionDA');
+      const eventSourcing = require('../bin/tools/EventSourcing')();
+      const eventStoreService = require('../bin/services/event-store/EventStoreService')();
+      mongoDB = require('../bin/data/MongoDB').singleton();
+      const ClearingDA = require('../bin/data/ClearingDA');
+      const SettlementDA = require('../bin/data/SettlementDA');
+      const BusinessDA = require('../bin/data/BusinessDA');
+      const TransactionsCursorDA = require('../bin/data/TransactionsCursorDA');
+      const TransactionsDA = require('../bin/data/TransactionsDA');
+      const LogErrorDA = require('../bin/data/LogErrorDA');
+      const AccumulatedTransactionDA = require('../bin/data/AccumulatedTransactionDA');
       // const graphQlService = require('../bin//services/emi-gateway/GraphQlService')();
 
       Rx.Observable.concat(
@@ -107,7 +109,7 @@ describe("E2E - Simple transaction", function() {
 
       const eventSourcing = require('../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload/bin/tools/EventSourcing')();
       const eventStoreService = require('../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload/bin/services/event-store/EventStoreService')();
-      const mongoDB = require('../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload//bin/data/MongoDB').singleton();
+      const mongoDB = require('../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload/bin/data/MongoDB').singleton();
       const AfccReloadChannelDA = require('../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload/bin/data/AfccReloadChannelDA');
       const AfccReloadsDA = require('../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload/bin/data/AfccReloadsDA');
       const TransactionsDA = require('../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload/bin/data/TransactionsDA');
@@ -266,15 +268,16 @@ describe("E2E - Simple transaction", function() {
 });
 
   /*
-  * CREATE 1 RELOAD
+  * CREATE 1 RELOAD WITHOUT BONUS
   */
 
   describe("Create AFCC reload and check its transactions", () =>  {
     
-    it("Create single AFCC reload", (done) => {
+    it("Create single AFCC reload without bonus", (done) => {
       this.timeout(1000);
       const cardId = uuidv4();
       broker.send$('Events', '', {
+        _id: uuidv4(),
         et: "WalletTransactionExecuted",
         etv: 1,
         at: "Wallet",
@@ -290,7 +293,7 @@ describe("E2E - Simple transaction", function() {
               value: -11000,
               user: "juan.vendedor",
               location: {},
-              notes: "notas de la recarga de 5000",
+              notes: "notas de la recarga de 11000",
               terminal: {
                 id: uuidv4(),
                 userId: "juan.user_de_terminal",
@@ -318,24 +321,28 @@ describe("E2E - Simple transaction", function() {
       this.timeout(4000);
       const transactionsExpected = { 
         "123456789_Metro_med": 10835, 
-        "123456789_PlaceToPay": 7.5,
-        "123456789_NebulaE": 8.99, 
+        "123456789_PlaceToPay": 75.07,
+        "123456789_NebulaE": 89.92, 
         "123456789_surplus": 0.01 };
       Rx.Observable.of({})
         .delay(1000)
         .mapTo(mongoDB.client.db(dbName).collection("Transactions"))
         .mergeMap((collection) => Rx.Observable.defer(() => collection.find().toArray()))
+        .mergeMap(transactions => Rx.Observable.from(transactions)
+          .map(tx => ({ ...tx, amount: parseFloat(new NumberDecimal(tx.amount.bytes).toString()) }) )
+          .toArray()
+        )
+        .do(r => console.log("TRANSACTIONS #########", JSON.stringify(r)))
         .mergeMap(transactions => Rx.Observable.from(Object.keys(transactionsExpected))
           .map(buId => { 
             const index = transactions.findIndex(t => t.toBu == buId);
-            console.log("##############",JSON.stringify(t), "#######################");
             return { match: transactions[index].amount == transactionsExpected[buId], amount: transactions[index].amount }
           })
           .toArray()
         )
         .do(results => {
-          expect(results).to.be.lengthOf(5);
-          expect(results).to.be.deep.equals([...Array(5)].map((e, i) => ({match: true, amount: transactionsExpected[Object.keys(transactionsExpected)[i]] })))
+          expect(results).to.be.lengthOf(4);
+          expect(results).to.be.deep.equals([...Array(4)].map((e, i) => ({match: true, amount: transactionsExpected[Object.keys(transactionsExpected)[i]] })))
         })
       .subscribe(
         ok => console.log("$$$$$", ok),
@@ -350,7 +357,128 @@ describe("E2E - Simple transaction", function() {
 
   });
 
-  /** RUN THE CLEARING CRONJOB TASK */
+  describe("drop transactions tables", () => {
+    it("drop tables", (done) => {
+      this.timeout(5000);
+
+      Rx.Observable.of({
+        transactionsCollection: mongoDB.client.db(dbName).collection("Transactions"),
+        reloadsCollection: mongoDB.client.db(dbName).collection("AfccReloadEvents")
+      })
+      .mergeMap( ({transactionsCollection, reloadsCollection}) => 
+        Rx.Observable.forkJoin(
+          Rx.Observable.defer(() => transactionsCollection.drop()),
+          Rx.Observable.defer(() => reloadsCollection.drop())  
+        ))
+      .subscribe(ok => {}, error => console.log(error), () => { return done(); })
+    });
+  });
+
+
+
+    /*
+  * CREATE 1 RELOAD WITH BONUS
+  */
+
+ describe("Create AFCC reload with BONUS and check its transactions", () =>  {
+    
+  it("Create single AFCC reload with bonus", (done) => {
+    this.timeout(1000);
+    const cardId = uuidv4();
+    broker.send$('Events', '', {
+      _id: uuidv4(),
+      et: "WalletTransactionExecuted",
+      etv: 1,
+      at: "Wallet",
+      aid: cardId,
+      data: {
+        businessId:  '123456789_NebulaE_POS',
+        transactionType: "SALE",
+        transactionConcept: "RECARGA_CIVICA",
+        transactions:[
+          {
+            id: uuidv4(),
+            pocket: "MAIN",
+            value: -11000,
+            user: "juan.vendedor",
+            location: {},
+            notes: "notas de la recarga de 11000",
+            terminal: {
+              id: uuidv4(),
+              userId: "juan.user_de_terminal",
+              username: "JUAN.SANTA",
+              associatedTransactionIds: []
+            }
+          },
+          {
+            id: uuidv4(),
+            pocket: "BONUS",
+            value: 148.5,
+            user: "juan.vendedor",
+            location: {},
+            notes: "bonus generado para  11000",
+            terminal: {
+              id: uuidv4(),
+              userId: "juan.user_de_terminal",
+              username: "JUAN.SANTA",
+              associatedTransactionIds: []
+            }
+          }
+        ]
+      },
+      user: "juan.santa",
+      timestamp: Date.now(),
+      av: 1
+    })
+    .subscribe(
+      ok => console.log(ok),
+      error => {
+        console.log(error);
+        return done(error);
+      },
+      () => { console.log("Reload made finished"); return done();  }
+    )
+  }),
+
+  it('Chek all transactions amounts', (done) => {
+    this.timeout(4000);
+    const transactionsExpected = { 
+      "123456789_Metro_med": 10835, 
+      "123456789_PlaceToPay": 7.5,
+      "123456789_NebulaE": 8.99, 
+      "123456789_surplus": 0.01 };
+    Rx.Observable.of({})
+      .delay(1000)
+      .mapTo(mongoDB.client.db(dbName).collection("Transactions"))
+      .mergeMap((collection) => Rx.Observable.defer(() => collection.find().toArray()))
+      .mergeMap(transactions => Rx.Observable.from(transactions)
+        .map(tx => ({ ...tx, amount: parseFloat(new NumberDecimal(tx.amount.bytes).toString()) }) )
+        .toArray()
+      )
+      .do(r => console.log("TRANSACTIONS WITH BONUS #########", JSON.stringify(r)))
+      .mergeMap(transactions => Rx.Observable.from(Object.keys(transactionsExpected))
+        .map(buId => { 
+          const index = transactions.findIndex(t => t.toBu == buId);
+          return { match: transactions[index].amount == transactionsExpected[buId], amount: transactions[index].amount }
+        })
+        .toArray()
+      )
+      .do(results => {
+        expect(results).to.be.lengthOf(4);
+        // expect(results).to.be.deep.equals([...Array(4)].map((e, i) => ({match: true, amount: transactionsExpected[Object.keys(transactionsExpected)[i]] })))
+      })
+    .subscribe(
+      ok => console.log("$$$$$", ok),
+      error => {
+        console.log(error);
+        return done(error);
+      },
+      () => { console.log("Reload made finished"); return done();  }
+    )
+
+  })
+
+});
 
 
 
@@ -360,36 +488,36 @@ describe("E2E - Simple transaction", function() {
   * DE-PREAPARE
   */
 
-//  describe('de-prepare test DB', function () {
-//    it('delete mongoDB', function (done) {
-//      this.timeout(8000);
-//      Rx.Observable.of({})
-//        .delay(5000)
-//        .mergeMap(() => mongoDB.dropDB$())
-//        .subscribe(
-//          (evt) => console.log(`${evt}`),
-//          (error) => {
-//            console.error(`Mongo DropDB failed: ${error}`);
-//            return done(error);
-//          },
-//          () => { return done(); }
-//        );
-//    });
-//    it('stop mongo', function (done) {
-//      this.timeout(4000);
-//      Rx.Observable.of({})
-//        .delay(1000)
-//        .mergeMap(() => mongoDB.stop$())
-//        .subscribe(
-//          (evt) => console.log(`Mongo Stop: ${evt}`),
-//          (error) => {
-//            console.error(`Mongo Stop failed: ${error}`);
-//            return done(error);
-//          },
-//          () => { return done(); }
-//        );
-//    });
-// });
+ describe('de-prepare test DB', function () {
+   it('delete mongoDB', function (done) {
+     this.timeout(8000);
+     Rx.Observable.of({})
+       .delay(5000)
+       .mergeMap(() => mongoDB.dropDB$())
+       .subscribe(
+         (evt) => console.log(`${evt}`),
+         (error) => {
+           console.error(`Mongo DropDB failed: ${error}`);
+           return done(error);
+         },
+         () => { return done(); }
+       );
+   });
+   it('stop mongo', function (done) {
+     this.timeout(4000);
+     Rx.Observable.of({})
+       .delay(1000)
+       .mergeMap(() => mongoDB.stop$())
+       .subscribe(
+         (evt) => console.log(`Mongo Stop: ${evt}`),
+         (error) => {
+           console.error(`Mongo Stop failed: ${error}`);
+           return done(error);
+         },
+         () => { return done(); }
+       );
+   });
+});
 
 
 

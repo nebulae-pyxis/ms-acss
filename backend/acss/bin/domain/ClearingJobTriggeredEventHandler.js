@@ -27,37 +27,33 @@ class ClearingJobTriggeredEventHandler {
             .mergeMap(cursor =>
                 this.accumulateTransactions$(TransactionsDA.getTransactions$(cursor, cursorLimitTimestamp))
                     .toArray()
-                    .map(accumulatedTransactions => { return { accumulatedTransactions, cursor }; })
+                    .map(accumulatedTransactions => ({ accumulatedTransactions, cursor }) )
             )
             .filter(({ accumulatedTransactions, cursor }) => accumulatedTransactions.length > 0)
-            .mergeMap(({ accumulatedTransactions, cursor }) => {
-                const newCursor = { ...cursor };
-                newCursor.timestamp = cursorLimitTimestamp;
-                return Rx.Observable.forkJoin(
+            .mergeMap(({ accumulatedTransactions, cursor }) => 
+                Rx.Observable.forkJoin(
                     AccumulatedTransactionDA.generateAccumulatedTransactionsStatement$(accumulatedTransactions),
-                    TransactionsCursorDA.generateSetCursorStatement$(newCursor)
-                );
-            })
+                    TransactionsCursorDA.generateSetCursorStatement$({ ...cursor, timestamp: cursorLimitTimestamp })
+                )
+            )
             .mergeMap(statements => mongoDB.applyAll$(statements).map(res=> [statements, res]))
-            .mergeMap(([statements, [txs, txResult]]) => {
-                return Rx.Observable.from(txs)
-                .map(tx => {
-                    return tx.insertedIds ? Object.values(tx.insertedIds): []
-                })
-                .reduce((acc, array) => [...acc, ...array], [])
-                .mergeMap(ids => {
-                    return eventSourcing.eventStore.emitEvent$(
-                        new Event({
-                          eventType: 'AcssAccumulatedTransactionGenerated',
-                          eventTypeVersion: 1,
-                          aggregateType: 'Acss',
-                          aggregateId: 0,
-                          data: {ids},
-                          user: 'SYSTEM'
-                        })
-                      ).mapTo([txs, txResult])
-                })
-            })
+            .mergeMap(([statements, [txs, txResult]]) =>
+                Rx.Observable.from(txs)
+                    .map(tx => tx.insertedIds ? Object.values(tx.insertedIds) : [])
+                    .reduce((acc, array) => [...acc, ...array], [])
+                    .mergeMap(ids =>
+                        eventSourcing.eventStore.emitEvent$(
+                            new Event({
+                                eventType: 'AcssAccumulatedTransactionGenerated',
+                                eventTypeVersion: 1,
+                                aggregateType: 'Acss',
+                                aggregateId: 0,
+                                data: { ids },
+                                user: 'SYSTEM'
+                            })
+                        ).mapTo([txs, txResult])
+                    )
+            )
             .map(([txs, txResult]) => `Clearing job trigger handling: ok:${txResult.ok}`)
             .catch(error => {
                 console.log(`An error was generated while a clearingJobTriggeredEvent was being processed: ${error.stack}`);

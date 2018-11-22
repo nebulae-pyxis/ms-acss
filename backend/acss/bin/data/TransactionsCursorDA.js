@@ -64,19 +64,17 @@ class TransactionsCursorDA {
    * @returns {Rx.Observable} Rx.Observable resolves to statement
    */
   static generateSetCursorStatement$(cursor) {
-
     return Rx.Observable.of(cursor)
-      .map(cursor => {
-        return {
-          collection: CollectionName,
-          operation: "updateOne",
-          operationArgs: [
-            { _id: 'current' },
-            { $set: { ...cursor } }            
-          ],
-          operationOps: { upsert: true },
-        };
-      });
+      .map(cursor => ({
+        collection: CollectionName,
+        operation: "updateOne",
+        operationArgs: [
+          { _id: 'current' },
+          { $set: { ...cursor } }
+        ],
+        operationOps: { upsert: true },
+      })
+      );
   }
 
 

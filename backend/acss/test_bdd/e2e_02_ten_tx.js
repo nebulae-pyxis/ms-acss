@@ -15,6 +15,7 @@ let mongoDB = undefined;
 let broker = undefined;
 
 const dbName = `test-${uuidv4().toString().slice(0, 5)}-acss`;
+// const dbName = `acss`;
 
 const environment = {
   NODE_ENV: "production",
@@ -246,6 +247,7 @@ describe("E2E - Simple transaction", function() {
 
       Rx.Observable.range(0, 10)
         .mergeMap(() => broker.send$('Events', '', {
+          _id: uuidv4(),
           et: "WalletTransactionExecuted",
           etv: 1,
           at: "Wallet",
@@ -359,6 +361,7 @@ describe("E2E - Simple transaction", function() {
 
       Rx.Observable.range(0, 10)
         .mergeMap(() => broker.send$('Events', '', {
+          _id: uuidv4(),
           et: "WalletTransactionExecuted",
           etv: 1,
           at: "Wallet",
@@ -494,7 +497,7 @@ describe("E2E - Simple transaction", function() {
       .first()
       .subscribe(
         ok => {},
-        error => { console.log(error); return done(error); },
+        error => { console.log( "ERROR => ", error); return done(error); },
         () => { console.log("[[################ 09 ################ Send the cronjob task to create the accumulated transactions DONE ]]"); return done();  }
       )
     }),
@@ -531,7 +534,7 @@ describe("E2E - Simple transaction", function() {
         })
         .subscribe(
           result => { },
-          error => { console.log(error); return done(error); },
+          error => { console.log("ERROR => ", error); return done(error); },
           () => { console.log("[[################ 10 ################ Check the accumulated transactions done"); return done(); }
         )
     })
@@ -568,6 +571,23 @@ describe("E2E - Simple transaction", function() {
       .delay(1000)
       .mapTo(mongoDB.client.db(dbName).collection('Clearing'))
       .mergeMap(collection => Rx.Observable.defer(() => collection.find().toArray()))
+      .mergeMap(transactions => Rx.Observable.from(transactions)
+        .map(clearingData => {
+          const result = { ...clearingData};
+          if(clearingData.output){
+            Object.keys(clearingData.output).forEach(prop => {
+              result.output[prop].amount = parseFloat(new NumberDecimal(result.output[prop].amount.bytes).toString())
+            })
+          }
+          if(clearingData.input){
+            Object.keys(clearingData.input).forEach(prop => {
+              result.input[prop].amount = parseFloat(new NumberDecimal(result.input[prop].amount.bytes).toString())
+            })
+          }
+          return result;
+        } )
+        .toArray()
+      )
       .mergeMap(clearings => Rx.Observable.from(clearings)
         .do(clearing => {
           switch(clearing.businessId){
@@ -668,6 +688,23 @@ describe("E2E - Simple transaction", function() {
       .delay(30000)
       .mapTo(mongoDB.client.db(dbName).collection('ClosedClearing'))
       .mergeMap((collection) => Rx.Observable.defer(() => collection.find().toArray()))
+      .mergeMap(transactions => Rx.Observable.from(transactions)
+        .map(clearingData => {
+          const result = { ...clearingData};
+          if(clearingData.output){
+            Object.keys(clearingData.output).forEach(prop => {
+              result.output[prop].amount = parseFloat(new NumberDecimal(result.output[prop].amount.bytes).toString())
+            })
+          }
+          if(clearingData.input){
+            Object.keys(clearingData.input).forEach(prop => {
+              result.input[prop].amount = parseFloat(new NumberDecimal(result.input[prop].amount.bytes).toString())
+            })
+          }
+          return result;
+        } )
+        .toArray()
+      )
       .do(result => expect(result).to.be.lengthOf(4))
       .mergeMap(closedClearings => Rx.Observable.from(Object.keys(transactionsExpected))
         .do( buId => {

@@ -36,11 +36,8 @@ class TransactionsDA {
     if (cursor) {
       findQuery.timestamp["$gt"] = cursor.timestamp;
     }
-    return Rx.Observable.bindNodeCallback(collection.find.bind(collection))(
-      findQuery
-    ).mergeMap(cursor =>
-      Rx.Observable.defer(() => MongoDB.extractAllFromMongoCursor$(cursor))
-    );
+    return Rx.Observable.bindNodeCallback(collection.find.bind(collection))(findQuery)
+      .mergeMap(cursor => Rx.Observable.defer(() => MongoDB.extractAllFromMongoCursor$(cursor)));
   }
 
   /**

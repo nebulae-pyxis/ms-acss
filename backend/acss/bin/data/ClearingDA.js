@@ -6,6 +6,7 @@ const ObjectID = require('mongodb').ObjectID;
 const OpenClearingCollectionName = "Clearing";
 const ClosedClearingCollectionName = "ClosedClearing";
 const BusinessDA = require("./BusinessDA");
+const NumberDecimal = require('mongodb').Decimal128;
 
 class ClearingDA {
   static start$(mongoDbInstance) {
@@ -203,7 +204,7 @@ class ClearingDA {
     const transformedMovements = [];
     if (movements) {
       Object.keys(movements).forEach(businessId => {
-        const amount = movements[businessId].amount;
+        const amount = parseFloat(new NumberDecimal(movements[businessId].amount.bytes).toString());
         const business = businessArray.find(business => business._id == businessId) || {};
         transformedMovements.push({ businessId, amount, businessName: business.name });
       });

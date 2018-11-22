@@ -4,6 +4,7 @@ const MATERIALIZED_VIEW_TOPIC = "materialized-view-updates";
 const ClearingDA = require("../data/ClearingDA");
 const LogErrorDA = require('../data/LogErrorDA');
 const AccumulatedTransactionDA = require("../data/AccumulatedTransactionDA");
+const NumberDecimal = require('mongodb').Decimal128;
 
 let instance;
 
@@ -81,7 +82,7 @@ class TransactionAccumulatedEventConsumer {
         const propertyKey = isFromBusiness
           ? `output.${accumulatedTx.toBu}.amount`
           : `input.${accumulatedTx.fromBu}.amount`;
-        dynamicObj[propertyKey] = accumulatedTx.amount;
+        dynamicObj[propertyKey] = NumberDecimal.fromString(accumulatedTx.amount.toString()),
         mongoOperation.operationArgs[1]["$inc"] = dynamicObj;
         return mongoOperation;
       }

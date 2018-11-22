@@ -69,9 +69,7 @@ class Clearing {
         return ClearingDA.getClearingByClearingId$(args.id, role.SYSADMIN ? undefined: authToken.businessId);
       })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
-      .catch(err => {
-        return this.handleError$(err);
-      });
+      .catch(err => this.handleError$(err));
   }
 
     /**
@@ -93,9 +91,7 @@ class Clearing {
         return AccumulatedTransactionDA.getAccumulatedTransactionsByIds$(args.page, args.count, args.ids, role.SYSADMIN ? undefined: authToken.businessId)
       })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
-      .catch(err => {
-        return this.handleError$(err);
-      });
+      .catch(err => this.handleError$(err));
   }
 
       /**
@@ -118,9 +114,7 @@ class Clearing {
         return AccumulatedTransactionDA.getAccumulatedTransactionsByIds$(args.page, args.count, clearing.accumulatedTransactionIds, role.SYSADMIN ? undefined: authToken.businessId)
       })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
-      .catch(err => {
-        return this.handleError$(err);
-      });
+      .catch(err => this.handleError$(err));
   }
 
   /**
@@ -142,9 +136,7 @@ class Clearing {
         return TransactionDA.getTransactionsByIds$(args.page, args.count, args.ids, roles.SYSADMIN ? undefined:authToken.businessId)
       })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
-      .catch(err => {
-        return this.handleError$(err);
-      });
+      .catch(err => this.handleError$(err));
   }
 
     /**
@@ -170,9 +162,7 @@ class Clearing {
         return TransactionDA.getTransactionsByIds$(args.page, args.count, transactionIds, roles.SYSADMIN ? undefined:authToken.businessId)
       })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
-      .catch(err => {
-        return this.handleError$(err);
-      });
+      .catch(err => this.handleError$(err));
   }
   
   //#region  mappers for API responses
@@ -194,14 +184,10 @@ class Clearing {
   }
 
   buildSuccessResponse$(rawRespponse) {
-    return Rx.Observable.of(rawRespponse).map(resp => {
-      return {
-        data: resp,
-        result: {
-          code: 200
-        }
-      };
-    });
+    return Rx.Observable.of(rawRespponse).map(resp => ({
+      data: resp,
+      result: { code: 200 }
+    }));
   }
 
   //#endregion

@@ -27,13 +27,12 @@ class AccumulatedTransactionDA {
    * @returns {Rx.Observable} insert statement
    */
   static generateAccumulatedTransactionsStatement$(accumulatedTransactions) {
-    return Rx.Observable.of(accumulatedTransactions).map(ats => {
-      return {
+    return Rx.Observable.of(accumulatedTransactions)
+      .map(ats => ({
         collection: CollectionName,
         operation: "insertMany",
         operationArgs: [ats]
-      };
-    });
+      }));
   }
 
   /**

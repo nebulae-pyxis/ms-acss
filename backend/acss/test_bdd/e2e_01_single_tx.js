@@ -126,11 +126,9 @@ describe("E2E - Simple transaction", function() {
             AfccReloadsDA.start$(),
             TransactionsDA.start$(),
             TransactionsErrorsDA.start$()
-        ),
-        // graphQlService.start$()
+        ), 
     ).subscribe(
-        (evt) => {
-            // console.log(evt)
+        (evt) => { 
         },
         (error) => {
             console.error('Failed to start', error);
@@ -252,7 +250,7 @@ describe("E2E - Simple transaction", function() {
     })
     .delay(3000)
     .subscribe(
-      result => console.log(result),
+      result => {},
       error => {
         console.error(`sent message failded ${error}`);
         return done(error);
@@ -308,7 +306,7 @@ describe("E2E - Simple transaction", function() {
         av: 1
       })
       .subscribe(
-        ok => console.log(ok),
+        ok => {},
         error => {
           console.log(error);
           return done(error);
@@ -332,7 +330,7 @@ describe("E2E - Simple transaction", function() {
           .map(tx => ({ ...tx, amount: parseFloat(new NumberDecimal(tx.amount.bytes).toString()) }) )
           .toArray()
         )
-        .do(r => console.log("TRANSACTIONS #########", JSON.stringify(r)))
+        // .do(r => console.log("TRANSACTIONS #########", JSON.stringify(r)))
         .mergeMap(transactions => Rx.Observable.from(Object.keys(transactionsExpected))
           .map(buId => { 
             const index = transactions.findIndex(t => t.toBu == buId);
@@ -345,7 +343,7 @@ describe("E2E - Simple transaction", function() {
           expect(results).to.be.deep.equals([...Array(4)].map((e, i) => ({match: true, amount: transactionsExpected[Object.keys(transactionsExpected)[i]] })))
         })
       .subscribe(
-        ok => console.log("$$$$$", ok),
+        ok => {},
         error => {
           console.log(error);
           return done(error);
@@ -357,6 +355,9 @@ describe("E2E - Simple transaction", function() {
 
   });
 
+  /**
+   * Drop transactions and reloads documents
+   */
   describe("drop transactions tables", () => {
     it("drop tables", (done) => {
       this.timeout(5000);
@@ -373,6 +374,186 @@ describe("E2E - Simple transaction", function() {
       .subscribe(ok => {}, error => console.log(error), () => { return done(); })
     });
   });
+
+  /**
+   * Send events with no allowed transaction type, concepts.
+   */
+  describe("Send Executeed transactions not allowed", () =>  {
+    
+    // No allowed transaction type
+    it("Send Transaction executed without allowed transaction type", (done) => {
+      this.timeout(1000);
+      const cardId = uuidv4();
+      broker.send$('Events', '', {
+        _id: uuidv4(),
+        et: "WalletTransactionExecuted",
+        etv: 1,
+        at: "Wallet",
+        aid: cardId,
+        data: {
+          businessId:  '123456789_NebulaE_POS',
+          transactionType: "SALE_PLUS",
+          transactionConcept: "RECARGA_CIVICA",
+          transactions:[
+            {
+              id: uuidv4(),
+              pocket: "MAIN",
+              value: -11000,
+              user: "juan.vendedor",
+              location: {},
+              notes: "notas de la recarga de 11000",
+              terminal: {
+                id: uuidv4(),
+                userId: "juan.user_de_terminal",
+                username: "JUAN.SANTA",
+                associatedTransactionIds: []
+              }
+            }
+          ]
+        },
+        user: "juan.santa",
+        timestamp: Date.now(),
+        av: 1
+      })
+      .subscribe(
+        ok => {},
+        error => {
+          console.log(error);
+          return done(error);
+        },
+        () => { console.log("Reload made finished"); return done();  }
+      )
+    });
+
+    // No allowed transaction concept
+    it("Send Transaction executed without allowed transaction concept", (done) => {
+      this.timeout(1000);
+      const cardId = uuidv4();
+      broker.send$('Events', '', {
+        _id: uuidv4(),
+        et: "WalletTransactionExecuted",
+        etv: 1,
+        at: "Wallet",
+        aid: cardId,
+        data: {
+          businessId:  '123456789_NebulaE_POS',
+          transactionType: "SALE",
+          transactionConcept: "RECARGA_CIVICA_COMERCIO",
+          transactions:[
+            {
+              id: uuidv4(),
+              pocket: "MAIN",
+              value: -11000,
+              user: "juan.vendedor",
+              location: {},
+              notes: "notas de la recarga de 11000",
+              terminal: {
+                id: uuidv4(),
+                userId: "juan.user_de_terminal",
+                username: "JUAN.SANTA",
+                associatedTransactionIds: []
+              }
+            }
+          ]
+        },
+        user: "juan.santa",
+        timestamp: Date.now(),
+        av: 1
+      })
+      .subscribe(
+        ok => {},
+        error => {
+          console.log(error);
+          return done(error);
+        },
+        () => { console.log("Reload made finished"); return done();  }
+      )
+    });
+
+    // TransactionExecutted evetn with only bonus spendings
+    it("Send Transaction executed with only  bonus pocket used", (done) => {
+      this.timeout(1000);
+      const cardId = uuidv4();
+      broker.send$('Events', '', {
+        _id: uuidv4(),
+        et: "WalletTransactionExecuted",
+        etv: 1,
+        at: "Wallet",
+        aid: cardId,
+        data: {
+          businessId:  '123456789_NebulaE_POS',
+          transactionType: "SALE",
+          transactionConcept: "RECARGA_CIVICA",
+          transactions:[
+            {
+              id: uuidv4(),
+              pocket: "BONUS",
+              value: -11000,
+              user: "juan.vendedor",
+              location: {},
+              notes: "notas de la recarga de 11000",
+              terminal: {
+                id: uuidv4(),
+                userId: "juan.user_de_terminal",
+                username: "JUAN.SANTA",
+                associatedTransactionIds: []
+              }
+            }
+          ]
+        },
+        user: "juan.santa",
+        timestamp: Date.now(),
+        av: 1
+      })
+      .subscribe(
+        ok => {},
+        error => {
+          console.log(error);
+          return done(error);
+        },
+        () => { console.log("Reload made finished"); return done();  }
+      )
+    });
+
+    it('Chek all transactions amounts', (done) => {
+      this.timeout(4000);
+      Rx.Observable.of({})
+        .delay(1000)
+        .mapTo(mongoDB.client.db(dbName).collection("Transactions"))
+        .mergeMap((collection) => Rx.Observable.defer(() => collection.find().toArray()))
+        .do( result => {
+          expect(result).to.be.lengthOf(0);
+        })
+      .subscribe(
+        ok => {},
+        error => {
+          console.log(error);
+          return done(error);
+        },
+        () => { console.log("Reload made finished"); return done();  }
+      )
+
+    });
+
+  });
+
+  // describe("drop transactions tables", () => {
+  //   it("drop tables", (done) => {
+  //     this.timeout(5000);
+
+  //     Rx.Observable.of({
+  //       transactionsCollection: mongoDB.client.db(dbName).collection("Transactions"),
+  //       reloadsCollection: mongoDB.client.db(dbName).collection("AfccReloadEvents")
+  //     })
+  //     .mergeMap( ({transactionsCollection, reloadsCollection}) => 
+  //       Rx.Observable.forkJoin(
+  //         Rx.Observable.defer(() => transactionsCollection.drop()),
+  //         Rx.Observable.defer(() => reloadsCollection.drop())  
+  //       ))
+  //     .subscribe(ok => {}, error => console.log(error), () => { return done(); })
+  //   });
+  // });
+
 
 
 
@@ -431,7 +612,7 @@ describe("E2E - Simple transaction", function() {
       av: 1
     })
     .subscribe(
-      ok => console.log(ok),
+      ok => {},
       error => {
         console.log(error);
         return done(error);
@@ -455,7 +636,7 @@ describe("E2E - Simple transaction", function() {
         .map(tx => ({ ...tx, amount: parseFloat(new NumberDecimal(tx.amount.bytes).toString()) }) )
         .toArray()
       )
-      .do(r => console.log("TRANSACTIONS WITH BONUS #########", JSON.stringify(r)))
+      // .do(r => console.log("TRANSACTIONS WITH BONUS #########", JSON.stringify(r)))
       .mergeMap(transactions => Rx.Observable.from(Object.keys(transactionsExpected))
         .map(buId => { 
           const index = transactions.findIndex(t => t.toBu == buId);
@@ -465,10 +646,10 @@ describe("E2E - Simple transaction", function() {
       )
       .do(results => {
         expect(results).to.be.lengthOf(4);
-        // expect(results).to.be.deep.equals([...Array(4)].map((e, i) => ({match: true, amount: transactionsExpected[Object.keys(transactionsExpected)[i]] })))
+        expect(results).to.be.deep.equals([...Array(4)].map((e, i) => ({ match: true, amount: transactionsExpected[Object.keys(transactionsExpected)[i]] })))
       })
     .subscribe(
-      ok => console.log("$$$$$", ok),
+      ok => {},
       error => {
         console.log(error);
         return done(error);

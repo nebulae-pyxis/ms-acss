@@ -22,7 +22,7 @@ class BusinessValidatorHelper {
       method,
       PERMISSION_DENIED_ERROR_CODE.code,
       PERMISSION_DENIED_ERROR_CODE.description,
-      ["business-owner"]
+      ["SYSADMIN", "business-owner"]
     );
   }
 

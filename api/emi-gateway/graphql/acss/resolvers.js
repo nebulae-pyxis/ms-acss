@@ -59,7 +59,7 @@ module.exports = {
               "getACSSBusiness",
               PERMISSION_DENIED_ERROR_CODE,
               "Permission denied",
-              ["business-owner"]
+              ["SYSADMIN", "business-owner"]
             )
               .mergeMap(response => {
                 return broker.forwardAndGetReply$(

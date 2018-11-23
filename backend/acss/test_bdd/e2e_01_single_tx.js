@@ -11,8 +11,6 @@ const NumberDecimal = require('mongodb').Decimal128;
 
 
 
-
-//
 let mongoDB = undefined;
 let broker = undefined;
 
@@ -160,22 +158,10 @@ describe("E2E - Simple transaction", function() {
        { _id: "123456789_Metro_med", name: "Metro de Medellin" },
        { _id: "123456789_Gana", name: "Gana Medellin" },
        { _id: "123456789_NebulaE_POS", name: "NebulaE_POS" },
-       {
-         _id: "123456789_PlaceToPay",
-         name: "Place to Play"
-       },
-       {
-        _id: "123456789_NebulaE",
-         name: "NebulaE"
-       },
-       {
-        _id: "123456789_surplus",
-         name: "surplus collector"
-       },
-       {
-        _id: "123456789_Pasarela",
-        name: "Pasarela"
-       }
+       { _id: "123456789_PlaceToPay", name: "Place to Play" },
+       { _id: "123456789_NebulaE", name: "NebulaE" },
+       { _id: "123456789_surplus", name: "surplus collector" },
+       { _id: "123456789_Pasarela", name: "Pasarela" }
      ])
        .delay(10)
        .mergeMap(bu => broker.send$('Events', '', {
@@ -202,8 +188,6 @@ describe("E2E - Simple transaction", function() {
    });
 
  });
-
-
 
 
   /*
@@ -470,7 +454,7 @@ describe("E2E - Simple transaction", function() {
       )
     });
 
-    // TransactionExecutted evetn with only bonus spendings
+    // TransactionExecutted event with only bonus spendings
     it("Send Transaction executed with only  bonus pocket used", (done) => {
       this.timeout(1000);
       const cardId = uuidv4();
@@ -537,27 +521,7 @@ describe("E2E - Simple transaction", function() {
 
   });
 
-  // describe("drop transactions tables", () => {
-  //   it("drop tables", (done) => {
-  //     this.timeout(5000);
-
-  //     Rx.Observable.of({
-  //       transactionsCollection: mongoDB.client.db(dbName).collection("Transactions"),
-  //       reloadsCollection: mongoDB.client.db(dbName).collection("AfccReloadEvents")
-  //     })
-  //     .mergeMap( ({transactionsCollection, reloadsCollection}) => 
-  //       Rx.Observable.forkJoin(
-  //         Rx.Observable.defer(() => transactionsCollection.drop()),
-  //         Rx.Observable.defer(() => reloadsCollection.drop())  
-  //       ))
-  //     .subscribe(ok => {}, error => console.log(error), () => { return done(); })
-  //   });
-  // });
-
-
-
-
-    /*
+ /*
   * CREATE 1 RELOAD WITH BONUS
   */
 
@@ -662,10 +626,7 @@ describe("E2E - Simple transaction", function() {
 });
 
 
-
- 
-
-   /*
+ /*
   * DE-PREAPARE
   */
 

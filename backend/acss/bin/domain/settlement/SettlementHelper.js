@@ -67,12 +67,11 @@ class SettlementHelper {
       ).mergeMap(({ businessId, clearing, debits, credits }) => Rx.Observable.merge(
         // now that we have all the debits and credits 
         // lets make all the increments/decrements and registries for this clearing
-        Rx.Observable.from(debits).map(debit => { return { type: "$inc", field: `output.${debit.toBu}.amount`, value: (debit.amount * -1) }; }),
-        Rx.Observable.from(debits).map(debit => { return { type: "$push", field: `partialSettlement.output`, value: { buId: debit.toBu, amount: debit.amount, settlementId: debit._id } }; }),
-        Rx.Observable.from(credits).map(credit => { return { type: "$inc", field: `input.${credit.fromBu}.amount`, value: (credit.amount * -1) }; }),
-        Rx.Observable.from(credits).map(credit => { return { type: "$push", field: `partialSettlement.input`, value: { buId: credit.fromBu, amount: credit.amount, settlementId: credit._id } }; }),
+        Rx.Observable.from(debits).map(debit => ({ type: "$inc", field: `output.${debit.toBu}.amount`, value: (debit.amount * -1) }) ),
+        Rx.Observable.from(debits).map(debit => ({ type: "$push", field: `partialSettlement.output`, value: { buId: debit.toBu, amount: debit.amount, settlementId: debit._id } }) ),
+        Rx.Observable.from(credits).map(credit => ({ type: "$inc", field: `input.${credit.fromBu}.amount`, value: (credit.amount * -1) }) ),
+        Rx.Observable.from(credits).map(credit => ({ type: "$push", field: `partialSettlement.input`, value: { buId: credit.fromBu, amount: credit.amount, settlementId: credit._id } }) ),
         Rx.Observable.of( { type: "$set", field: `lastUpdateTimestamp`, value: Date.now() })
-
       ).reduce(
         //lets put all the increments and pushes on the same transactions
         (acc, operation) => {

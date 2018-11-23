@@ -19,13 +19,9 @@ class SettlementES {
   start$() {
     return Rx.Observable.create(obs => {
       this.settlementEventSubscription = this.settlementEvent$
-        .concatMap(settlement => {
-          return this.executeSettlementJobTriggered$(settlement).delay(3000);
-        })
+        .concatMap(settlement => this.executeSettlementJobTriggered$(settlement).delay(3000))
         .subscribe(
-          evt => {
-            console.log(evt);
-          },
+          evt => console.log(evt),
           error => {
             console.error("Failed processing settlement events", error);
             //process.exit(1);
@@ -42,9 +38,8 @@ class SettlementES {
    * @param {*} settlementJobTriggered
    */
   handleSettlementJobTriggeredEvent$(settlementJobTriggered) {
-    return Rx.Observable.of(settlementJobTriggered).do(settlementJob => {
-      this.settlementEvent$.next(settlementJob);
-    });
+    return Rx.Observable.of(settlementJobTriggered)
+    .do(settlementJob => { this.settlementEvent$.next(settlementJob);});
   }
 
   /**
@@ -55,9 +50,7 @@ class SettlementES {
    */
   executeSettlementJobTriggered$(settlementJobTriggered) {
     return ClearingDA.closeClearing$(settlementJobTriggered.data.businessId)
-      .filter(
-        ({ found, closed, clearing }) => found && closed && clearing !== null
-      )
+      .filter( ({ found, closed, clearing }) => found && closed && clearing !== null )
       .pluck("clearing")
       .map(clearing => {
         //normalizes data structure
@@ -73,9 +66,7 @@ class SettlementES {
       .mergeMap(clearing =>
         SettlementHelper.generateSettlements$(clearing)
           .toArray()
-          .map(settlements => {
-            return { clearing, settlements };
-          })
+          .map(settlements => ({ clearing, settlements }) )
       )
       .mergeMap(({ clearing, settlements }) =>
         Rx.Observable.merge(

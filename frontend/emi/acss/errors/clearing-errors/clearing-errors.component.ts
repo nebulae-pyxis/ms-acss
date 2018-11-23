@@ -41,7 +41,7 @@ import { map, mapTo, mergeMap, filter, tap, toArray } from "rxjs/operators";
     ]),
   ],
 })
-export class ClearingErrorsComponent implements OnInit {
+export class ClearingErrorsComponent implements OnInit, OnDestroy {
 
   // Rxjs subscriptions
   subscriptions = [];

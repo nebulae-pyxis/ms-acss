@@ -41,7 +41,7 @@ import { map, mapTo, mergeMap, filter, tap, toArray } from "rxjs/operators";
     ]),
   ],
 })
-export class SettlementErrorsComponent implements OnInit {
+export class SettlementErrorsComponent implements OnInit, OnDestroy {
 
     // Rxjs subscriptions
     subscriptions = [];

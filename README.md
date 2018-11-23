@@ -63,6 +63,16 @@ Fig 1. You can filter the clearings by agent
 
 ![clearing list](docs/images/clearingList.png "clearing list")
 
+A clearing can have two states:
+
+Open: If a clearing is open that means the clearing has not been settled therefore there are still transactions that can be processed and modify the info of the clearing (A open clearing is denoted with an green icon). 
+
+Closed: If a clearing is closed that means the clearing has been settled (A closed clearing is denoted with an green icon). 
+
+Clearing detail:
+
+
+
 - Setttlement:
 
 Here you can see info related with the settlements of the system. If the role of the logged user is "SYS ADMIN", you will be able to see the settlements of all of the agents registered on the platforms. While if the role of the user is "Business owner" only will be able to see the settlements associated with the agent which it belongs.

@@ -4,6 +4,7 @@ let mongoDB = undefined;
 const Rx = require("rxjs");
 const CollectionName = "Settlements";
 const ObjectID = require("mongodb").ObjectID;
+const NumberDecimal = require('mongodb').Decimal128;
 const BusinessDA = require("./BusinessDA");
 
 class SettlementDA {
@@ -172,6 +173,7 @@ class SettlementDA {
           .map(([cache, settlement]) => {
             return {
               ...settlement,
+              amount: parseFloat(new NumberDecimal(settlement.amount.bytes).toString()),
               fromBusinessName: cache[settlement.fromBu],
               toBusinessName: cache[settlement.toBu]
             };

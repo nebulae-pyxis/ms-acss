@@ -14,8 +14,8 @@ const NumberDecimal = require('mongodb').Decimal128;
 let mongoDB = undefined;
 let broker = undefined;
 
-const dbName = `test-${uuidv4().toString().slice(0, 5)}-acss`;
-// const dbName = `acss`;
+// const dbName = `test-${uuidv4().toString().slice(0, 5)}-acss`;
+const dbName = `acss`;
 
 const environment = {
   NODE_ENV: "production",
@@ -746,36 +746,36 @@ describe("E2E - Simple transaction", function() {
   * DE-PREAPARE
   */
 
- describe('de-prepare test DB', function () {
-   it('delete mongoDB', function (done) {
-     this.timeout(12000);
-     Rx.Observable.of({})
-       .delay(5000)
-       .mergeMap(() => mongoDB.dropDB$())
-       .subscribe(
-         (evt) => console.log(`${evt}`),
-         (error) => {
-           console.error(`Mongo DropDB failed: ${error}`);
-           return done(error);
-         },
-         () => { return done(); }
-       );
-   });
-   it('stop mongo', function (done) {
-     this.timeout(25000);
-     Rx.Observable.of({})
-       .delay(1000)
-       .mergeMap(() => mongoDB.stop$())
-       .subscribe(
-         (evt) => console.log(`Mongo Stop: ${evt}`),
-         (error) => {
-           console.error(`Mongo Stop failed: ${error}`);
-           return done(error);
-         },
-         () => { return done(); }
-       );
-   });
-});
+//  describe('de-prepare test DB', function () {
+//    it('delete mongoDB', function (done) {
+//      this.timeout(12000);
+//      Rx.Observable.of({})
+//        .delay(5000)
+//        .mergeMap(() => mongoDB.dropDB$())
+//        .subscribe(
+//          (evt) => console.log(`${evt}`),
+//          (error) => {
+//            console.error(`Mongo DropDB failed: ${error}`);
+//            return done(error);
+//          },
+//          () => { return done(); }
+//        );
+//    });
+//    it('stop mongo', function (done) {
+//      this.timeout(25000);
+//      Rx.Observable.of({})
+//        .delay(1000)
+//        .mergeMap(() => mongoDB.stop$())
+//        .subscribe(
+//          (evt) => console.log(`Mongo Stop: ${evt}`),
+//          (error) => {
+//            console.error(`Mongo Stop failed: ${error}`);
+//            return done(error);
+//          },
+//          () => { return done(); }
+//        );
+//    });
+// });
 
 
 

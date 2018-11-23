@@ -225,7 +225,7 @@ class ClearingDA {
     const transformedMovements = [];
     if (movements) {
       movements.forEach(movement => {
-        const amount = movement.amount;
+        const amount = parseFloat(new NumberDecimal(movement.amount.bytes).toString())
         const business = businessArray.find(business => business._id == movement.buId) || {};
         transformedMovements.push({ businessId: movement.buId, amount, businessName: business.name });
       });

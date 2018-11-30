@@ -14,8 +14,8 @@ const NumberDecimal = require('mongodb').Decimal128;
 let mongoDB = undefined;
 let broker = undefined;
 
-// const dbName = `test-${uuidv4().toString().slice(0, 5)}-acss`;
-const dbName = `acss`;
+const dbName = `test-${uuidv4().toString().slice(0, 5)}-acss`;
+// const dbName = `acss`;
 
 const environment = {
   NODE_ENV: "production",
@@ -95,6 +95,7 @@ describe("E2E - Simple transaction", function() {
       );
 
     }),
+
     it("start acss-channel server", function (done) {
         this.timeout(3000);
         const eventSourcing = require('../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload/bin/tools/EventSourcing')();
@@ -104,6 +105,7 @@ describe("E2E - Simple transaction", function() {
         const AfccReloadsDA = require('../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload/bin/data/AfccReloadsDA');
         const TransactionsDA = require('../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload/bin/data/TransactionsDA');
         const TransactionsErrorsDA = require('../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload/bin/data/TransactionsErrorsDA');
+        const BusinessDA_channel = require('../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload/bin/data/businessUnitDA');
         // const graphQlService = require('./services/emi-gateway/GraphQlService')();
         const Rx = require('rxjs');
 
@@ -115,7 +117,8 @@ describe("E2E - Simple transaction", function() {
             AfccReloadChannelDA.start$(),
             AfccReloadsDA.start$(),
             TransactionsDA.start$(),
-            TransactionsErrorsDA.start$()
+            TransactionsErrorsDA.start$(),
+            BusinessDA_channel.start$()
           ),
           // graphQlService.start$()
         ).subscribe(

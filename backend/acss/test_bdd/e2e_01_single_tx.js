@@ -14,7 +14,9 @@ const NumberDecimal = require('mongodb').Decimal128;
 let mongoDB = undefined;
 let broker = undefined;
 
-const dbName = `test-${uuidv4().toString().slice(0, 5)}-acss`;
+// const dbName = `test-${uuidv4().toString().slice(0, 5)}-acss`;
+const dbName = `acss`;
+
 
 const environment = {
   NODE_ENV: "production",
@@ -112,6 +114,8 @@ describe("E2E - Simple transaction", function() {
       const AfccReloadsDA = require('../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload/bin/data/AfccReloadsDA');
       const TransactionsDA = require('../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload/bin/data/TransactionsDA');
       const TransactionsErrorsDA = require('../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload/bin/data/TransactionsErrorsDA');
+      const BusinessDA = require('../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload/bin/data/businessUnitDA');
+
       // const graphQlService = require('./services/emi-gateway/GraphQlService')();
       const Rx = require('rxjs');
 
@@ -123,7 +127,8 @@ describe("E2E - Simple transaction", function() {
             AfccReloadChannelDA.start$(),
             AfccReloadsDA.start$(),
             TransactionsDA.start$(),
-            TransactionsErrorsDA.start$()
+            TransactionsErrorsDA.start$(),
+            BusinessDA.start$()
         ), 
     ).subscribe(
         (evt) => { 
@@ -137,6 +142,7 @@ describe("E2E - Simple transaction", function() {
     );
 
     });
+
     it("start MQTT broker", function (done) {
       broker = new MqttBroker({
         mqttServerUrl: process.env.MQTT_SERVER_URL,
@@ -246,6 +252,40 @@ describe("E2E - Simple transaction", function() {
     )
 
   });
+
+});
+
+describe("Associate child business to other (RENE  CASE)", function(){
+
+  it("Send BusinessAttributesUpdated event", function(done){
+    this.timeout(7000);
+    broker.send$('Events', '',{
+      et: "BusinessAttributesUpdated",
+      etv: 1,
+      at: "Business",
+      aid: 1,
+      data: {
+
+      },
+      user: "esteban.zapata",
+      timestamp: Date.now(),
+      av: 164
+    })
+    .delay(3000)
+    .subscribe(
+      result => {},
+      error => {
+        console.error(`sent message failded ${error}`);
+        return done(error);
+      },
+      () => {
+        console.log("!!!!!!!!!!!!!!!!!!!Stream finished!!!!!!!!!!!!!");
+        return done();
+      }
+    )
+
+  });
+
 
 });
 

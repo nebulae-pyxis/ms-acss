@@ -13,18 +13,6 @@
               "priority": 180
             }
         ],
-        "subgroups": [
-            {
-                "groupId": "CLEARING_AND_SETTLEMENT",
-                "id": "CHANNELS",
-                "icon": "account_balance",
-                "translate": {
-                    "en": "ACSS",
-                    "es": "ACSS"
-                },
-                "priority": 2000
-            }
-        ],
         "contents": [
             {
                 "groupId": "CLEARING_AND_SETTLEMENT",
@@ -67,7 +55,7 @@
                 "navURL": "/acss/errors",
                 "path": "acss",
                 "loadChildren": "./main/content/acss/acss.module#ACSSModule",
-                "priority": 1000,
+                "priority": 700,
                 "roles" : ["SYSADMIN"],
                 "default" : false
             }       

@@ -4,19 +4,19 @@
         "src": "frontend/emi/acss",
         "groups": [
             {
-              "id": "SYSTEM",
+              "id": "CLEARING_AND_SETTLEMENT",
               "icon": "location_searching",
               "translate": {
-                "en": "System",
-                "es": "Sistema"
+                "en": "clearing and settlement",
+                "es": "Liquidación y compensación"
               },
-              "priority": 100
+              "priority": 180
             }
         ],
         "subgroups": [
             {
-                "groupId": "SYSTEM",
-                "id": "ACSS",
+                "groupId": "CLEARING_AND_SETTLEMENT",
+                "id": "CHANNELS",
                 "icon": "account_balance",
                 "translate": {
                     "en": "ACSS",
@@ -27,13 +27,12 @@
         ],
         "contents": [
             {
-                "groupId": "SYSTEM",
-                "subgroupId": "ACSS",
+                "groupId": "CLEARING_AND_SETTLEMENT",
                 "id": "CLEARINGS",
                 "icon": "chrome_reader_mode",
                 "translate": {
-                    "en": "Clearing",
-                    "es": "Liquidación"
+                    "en": "Clearings",
+                    "es": "Liquidaciones"
                 },
                 "navURL": "/acss/clearing",
                 "path": "acss",
@@ -43,24 +42,22 @@
                 "default" : false
             },
             {
-                "groupId": "SYSTEM",
-                "subgroupId": "ACSS",
+                "groupId": "CLEARING_AND_SETTLEMENT",
                 "id": "SETTLEMENTS",
                 "icon": "money",
                 "translate": {
-                    "en": "Settlement",
-                    "es": "Compensación"
+                    "en": "Settlements",
+                    "es": "Compensaciones"
                 },
                 "navURL": "/acss/settlement",
                 "path": "acss",
                 "loadChildren": "./main/content/acss/acss.module#ACSSModule",
-                "priority": 1000,
+                "priority": 900,
                 "roles" : ["business-owner", "SYSADMIN"],
                 "default" : false
             },
             {
-                "groupId": "SYSTEM",
-                "subgroupId": "ACSS",
+                "groupId": "CLEARING_AND_SETTLEMENT",
                 "id": "ERRORS",
                 "icon": "error",
                 "translate": {

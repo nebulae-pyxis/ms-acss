@@ -26,11 +26,11 @@
           <form name="businessForm" [formGroup]="businessForm" fxFlex>
             <mat-form-field class="w-100-p">
               <mat-select placeholder="{{'ACSS.SELECT_BUSINESS' | translate}}" [(value)]="selectedBusinessData" (selectionChange)="onSelectBusinessEvent($event.value)">
-
+            
                 <mat-option *ngFor="let business of allBusiness" [value]="business">
-                  {{business.name}} - {{business._id}} 
+                  {{business.name}} - {{business._id}}
                 </mat-option>
-
+            
               </mat-select>
               <mat-error *ngIf="businessForm.hasError('required', ['business'])">
                 {{'ACSS.BUSINESS_REQUIRED' | translate}}

@@ -699,24 +699,24 @@ describe("Associate child business to other (RENE  CASE)", function () {
       )
     });
 
-  //   it('Check the opened clearings', function (done) {
-  //     this.timeout(15000);
-  //     Rx.Observable.of({})
-  //     .delay(1000)
-  //     .mapTo(mongoDB.client.db(dbName).collection('Clearing'))
-  //     .mergeMap((collection) => Rx.Observable.defer(() => collection.find().toArray()))
-  //     .do(result => expect(result).to.be.lengthOf(1))
-  //     .mergeMap(closedClearings => Rx.Observable.from(closedClearings)
-  //       .do( openedClearing => {
-  //         expect(openedClearing.open).to.be.equal(true);
-  //       })
-  //       )
-  //       .subscribe(
-  //         result => { },
-  //         error => { console.log(error); return done(error); },
-  //       () => { console.log(" [[################ 15 ################ Check the opened clearings"); return done(); }
-  //       )
-  //   })
+    it('Check the opened clearings', function (done) {
+      this.timeout(15000);
+      Rx.Observable.of({})
+      .delay(1000)
+      .mapTo(mongoDB.client.db(dbName).collection('Clearing'))
+      .mergeMap((collection) => Rx.Observable.defer(() => collection.find().toArray()))
+      .do(result => expect(result).to.be.lengthOf(1))
+      .mergeMap(closedClearings => Rx.Observable.from(closedClearings)
+        .do( openedClearing => {
+          expect(openedClearing.open).to.be.equal(true);
+        })
+        )
+        .subscribe(
+          result => { },
+          error => { console.log(error); return done(error); },
+        () => { console.log(" [[################ 15 ################ Check the opened clearings"); return done(); }
+        )
+    })
 
   })
  

@@ -55,7 +55,7 @@
                 "navURL": "/acss/errors",
                 "path": "acss",
                 "loadChildren": "./main/content/acss/acss.module#ACSSModule",
-                "priority": 700,
+                "priority": 600,
                 "roles" : ["SYSADMIN"],
                 "default" : false
             }       

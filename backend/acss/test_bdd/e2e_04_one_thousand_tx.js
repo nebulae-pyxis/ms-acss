@@ -7,6 +7,7 @@ const expect = require("chai").expect;
 //LIBS FOR TESTING
 const MqttBroker = require("../bin/tools/broker/MqttBroker");
 const MongoDB = require('../bin/data/MongoDB').MongoDB;
+const NumberDecimal = require('mongodb').Decimal128;
 
 
 
@@ -15,6 +16,7 @@ let mongoDB = undefined;
 let broker = undefined;
 
 const dbName = `test-${uuidv4().toString().slice(0, 5)}-acss`;
+// const dbName = "acss";
 
 const environment = {
   NODE_ENV: "production",
@@ -103,6 +105,7 @@ describe("E2E - Simple transaction", function() {
         const AfccReloadsDA = require('../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload/bin/data/AfccReloadsDA');
         const TransactionsDA = require('../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload/bin/data/TransactionsDA');
         const TransactionsErrorsDA = require('../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload/bin/data/TransactionsErrorsDA');
+        const BusinessDA_channel = require('../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload/bin/data/businessUnitDA');
         // const graphQlService = require('./services/emi-gateway/GraphQlService')();
         const Rx = require('rxjs');
 
@@ -114,7 +117,8 @@ describe("E2E - Simple transaction", function() {
             AfccReloadChannelDA.start$(),
             AfccReloadsDA.start$(),
             TransactionsDA.start$(),
-            TransactionsErrorsDA.start$()
+            TransactionsErrorsDA.start$(),
+            BusinessDA_channel.start$()
           ),
           // graphQlService.start$()
         ).subscribe(
@@ -153,34 +157,14 @@ describe("E2E - Simple transaction", function() {
 
    it("Create several business units", function (done) {
      Rx.Observable.from([
-       {
-         _id: "123456789_Metro_med",
-         name: "Metro de Medellin"
-       },
-       {
-        _id: "123456789_Gana",
-         name: "Gana Medellin"
-       },
-       {
-        _id: "123456789_NebulaE_POS",
-         name: "NebulaE_POS"
-       },
-       {
-         _id: "123456789_PlaceToPay",
-         name: "Place to Play"
-       },
-       {
-        _id: "123456789_NebulaE",
-         name: "NebulaE"
-       },
-       {
-        _id: "123456789_surplus",
-         name: "surplus collector"
-       },
-       {
-        _id: "123456789_Pasarela",
-        name: "Pasarela"
-       }
+      { _id: "123456789_Metro_med", name: "Metro de Medellin"},
+      { _id: "123456789_Gana", name: "Gana Medellin" },
+      { _id: "123456789_NebulaE_POS", name: "NebulaE_POS" },
+      { _id: "123456789_PlaceToPay", name: "Place to Play" },
+      { _id: "123456789_NebulaE", name: "NebulaE" },
+      { _id: "123456789_surplus", name: "surplus collector" },
+      { _id: "123456789_Pasarela", name: "Pasarela" },
+      { _id: "123456789_Rene", name: "Agente Rene" }
      ])
        .delay(10)
        .mergeMap(bu => broker.send$('Events', '', {
@@ -224,18 +208,6 @@ describe("E2E - Simple transaction", function() {
             buId: "123456789_Metro_med",
             percentage: 98.5
           }],
-          reloadNetworks: [
-            {
-              fromBu: "123456789_Pasarela",
-              buId: "123456789_Gana",
-              percentage: 1.2
-            },
-            {
-              fromBu: "123456789_Pasarela",
-              buId: "123456789_NebulaE_POS",
-              percentage: 1.35
-            }
-          ],
           parties: [
             {
               fromBu: "123456789_Pasarela",
@@ -268,6 +240,42 @@ describe("E2E - Simple transaction", function() {
 
 });
 
+describe("Associate child business to other (RENE  CASE)", function () {
+
+  it("Send BusinessAttributesUpdated event", function (done) {
+    this.timeout(7000);
+    broker.send$('Events', '', {
+      et: "BusinessAttributesUpdated",
+      etv: 1,
+      at: "Business",
+      aid: "123456789_Rene",
+      data: {
+        attributes: [
+          { key: 'AFCC_CHANNEL_PERCENTAGE', value: '0.38' },
+          { key: 'CHILDREN_BUIDS', value: '123456789_NebulaE_POS, 123456789_Gana' },
+        ]
+      },
+      user: "esteban.zapata",
+      timestamp: Date.now(),
+      av: 164
+    })
+      .delay(3000)
+      .subscribe(
+        result => { },
+        error => {
+          console.error(`sent message failded ${error}`);
+          return done(error);
+        },
+        () => {
+          console.log("!!!!!!!!!!!!!!!!!!!Stream finished!!!!!!!!!!!!!");
+          return done();
+        }
+      )
+
+  });
+
+});
+
   /*
   * CREATE 1K RELOADS
   */
@@ -280,110 +288,135 @@ describe("E2E - Simple transaction", function() {
       const reloadAmount = 20000;
 
       Rx.Observable.range(0, 1000)
-        .mergeMap(() => broker.send$('Events', '', {
-          et: "AfccReloadSold",
-          etv: 1,
-          at: "Afcc",
-          aid: cardId,
-          data: {
-            amount: reloadAmount,
-            businessId: '123456789_NebulaE_POS',
-            afcc: {
-              data: {
-                before: {},
-                after: {}
-              },
-              uId: cardId,
-              cardId: cardId,
-              balance: {
-                before: 0,
-                after: reloadAmount
+      .mergeMap(() => broker.send$('Events', '', {
+        _id: uuidv4(),
+        et: "WalletTransactionExecuted",
+        etv: 1,
+        at: "Wallet",
+        aid: cardId,
+        data: {
+          businessId:  '123456789_NebulaE_POS',
+          transactionType: "SALE",
+          transactionConcept: "RECARGA_CIVICA",
+          transactions:[
+            {
+              id: uuidv4(),
+              pocket: "MAIN",
+              value: reloadAmount * -1,
+              user: "juan.vendedor",
+              location: {},
+              notes: "notas de la recarga de 11000",
+              terminal: {
+                id: uuidv4(),
+                userId: "juan.user_de_terminal",
+                username: "JUAN.SANTA",
+                associatedTransactionIds: []
               }
             },
-            source: {
-              machine: "Nesas-12",
-              ip: "192.168.1.15"
+            {
+              id: uuidv4(),
+              pocket: "BONUS",
+              value: 170,
+              user: "juan.vendedor",
+              location: {},
+              notes: "bonus generado para  11000",
+              terminal: {
+                id: uuidv4(),
+                userId: "juan.user_de_terminal",
+                username: "JUAN.SANTA",
+                associatedTransactionIds: []
+              }
             }
-
-          },
-          user: "juan.santa",
-          timestamp: Date.now(),
-          av: 1
-        }))
-        .toArray()
-        .first()
-        .subscribe(
-          ok => {},
-          error => { console.log(error); return done(error); },
-          () => {  console.log("[[################ 06 ################ Create ten AFCC reloads DONE ]]"); return done(); }
-        )
-    }),
+          ]
+        },
+        user: "juan.santa",
+        timestamp: Date.now(),
+        av: 1
+      }))
+      .toArray()
+      .first()
+      .subscribe(
+        ok => {},
+        error => { console.log(error); return done(error); },
+        () => {  console.log("[[################ 06 ################ Create ten AFCC reloads DONE ]]"); return done(); }
+      )
+    });
 
     it('Check all transactions amounts', function (done) {
-      this.timeout(15000);
-      const accumulatedTransactions = {
-        "123456789_Metro_med": 0, 
-        "123456789_NebulaE_POS": 0, 
-        "123456789_PlaceToPay": 0,
-        "123456789_NebulaE": 0
-      };
+      this.timeout(72000);
       const transactionsExpected = { 
         "123456789_Metro_med": 19700000, 
-        "123456789_NebulaE_POS": 270000, 
-        "123456789_PlaceToPay": 13650,
-        "123456789_NebulaE": 16350
+        "123456789_Rene": 76000, 
+        "123456789_PlaceToPay": 24570,
+        "123456789_NebulaE": 29430,
+        "total": 19830000
       };
-      Rx.Observable.of({})
-        .delay(10000)
-        .mapTo(mongoDB.client.db(dbName).collection("Transactions"))
-        .mergeMap((collection) => Rx.Observable.defer(() => collection.find().toArray()))
-        .mergeMap(transactionArray => Rx.Observable.from(transactionArray)          
-          .do(tr => {
-            expect(transactionArray).to.be.lengthOf(Object.keys(transactionsExpected).length * 1000)
-            switch (tr.toBu){
-              case '123456789_Metro_med':{
+      
+      const collection = mongoDB.client.db(dbName).collection('Transactions');
+      const expectedTransactions = 4000;
+      let count = 0;
+      Rx.Observable.interval(1000)
+        .do(() => console.log("Waiting for all transactions creation...", count))
+        .mergeMap(() => Rx.Observable.defer(() => collection.countDocuments()))
+        .filter(c => { count = c; return count >= expectedTransactions; })
+        .take(1)
+        .mergeMap(() => Rx.Observable.bindNodeCallback(collection.find.bind(collection))({})
+          .mergeMap(cursor => Rx.Observable.defer(() => MongoDB.extractAllFromMongoCursor$(cursor)))
+          .map(tx => ({ ...tx, amount: parseFloat(new NumberDecimal(tx.amount.bytes).toString()) }))
+          .reduce((accumulatedTransactions, tr) => {
+            accumulatedTransactions.total += tr.amount * 1000;
+            switch (tr.toBu) {
+              case '123456789_Metro_med': {
                 expect(tr.amount).to.be.equal(19700);
-                accumulatedTransactions['123456789_Metro_med'] += Math.floor(tr.amount * 1000);
+                accumulatedTransactions['123456789_Metro_med'] += tr.amount * 1000;
                 break;
               };
-              case '123456789_NebulaE_POS': {
-                expect(tr.amount).to.be.equal(270)
-                accumulatedTransactions['123456789_NebulaE_POS'] +=  Math.floor(tr.amount * 1000);
+              case '123456789_Rene': {
+                expect(tr.amount).to.be.equal(76)
+                accumulatedTransactions['123456789_Rene'] += tr.amount * 1000
                 break;
               };
-              case '123456789_PlaceToPay':{
-                expect(tr.amount).to.be.equal(13.65)
-                accumulatedTransactions['123456789_PlaceToPay'] +=  Math.floor(tr.amount * 1000);
+              case '123456789_PlaceToPay': {
+                expect(tr.amount).to.be.equal(24.57)
+                accumulatedTransactions['123456789_PlaceToPay'] += tr.amount * 1000
                 break;
               };
-              case '123456789_NebulaE':{
-                expect(tr.amount).to.be.equal(16.35)
-                accumulatedTransactions['123456789_NebulaE'] +=  Math.floor(tr.amount * 1000);
+              case '123456789_NebulaE': {
+                expect(tr.amount).to.be.equal(29.43)
+                accumulatedTransactions['123456789_NebulaE'] += tr.amount * 1000
                 break;
               };
               default: {
+                console.log("unExpected transaction =>> ", tr);
                 expect(1).to.be.equal(0);
               }
             };
-          })
-          .toArray()
-          .do(() => {
-              Object.keys(accumulatedTransactions).forEach(e => { accumulatedTransactions[e] = accumulatedTransactions[e]/1000 });
-              console.log("###############################################################", accumulatedTransactions);
-             expect(accumulatedTransactions).to.be.deep.equals(transactionsExpected);
-          })
-          .mapTo(transactionArray)
+            return accumulatedTransactions;
+
+          }, {
+              "123456789_Metro_med": 0,
+              "123456789_Rene": 0,
+              "123456789_PlaceToPay": 0,
+              "123456789_NebulaE": 0,
+              "total": 0
+            })
+            .map(result => {
+              const finalResult  = {};
+              Object.keys(result).forEach(atr => {
+                finalResult[atr] = result[atr] / 1000
+              })
+              return finalResult;
+            })
+            .do(result => {
+              expect(result).to.be.deep.equal(transactionsExpected)
+            })
         )
-        .do(transactionArray => {
-          const totalAmount = transactionArray.reduce((acc, transaction) => acc +  transaction.amount * 1000, 0);
-          expect(totalAmount / 1000).to.be.equals(20000000);
-        })
         .subscribe(
           ok => {},
           error => { console.log(error); return done(error); },
           () => {  console.log("[[################ 07 ################ Check all transactions amounts DONE ]]"); return done(); }
         )
-    })
+    });
 
   });
 
@@ -426,16 +459,16 @@ describe("E2E - Simple transaction", function() {
         error => { console.log(error); return done(error); },
         () => { console.log("[[################ 09 ################ Send the cronjob task to create the accumulated transactions DONE ]]"); return done();  }
       )
-    }),
+    });
 
     it('Check the accumulated transactionis', function(done) {
 
-      AcumulatedTransactionAmountExpected = 20000000;
+      AcumulatedTransactionAmountExpected = 19830000;
         const transactionsExpected = { 
           "123456789_Metro_med": 19700000, 
-          "123456789_NebulaE_POS": 270000, 
-          "123456789_PlaceToPay": 13650,
-          "123456789_NebulaE": 16350
+          "123456789_Rene": 76000, 
+          "123456789_PlaceToPay": 24570,
+          "123456789_NebulaE": 29430
         };
 
       Rx.Observable.of({})
@@ -486,18 +519,38 @@ describe("E2E - Simple transaction", function() {
         () => { console.log(" [[################ 11 ################ Check the accumulated transactions done"); return done(); }
       )
     });
+
     it('verify inputs and outputs', function(done){      
       const transactionsExpected = { 
         "123456789_Metro_med": 19700000, 
-        "123456789_NebulaE_POS": 270000, 
-        "123456789_PlaceToPay": 13650,
-        "123456789_NebulaE": 16350
+        "123456789_Rene": 76000, 
+        "123456789_PlaceToPay": 24570,
+        "123456789_NebulaE": 29430
       };
 
       Rx.Observable.of({})
       .delay(1000)
       .mapTo(mongoDB.client.db(dbName).collection('Clearing'))
       .mergeMap(collection => Rx.Observable.defer(() => collection.find().toArray()))
+
+      .mergeMap(transactions => Rx.Observable.from(transactions)
+        .map(clearingData => {
+          const result = { ...clearingData};
+          if(clearingData.output){
+            Object.keys(clearingData.output).forEach(prop => {
+              result.output[prop].amount = parseFloat(new NumberDecimal(result.output[prop].amount.bytes).toString())
+            })
+          }
+          if(clearingData.input){
+            Object.keys(clearingData.input).forEach(prop => {
+              result.input[prop].amount = parseFloat(new NumberDecimal(result.input[prop].amount.bytes).toString())
+            })
+          }
+          return result;
+        } )
+        .toArray()
+      )
+
       .mergeMap(clearings => Rx.Observable.from(clearings)
         .do(clearing => {
           switch(clearing.businessId){
@@ -546,6 +599,13 @@ describe("E2E - Simple transaction", function() {
               expect(clearing.input['123456789_Pasarela']).to.be.deep.equals({ amount: transactionsExpected['123456789_surplus'] })
               break;
             };
+            case '123456789_Rene': {
+              expect(clearing.open).to.be.deep.equals(true);
+              expect(clearing.accumulatedTransactionIds).to.be.lengthOf(1);
+              expect(clearing.output).to.be.deep.equals(undefined);
+              expect(clearing.input['123456789_Pasarela']).to.be.deep.equals({ amount: transactionsExpected['123456789_Rene'] })
+              break;
+            };
           }
         })
       )
@@ -554,7 +614,7 @@ describe("E2E - Simple transaction", function() {
         error => { console.log(error); return done(error); },
         () => { console.log("[[################ 12 ################verify inputs and outputs done"); return done(); }
       )
-    })
+    });
   })
 
   /**
@@ -565,7 +625,8 @@ describe("E2E - Simple transaction", function() {
       this.timeout(15000);
       Rx.Observable.of({})
         .mergeMap(() => Rx.Observable.from([
-          "123456789_PlaceToPay", "123456789_Metro_med", "123456789_NebulaE", "123456789_NebulaE_POS", "123456789_surplus"
+          "123456789_PlaceToPay", "123456789_Metro_med", "123456789_NebulaE",
+          "123456789_NebulaE_POS", "123456789_surplus", "123456789_Rene"
         ])
           .concatMap(bu => {
             return Rx.Observable.of({})
@@ -591,19 +652,38 @@ describe("E2E - Simple transaction", function() {
           error => { console.log(error); return done(error); },
           () => { console.log("[[################ 13 ################send the cronjob event done"); return done(); }
         )
-    }),
+    });
+
     it('Check the closed clearings', function (done) {
       this.timeout(40000);
       const transactionsExpected = { 
         "123456789_Metro_med": 19700000, 
-        "123456789_NebulaE_POS": 270000, 
-        "123456789_PlaceToPay": 13650,
-        "123456789_NebulaE": 16350
+        "123456789_Rene": 76000, 
+        "123456789_PlaceToPay": 24570,
+        "123456789_NebulaE": 29430
       };
       Rx.Observable.of({})
       .delay(30000)
       .mapTo(mongoDB.client.db(dbName).collection('ClosedClearing'))
       .mergeMap((collection) => Rx.Observable.defer(() => collection.find().toArray()))
+
+      .mergeMap(transactions => Rx.Observable.from(transactions)
+        .map(clearingData => {
+          const result = { ...clearingData};
+          if(clearingData.output){
+            Object.keys(clearingData.output).forEach(prop => {
+              result.output[prop].amount = parseFloat(new NumberDecimal(result.output[prop].amount.bytes).toString())
+            })
+          }
+          if(clearingData.input){
+            Object.keys(clearingData.input).forEach(prop => {
+              result.input[prop].amount = parseFloat(new NumberDecimal(result.input[prop].amount.bytes).toString())
+            })
+          }
+          return result;
+        } )
+        .toArray()
+      )
       .do(result => expect(result).to.be.lengthOf(4))
       .mergeMap(closedClearings => Rx.Observable.from(Object.keys(transactionsExpected))
         .do( buId => {
@@ -617,26 +697,26 @@ describe("E2E - Simple transaction", function() {
         error => { console.log(error); return done(error); },
         () => { console.log(" [[################ 14 ################ Check the closed clearings"); return done(); }
       )
-    }),
+    });
 
-    it('Check the opened clearings', function (done) {
-      this.timeout(15000);
-      Rx.Observable.of({})
-      .delay(1000)
-      .mapTo(mongoDB.client.db(dbName).collection('Clearing'))
-      .mergeMap((collection) => Rx.Observable.defer(() => collection.find().toArray()))
-      .do(result => expect(result).to.be.lengthOf(1))
-      .mergeMap(closedClearings => Rx.Observable.from(closedClearings)
-        .do( openedClearing => {
-          expect(openedClearing.open).to.be.equal(true);
-        })
-        )
-        .subscribe(
-          result => { },
-          error => { console.log(error); return done(error); },
-        () => { console.log(" [[################ 15 ################ Check the opened clearings"); return done(); }
-        )
-    })
+  //   it('Check the opened clearings', function (done) {
+  //     this.timeout(15000);
+  //     Rx.Observable.of({})
+  //     .delay(1000)
+  //     .mapTo(mongoDB.client.db(dbName).collection('Clearing'))
+  //     .mergeMap((collection) => Rx.Observable.defer(() => collection.find().toArray()))
+  //     .do(result => expect(result).to.be.lengthOf(1))
+  //     .mergeMap(closedClearings => Rx.Observable.from(closedClearings)
+  //       .do( openedClearing => {
+  //         expect(openedClearing.open).to.be.equal(true);
+  //       })
+  //       )
+  //       .subscribe(
+  //         result => { },
+  //         error => { console.log(error); return done(error); },
+  //       () => { console.log(" [[################ 15 ################ Check the opened clearings"); return done(); }
+  //       )
+  //   })
 
   })
  

@@ -167,7 +167,8 @@ describe("E2E - Simple transaction", function() {
        { _id: "123456789_PlaceToPay", name: "Place to Play" },
        { _id: "123456789_NebulaE", name: "NebulaE" },
        { _id: "123456789_surplus", name: "surplus collector" },
-       { _id: "123456789_Pasarela", name: "Pasarela" }
+       { _id: "123456789_Pasarela", name: "Pasarela" },
+       { _id: "123456789_Rene", name: "Agente Rene" }
      ])
        .delay(10)
        .mergeMap(bu => broker.send$('Events', '', {
@@ -255,39 +256,41 @@ describe("E2E - Simple transaction", function() {
 
 });
 
-describe("Associate child business to other (RENE  CASE)", function(){
+  describe("Associate child business to other (RENE  CASE)", function () {
 
-  it("Send BusinessAttributesUpdated event", function(done){
-    this.timeout(7000);
-    broker.send$('Events', '',{
-      et: "BusinessAttributesUpdated",
-      etv: 1,
-      at: "Business",
-      aid: 1,
-      data: {
+    it("Send BusinessAttributesUpdated event", function (done) {
+      this.timeout(7000);
+      broker.send$('Events', '', {
+        et: "BusinessAttributesUpdated",
+        etv: 1,
+        at: "Business",
+        aid: "123456789_Rene",
+        data: {
+          attributes: [
+            { key: 'AFCC_CHANNEL_PERCENTAGE', value: '0.38' },
+            { key: 'CHILDREN_BUIDS', value: '123456789_NebulaE_POS, 123456789_Gana' },
+          ]
+        },
+        user: "esteban.zapata",
+        timestamp: Date.now(),
+        av: 164
+      })
+        .delay(3000)
+        .subscribe(
+          result => { },
+          error => {
+            console.error(`sent message failded ${error}`);
+            return done(error);
+          },
+          () => {
+            console.log("!!!!!!!!!!!!!!!!!!!Stream finished!!!!!!!!!!!!!");
+            return done();
+          }
+        )
 
-      },
-      user: "esteban.zapata",
-      timestamp: Date.now(),
-      av: 164
-    })
-    .delay(3000)
-    .subscribe(
-      result => {},
-      error => {
-        console.error(`sent message failded ${error}`);
-        return done(error);
-      },
-      () => {
-        console.log("!!!!!!!!!!!!!!!!!!!Stream finished!!!!!!!!!!!!!");
-        return done();
-      }
-    )
+    });
 
   });
-
-
-});
 
   /*
   * CREATE 1 RELOAD WITHOUT BONUS
@@ -337,14 +340,15 @@ describe("Associate child business to other (RENE  CASE)", function(){
         },
         () => { console.log("Reload made finished"); return done();  }
       )
-    }),
+    });
 
     it('Chek all transactions amounts', (done) => {
       this.timeout(4000);
       const transactionsExpected = { 
-        "123456789_Metro_med": 10835, 
-        "123456789_PlaceToPay": 75.07,
-        "123456789_NebulaE": 89.92, 
+        "123456789_Metro_med": 10835,
+        "123456789_Rene": 41.8,
+        "123456789_PlaceToPay": 56.05,
+        "123456789_NebulaE": 67.14, 
         "123456789_surplus": 0.01 };
       Rx.Observable.of({})
         .delay(1000)
@@ -354,7 +358,6 @@ describe("Associate child business to other (RENE  CASE)", function(){
           .map(tx => ({ ...tx, amount: parseFloat(new NumberDecimal(tx.amount.bytes).toString()) }) )
           .toArray()
         )
-        // .do(r => console.log("TRANSACTIONS #########", JSON.stringify(r)))
         .mergeMap(transactions => Rx.Observable.from(Object.keys(transactionsExpected))
           .map(buId => { 
             const index = transactions.findIndex(t => t.toBu == buId);
@@ -363,8 +366,8 @@ describe("Associate child business to other (RENE  CASE)", function(){
           .toArray()
         )
         .do(results => {
-          expect(results).to.be.lengthOf(4);
-          expect(results).to.be.deep.equals([...Array(4)].map((e, i) => ({match: true, amount: transactionsExpected[Object.keys(transactionsExpected)[i]] })))
+          expect(results).to.be.lengthOf(5);
+          expect(results).to.be.deep.equals([...Array(5)].map((e, i) => ({match: true, amount: transactionsExpected[Object.keys(transactionsExpected)[i]] })))
         })
       .subscribe(
         ok => {},
@@ -375,7 +378,7 @@ describe("Associate child business to other (RENE  CASE)", function(){
         () => { console.log("Reload made finished"); return done();  }
       )
 
-    })
+    });
 
   });
 
@@ -404,7 +407,7 @@ describe("Associate child business to other (RENE  CASE)", function(){
    */
   describe("Send Executeed transactions not allowed", () =>  {
     
-    // No allowed transaction type
+  //   // No allowed transaction type
     it("Send Transaction executed without allowed transaction type", (done) => {
       this.timeout(1000);
       const cardId = uuidv4();
@@ -449,7 +452,7 @@ describe("Associate child business to other (RENE  CASE)", function(){
       )
     });
 
-    // No allowed transaction concept
+  //   // No allowed transaction concept
     it("Send Transaction executed without allowed transaction concept", (done) => {
       this.timeout(1000);
       const cardId = uuidv4();
@@ -494,7 +497,7 @@ describe("Associate child business to other (RENE  CASE)", function(){
       )
     });
 
-    // TransactionExecutted event with only bonus spendings
+  //   // TransactionExecutted event with only bonus spendings
     it("Send Transaction executed with only  bonus pocket used", (done) => {
       this.timeout(1000);
       const cardId = uuidv4();
@@ -598,7 +601,7 @@ describe("Associate child business to other (RENE  CASE)", function(){
           {
             id: uuidv4(),
             pocket: "BONUS",
-            value: 148.5,
+            value: 93.5,
             user: "juan.vendedor",
             location: {},
             notes: "bonus generado para  11000",
@@ -623,14 +626,15 @@ describe("Associate child business to other (RENE  CASE)", function(){
       },
       () => { console.log("Reload made finished"); return done();  }
     )
-  }),
+  });
 
   it('Chek all transactions amounts', (done) => {
     this.timeout(4000);
     const transactionsExpected = { 
       "123456789_Metro_med": 10835, 
-      "123456789_PlaceToPay": 7.5,
-      "123456789_NebulaE": 8.99, 
+      "123456789_Rene": 41.8,
+      "123456789_PlaceToPay": 13.51,
+      "123456789_NebulaE": 16.18, 
       "123456789_surplus": 0.01 };
     Rx.Observable.of({})
       .delay(1000)
@@ -649,8 +653,8 @@ describe("Associate child business to other (RENE  CASE)", function(){
         .toArray()
       )
       .do(results => {
-        expect(results).to.be.lengthOf(4);
-        expect(results).to.be.deep.equals([...Array(4)].map((e, i) => ({ match: true, amount: transactionsExpected[Object.keys(transactionsExpected)[i]] })))
+        expect(results).to.be.lengthOf(5);
+        expect(results).to.be.deep.equals([...Array(5)].map((e, i) => ({ match: true, amount: transactionsExpected[Object.keys(transactionsExpected)[i]] })))
       })
     .subscribe(
       ok => {},

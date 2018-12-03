@@ -14,8 +14,8 @@ const NumberDecimal = require('mongodb').Decimal128;
 let mongoDB = undefined;
 let broker = undefined;
 
-const dbName = `test-${uuidv4().toString().slice(0, 5)}-acss`;
-// const dbName = `acss`;
+// const dbName = `test-${uuidv4().toString().slice(0, 5)}-acss`;
+const dbName = `acss`;
 
 const environment = {
   NODE_ENV: "production",
@@ -161,7 +161,8 @@ describe("E2E - Simple transaction", function() {
        { _id: "123456789_PlaceToPay", name: "Place to Play" },
        { _id: "123456789_NebulaE", name: "NebulaE" },
        { _id: "123456789_surplus", name: "surplus collector" },
-       { _id: "123456789_Pasarela", name: "Pasarela" }
+       { _id: "123456789_Pasarela", name: "Pasarela" },
+       { _id: "123456789_Rene", name: "Agente Rene" }
      ])
        .delay(10)
        .mergeMap(bu => broker.send$('Events', '', {
@@ -237,6 +238,42 @@ describe("E2E - Simple transaction", function() {
 
 });
 
+describe("Associate child business to other (RENE  CASE)", function () {
+
+  it("Send BusinessAttributesUpdated event", function (done) {
+    this.timeout(7000);
+    broker.send$('Events', '', {
+      et: "BusinessAttributesUpdated",
+      etv: 1,
+      at: "Business",
+      aid: "123456789_Rene",
+      data: {
+        attributes: [
+          { key: 'AFCC_CHANNEL_PERCENTAGE', value: '0.38' },
+          { key: 'CHILDREN_BUIDS', value: '123456789_NebulaE_POS, 123456789_Gana' },
+        ]
+      },
+      user: "esteban.zapata",
+      timestamp: Date.now(),
+      av: 164
+    })
+      .delay(3000)
+      .subscribe(
+        result => { },
+        error => {
+          console.error(`sent message failded ${error}`);
+          return done(error);
+        },
+        () => {
+          console.log("!!!!!!!!!!!!!!!!!!!Stream finished!!!!!!!!!!!!!");
+          return done();
+        }
+      )
+
+  });
+
+});
+
   /*
   * CREATE 100 RELOADS
   */
@@ -302,22 +339,11 @@ describe("E2E - Simple transaction", function() {
         .mergeMap(transactionArray => Rx.Observable.from(transactionArray)
           .do(tr => {
             switch (tr.toBu){
-              case '123456789_Metro_med':{
-                expect(tr.amount).to.be.equal(12312.5);
-                break;
-              };
-              case '123456789_PlaceToPay':{
-                expect(tr.amount).to.be.equal(85.31)
-                break;
-              };
-              case '123456789_NebulaE':{
-                expect(tr.amount).to.be.equal(102.18)
-                break;
-              };
-              case '123456789_surplus': {
-                expect(tr.amount).to.be.equal(0.01)
-                break;
-              }
+              case '123456789_Metro_med': { expect(tr.amount).to.be.equal(12312.5); break; };
+              case '123456789_PlaceToPay': { expect(tr.amount).to.be.equal(63.7); break; };
+              case '123456789_NebulaE': { expect(tr.amount).to.be.equal(76.3); break; };
+              case '123456789_surplus': { expect(tr.amount).to.be.equal(0); break; };
+              case '123456789_Rene': { expect(tr.amount).to.be.equal(47.5); break; }
             }
           })
           .toArray()
@@ -354,7 +380,9 @@ describe("E2E - Simple transaction", function() {
   });
 
 
-
+/**
+ * create reload with bonus
+ */
   describe("Create ten AFCC reloads and check its transactions", function () {
 
     it("Create ten AFCC reloads", function (done) {
@@ -391,7 +419,7 @@ describe("E2E - Simple transaction", function() {
               {
                 id: uuidv4(),
                 pocket: "BONUS",
-                value: 168.75,
+                value: 106.25,
                 user: "juan.vendedor",
                 location: {},
                 notes: `bonus generado para ${reloadAmount}`,
@@ -430,22 +458,11 @@ describe("E2E - Simple transaction", function() {
         .mergeMap(transactionArray => Rx.Observable.from(transactionArray)
           .do(tr => {
             switch (tr.toBu){
-              case '123456789_Metro_med':{
-                expect(tr.amount).to.be.equal(12312.5);
-                break;
-              };
-              case '123456789_PlaceToPay':{
-                expect(tr.amount).to.be.equal(8.53)
-                break;
-              };
-              case '123456789_NebulaE':{
-                expect(tr.amount).to.be.equal(10.21)
-                break;
-              };
-              case '123456789_surplus': {
-                expect(tr.amount).to.be.equal(0.01)
-                break;
-              }
+              case '123456789_Metro_med':{ expect(tr.amount).to.be.equal(12312.5); break; };
+              case '123456789_Rene': { expect(tr.amount).to.be.equal(47.5); break; }
+              case '123456789_PlaceToPay':{ expect(tr.amount).to.be.equal(15.35); break; };
+              case '123456789_NebulaE':{ expect(tr.amount).to.be.equal(18.39); break; };
+              case '123456789_surplus': { expect(tr.amount).to.be.equal(0.01); break; }              
             }
           })
           .toArray()
@@ -453,7 +470,7 @@ describe("E2E - Simple transaction", function() {
         )
         .do(transactionArray => {
           const totalAmount = transactionArray.reduce((acc, transaction) => acc + transaction.amount * 1000, 0);
-          expect(totalAmount / 1000).to.be.equals(123312.5);
+          expect(totalAmount / 1000).to.be.equals(123937.5);
         })
         .subscribe(
           ok => {},
@@ -503,15 +520,16 @@ describe("E2E - Simple transaction", function() {
         error => { console.log( "ERROR => ", error); return done(error); },
         () => { console.log("[[################ 09 ################ Send the cronjob task to create the accumulated transactions DONE ]]"); return done();  }
       )
-    }),
+    });
 
     it('Check the accumulated transactionis', function(done) {
 
-      AcumulatedTransactionAmountExpected = 123312.5;
+      AcumulatedTransactionAmountExpected = 123937.5;
         const transactionsExpected = { 
           "123456789_Metro_med": 123125,
-          "123456789_PlaceToPay": 85.3,
-          "123456789_NebulaE": 102.1,
+          "123456789_Rene": 475,
+          "123456789_PlaceToPay": 153.5,
+          "123456789_NebulaE": 183.9,
           "123456789_surplus": 0.1
         };
 
@@ -523,7 +541,7 @@ describe("E2E - Simple transaction", function() {
           .do(buId => {
             const index = accTransactions.findIndex(t => t.toBu == buId);
             expect(accTransactions[index].amount).to.be.equals(transactionsExpected[buId]);
-            expect(accTransactions).to.be.lengthOf(4);
+            expect(accTransactions).to.be.lengthOf(5);
           })
           .map(buId => {
             const index = accTransactions.findIndex(t => t.toBu == buId);
@@ -553,10 +571,10 @@ describe("E2E - Simple transaction", function() {
       .mapTo(mongoDB.client.db(dbName).collection('Clearing'))
       .mergeMap(collection => Rx.Observable.defer(() => collection.countDocuments()))
       .do(count => {
-        expect(count).to.be.equals(5);
+        expect(count).to.be.equals(6);
       })
       .subscribe(
-        result => {  },
+        result => { },
         error => { console.log(error); return done(error); },
         () => { console.log(" [[################ 11 ################ Check the accumulated transactions done"); return done(); }
       )
@@ -565,8 +583,9 @@ describe("E2E - Simple transaction", function() {
     it('verify inputs and outputs', function(done){      
       const transactionsExpected = { 
         "123456789_Metro_med": 123125, 
-        "123456789_PlaceToPay": 85.3,
-        "123456789_NebulaE": 102.1, 
+        "123456789_Rene": 475,
+        "123456789_PlaceToPay": 153.5,
+        "123456789_NebulaE": 183.9, 
         "123456789_surplus": 0.1
       };
 
@@ -595,8 +614,8 @@ describe("E2E - Simple transaction", function() {
         .do(clearing => {
           switch(clearing.businessId){
             case '123456789_Pasarela': {
-              expect(Object.keys(clearing.output)).to.be.lengthOf(4, 'Pasarela has 5 ouputs OK');
-              expect(clearing.accumulatedTransactionIds).to.be.lengthOf(4);
+              expect(Object.keys(clearing.output)).to.be.lengthOf(5, 'Pasarela has 5 ouputs OK');
+              expect(clearing.accumulatedTransactionIds).to.be.lengthOf(5);
               Object.keys(transactionsExpected).forEach(key => {
                 expect(clearing.output[key].amount).to.be.equals(transactionsExpected[key])
               });
@@ -632,6 +651,13 @@ describe("E2E - Simple transaction", function() {
               expect(clearing.input['123456789_Pasarela']).to.be.deep.equals({ amount: transactionsExpected['123456789_surplus'] })
               break;
             };
+            case '123456789_Rene': {
+              expect(clearing.open).to.be.deep.equals(true);
+              expect(clearing.accumulatedTransactionIds).to.be.lengthOf(1);
+              expect(clearing.output).to.be.deep.equals(undefined);
+              expect(clearing.input['123456789_Pasarela']).to.be.deep.equals({ amount: transactionsExpected['123456789_Rene'] })
+              break;
+            };
           }
         })
       )
@@ -652,7 +678,8 @@ describe("E2E - Simple transaction", function() {
       this.timeout(15000);
       Rx.Observable.of({})
         .mergeMap(() => Rx.Observable.from([
-          "123456789_PlaceToPay", "123456789_Metro_med", "123456789_NebulaE", "123456789_NebulaE_POS", "123456789_surplus"
+          "123456789_PlaceToPay", "123456789_Metro_med", "123456789_NebulaE",
+          "123456789_NebulaE_POS", "123456789_surplus", "123456789_Rene"
         ])
           .concatMap(bu => {
             return Rx.Observable.of({})
@@ -683,8 +710,9 @@ describe("E2E - Simple transaction", function() {
       this.timeout(40000);
       const transactionsExpected = { 
         "123456789_Metro_med": 123125, 
-        "123456789_PlaceToPay": 85.3,
-        "123456789_NebulaE": 102.1, 
+        "123456789_Rene": 475,
+        "123456789_PlaceToPay": 153.5,
+        "123456789_NebulaE": 183.9, 
         "123456789_surplus": 0.1
       };
       Rx.Observable.of({})
@@ -708,7 +736,7 @@ describe("E2E - Simple transaction", function() {
         } )
         .toArray()
       )
-      .do(result => expect(result).to.be.lengthOf(4))
+      .do(result => expect(result).to.be.lengthOf(5))
       .mergeMap(closedClearings => Rx.Observable.from(Object.keys(transactionsExpected))
         .do( buId => {
           const index =  closedClearings.findIndex(i => i.businessId == buId);
@@ -749,36 +777,36 @@ describe("E2E - Simple transaction", function() {
   * DE-PREAPARE
   */
 
-//  describe('de-prepare test DB', function () {
-//    it('delete mongoDB', function (done) {
-//      this.timeout(12000);
-//      Rx.Observable.of({})
-//        .delay(5000)
-//        .mergeMap(() => mongoDB.dropDB$())
-//        .subscribe(
-//          (evt) => console.log(`${evt}`),
-//          (error) => {
-//            console.error(`Mongo DropDB failed: ${error}`);
-//            return done(error);
-//          },
-//          () => { return done(); }
-//        );
-//    });
-//    it('stop mongo', function (done) {
-//      this.timeout(25000);
-//      Rx.Observable.of({})
-//        .delay(1000)
-//        .mergeMap(() => mongoDB.stop$())
-//        .subscribe(
-//          (evt) => console.log(`Mongo Stop: ${evt}`),
-//          (error) => {
-//            console.error(`Mongo Stop failed: ${error}`);
-//            return done(error);
-//          },
-//          () => { return done(); }
-//        );
-//    });
-// });
+ describe('de-prepare test DB', function () {
+   it('delete mongoDB', function (done) {
+     this.timeout(12000);
+     Rx.Observable.of({})
+       .delay(8000)
+       .mergeMap(() => mongoDB.dropDB$())
+       .subscribe(
+         (evt) => console.log(`${evt}`),
+         (error) => {
+           console.error(`Mongo DropDB failed: ${error}`);
+           return done(error);
+         },
+         () => { return done(); }
+       );
+   });
+   it('stop mongo', function (done) {
+     this.timeout(25000);
+     Rx.Observable.of({})
+       .delay(1000)
+       .mergeMap(() => mongoDB.stop$())
+       .subscribe(
+         (evt) => console.log(`Mongo Stop: ${evt}`),
+         (error) => {
+           console.error(`Mongo Stop failed: ${error}`);
+           return done(error);
+         },
+         () => { return done(); }
+       );
+   });
+});
 
 
 

@@ -74,8 +74,8 @@ class ClearingJobTriggeredEventHandler {
     accumulateTransactions$(transactions$) {
         return transactions$
             .map(t => {  // build group key and values                
-                t.groupKey = [t.fromBu, t.toBu].sort().join('-');
-                t.groupAmount = t.fromBu === t.groupKey.split('-')[0] ? t.amount : (-1 * t.amount);
+                t.groupKey = [t.fromBu, t.toBu].sort().join('@');
+                t.groupAmount = t.fromBu === t.groupKey.split('@')[0] ? t.amount : (-1 * t.amount);
                 return t;
             })
             .groupBy(t => t.groupKey)
@@ -88,8 +88,8 @@ class ClearingJobTriggeredEventHandler {
                     acc.transactionIds[transaction.type].push(transaction._id);
                     return acc;
                 }, {
-                        fromBu: group$.key.split('-')[0],
-                        toBu: group$.key.split('-')[1],
+                        fromBu: group$.key.split('@')[0],
+                        toBu: group$.key.split('@')[1],
                         amount: 0,
                         timestamp: Date.now(),
                         transactionIds: {},

@@ -40,10 +40,10 @@ class SettlementCQRS {
       "getSettlementsByClearingId$()",
       PERMISSION_DENIED_ERROR_CODE.code,
       PERMISSION_DENIED_ERROR_CODE.description,
-      ["SYSADMIN", "business-owner"]
+      ["PLATFORM-ADMIN", "BUSINESS-OWNER"]
     )
       .mergeMap(roles => {
-        return SettlementDA.getSettlementsByClearingId$(args.page, args.count, args.clearingId, roles.SYSADMIN ? undefined:authToken.businessId)
+        return SettlementDA.getSettlementsByClearingId$(args.page, args.count, args.clearingId, roles.PLATFORM-ADMIN ? undefined:authToken.businessId)
       })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
       .catch(err => {
@@ -64,10 +64,10 @@ class SettlementCQRS {
       "getSettlementsCountByClearingId$()",
       PERMISSION_DENIED_ERROR_CODE.code,
       PERMISSION_DENIED_ERROR_CODE.description,
-      ["SYSADMIN", "business-owner"]
+      ["PLATFORM-ADMIN", "BUSINESS-OWNER"]
     )
       .mergeMap(roles => {
-        return SettlementDA.getSettlementsCountByClearingId$(args.clearingId, roles.SYSADMIN ? undefined:authToken.businessId)
+        return SettlementDA.getSettlementsCountByClearingId$(args.clearingId, roles.PLATFORM-ADMIN ? undefined:authToken.businessId)
       })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
       .catch(err => {
@@ -79,7 +79,7 @@ class SettlementCQRS {
    * Gets the settlements of a business
    *
    * @param args args
-   * @param args.businessId Id of the business (This values is taken into account if the user that perform the request has the role SYSADMIN)
+   * @param args.businessId Id of the business (This values is taken into account if the user that perform the request has the role PLATFORM-ADMIN)
    */
   getSettlementsByBusinessId$({ args }, authToken) {
     return RoleValidator.checkPermissions$(
@@ -88,10 +88,10 @@ class SettlementCQRS {
       "getSettlementsByBusinessId$()",
       PERMISSION_DENIED_ERROR_CODE.code,
       PERMISSION_DENIED_ERROR_CODE.description,
-      ["SYSADMIN", "business-owner"]
+      ["PLATFORM-ADMIN", "BUSINESS-OWNER"]
     )
       .mergeMap(roles =>{
-        args.businessId = roles.SYSADMIN ? args.businessId: null;
+        args.businessId = roles.PLATFORM-ADMIN ? args.businessId: null;
         return SettlementDA.getSettlementsByBusinessId$(args.page, args.count, args.businessId ? args.businessId : authToken.businessId);
       })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
@@ -113,10 +113,10 @@ class SettlementCQRS {
       "getSettlementsCountByBusinessId$()",
       PERMISSION_DENIED_ERROR_CODE.code,
       PERMISSION_DENIED_ERROR_CODE.description,
-      ["SYSADMIN", "business-owner"]
+      ["PLATFORM-ADMIN", "BUSINESS-OWNER"]
     )
       .mergeMap(roles => {
-        args.businessId = roles.SYSADMIN ? args.businessId: null;
+        args.businessId = roles.PLATFORM-ADMIN ? args.businessId: null;
         return SettlementDA.getSettlementsCountByBusinessId$(args.businessId ? args.businessId : authToken.businessId)
       })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
@@ -140,7 +140,7 @@ class SettlementCQRS {
       "changeSettlementState$()",
       PERMISSION_DENIED_ERROR_CODE,
       "Permission denied",
-      ["business-owner"]
+      ["BUSINESS-OWNER"]
     )
       .mergeMap(roles => {
         return SettlementDA.changeSettlementState$(

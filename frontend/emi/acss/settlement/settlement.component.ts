@@ -161,7 +161,7 @@ export class SettlementComponent implements OnInit, OnDestroy {
   loadBusinessData$() {
     return Rx.Observable.of(this.keycloakService.getUserRoles(true)).pipe(
       mergeMap(userRoles => {
-        const isAdmin = userRoles.some(role => role === "SYSADMIN");
+        const isAdmin = userRoles.some(role => role === "PLATFORM-ADMIN");
         return Rx.Observable.forkJoin(
           Rx.Observable.of(isAdmin),
           this.getBusiness$(),

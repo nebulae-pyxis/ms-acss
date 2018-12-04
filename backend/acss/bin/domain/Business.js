@@ -48,7 +48,7 @@ class Business {
       "getACSSBusinesses$()",
       PERMISSION_DENIED_ERROR_CODE,
       "Permission denied",
-      ["SYSADMIN", "business-owner"]
+      ["PLATFORM-ADMIN", "BUSINESS-OWNER"]
     )
       .mergeMap(val => BusinessDA.getBusiness$(args.id))
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
@@ -69,7 +69,7 @@ class Business {
       "getACSSBusinesses$()",
       PERMISSION_DENIED_ERROR_CODE,
       "Permission denied",
-      ["SYSADMIN", "business-owner"]
+      ["PLATFORM-ADMIN", "BUSINESS-OWNER"]
     )
       .mergeMap(val => BusinessDA.getAllBusinesses$())
       .toArray()

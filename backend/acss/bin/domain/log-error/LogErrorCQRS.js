@@ -41,7 +41,7 @@ class LogErrorCQRS {
       "getAccumulatedTransactionError$()",
       PERMISSION_DENIED_ERROR_CODE.code,
       PERMISSION_DENIED_ERROR_CODE.description,
-      ["SYSADMIN"]
+      ["PLATFORM-ADMIN"]
     )
       .mergeMap(roles => {
         return LogErrorDA.getAccumulatedTransactionErrors$(args.page, args.count)
@@ -66,7 +66,7 @@ class LogErrorCQRS {
       "getAccumulatedTransactionErrorsCount$()",
       PERMISSION_DENIED_ERROR_CODE.code,
       PERMISSION_DENIED_ERROR_CODE.description,
-      ["SYSADMIN"]
+      ["PLATFORM-ADMIN"]
     )
       .mergeMap(roles => {
         return LogErrorDA.getAccumulatedTransactionErrorsCount$(args.page, args.count)
@@ -91,7 +91,7 @@ class LogErrorCQRS {
       "getClearingErrors$()",
       PERMISSION_DENIED_ERROR_CODE.code,
       PERMISSION_DENIED_ERROR_CODE.description,
-      ["SYSADMIN"]
+      ["PLATFORM-ADMIN"]
     )
       .mergeMap(roles => {
         return LogErrorDA.getClearingErrors$(args.page, args.count)
@@ -116,7 +116,7 @@ class LogErrorCQRS {
       "getClearingErrorsCount$()",
       PERMISSION_DENIED_ERROR_CODE.code,
       PERMISSION_DENIED_ERROR_CODE.description,
-      ["SYSADMIN"]
+      ["PLATFORM-ADMIN"]
     )
       .mergeMap(roles => {
         return LogErrorDA.getClearingErrorsCount$(args.page, args.count)
@@ -141,7 +141,7 @@ class LogErrorCQRS {
       "getSettlementErrors$()",
       PERMISSION_DENIED_ERROR_CODE.code,
       PERMISSION_DENIED_ERROR_CODE.description,
-      ["SYSADMIN"]
+      ["PLATFORM-ADMIN"]
     )
       .mergeMap(roles => {
         return LogErrorDA.getSettlementErrors$(args.page, args.count)
@@ -166,7 +166,7 @@ class LogErrorCQRS {
       "getSettlementErrorsCount$()",
       PERMISSION_DENIED_ERROR_CODE.code,
       PERMISSION_DENIED_ERROR_CODE.description,
-      ["SYSADMIN"]
+      ["PLATFORM-ADMIN"]
     )
       .mergeMap(roles => {
         return LogErrorDA.getSettlementErrorsCount$(args.page, args.count)

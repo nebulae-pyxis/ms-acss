@@ -83,7 +83,7 @@ export class ClearingDetailComponent implements OnInit, OnDestroy {
   async checkIfUserIsSystemAdmin(){
     this.userRoles = await this.keycloakService.getUserRoles(true);
 
-    this.isSystemAdmin = this.userRoles.some(role => role === 'SYSADMIN');
+    this.isSystemAdmin = this.userRoles.some(role => role === 'PLATFORM-ADMIN');
   }
 
   /**

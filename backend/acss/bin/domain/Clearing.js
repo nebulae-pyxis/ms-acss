@@ -29,7 +29,7 @@ class Clearing {
    * Gets the clearings of a business
    *
    * @param args args
-   * @param args.businessId Id of the business (This values is taken into account if the user that perform the request has the role SYSADMIN)
+   * @param args.businessId Id of the business (This values is taken into account if the user that perform the request has the role PLATFORM-ADMIN)
    */
   getClearingsFromBusiness$({ args }, authToken) {
     return RoleValidator.checkPermissions$(
@@ -38,10 +38,10 @@ class Clearing {
       "getClearingsFromBusiness$()",
       PERMISSION_DENIED_ERROR_CODE.code,
       PERMISSION_DENIED_ERROR_CODE.description,
-      ["SYSADMIN", "business-owner"]
+      ["PLATFORM-ADMIN", "BUSINESS-OWNER"]
     )
       .mergeMap(roles =>{
-        args.businessId = roles.SYSADMIN ? args.businessId: null;
+        args.businessId = roles.PLATFORM-ADMIN ? args.businessId: null;
         return ClearingDA.getAllClearingsFromBusiness$(args.page, args.count, args.businessId ? args.businessId : authToken.businessId);
       })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
@@ -63,10 +63,10 @@ class Clearing {
       "getClearingsById$()",
       PERMISSION_DENIED_ERROR_CODE.code,
       PERMISSION_DENIED_ERROR_CODE.description,
-      ["SYSADMIN", "business-owner"]
+      ["PLATFORM-ADMIN", "BUSINESS-OWNER"]
     )
       .mergeMap(role => {
-        return ClearingDA.getClearingByClearingId$(args.id, role.SYSADMIN ? undefined: authToken.businessId);
+        return ClearingDA.getClearingByClearingId$(args.id, role.PLATFORM-ADMIN ? undefined: authToken.businessId);
       })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
       .catch(err => this.handleError$(err));
@@ -85,10 +85,10 @@ class Clearing {
       "getAccumulatedTransactionsByIds$()",
       PERMISSION_DENIED_ERROR_CODE.code,
       PERMISSION_DENIED_ERROR_CODE.description,
-      ["SYSADMIN", "business-owner"]
+      ["PLATFORM-ADMIN", "BUSINESS-OWNER"]
     )
       .mergeMap(role => {
-        return AccumulatedTransactionDA.getAccumulatedTransactionsByIds$(args.page, args.count, args.ids, role.SYSADMIN ? undefined: authToken.businessId)
+        return AccumulatedTransactionDA.getAccumulatedTransactionsByIds$(args.page, args.count, args.ids, role.PLATFORM-ADMIN ? undefined: authToken.businessId)
       })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
       .catch(err => this.handleError$(err));
@@ -107,11 +107,11 @@ class Clearing {
       "getAccumulatedTransactionsByIds$()",
       PERMISSION_DENIED_ERROR_CODE.code,
       PERMISSION_DENIED_ERROR_CODE.description,
-      ["SYSADMIN", "business-owner"]
+      ["PLATFORM-ADMIN", "BUSINESS-OWNER"]
     )
       .mergeMap(roles => ClearingDA.getClearingByClearingId$(args.clearingId).map(clearing  => [roles, clearing]))
       .mergeMap(([role, clearing]) => {
-        return AccumulatedTransactionDA.getAccumulatedTransactionsByIds$(args.page, args.count, clearing.accumulatedTransactionIds, role.SYSADMIN ? undefined: authToken.businessId)
+        return AccumulatedTransactionDA.getAccumulatedTransactionsByIds$(args.page, args.count, clearing.accumulatedTransactionIds, role.PLATFORM-ADMIN ? undefined: authToken.businessId)
       })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
       .catch(err => this.handleError$(err));
@@ -130,10 +130,10 @@ class Clearing {
       "getTransactionsByIds$()",
       PERMISSION_DENIED_ERROR_CODE.code,
       PERMISSION_DENIED_ERROR_CODE.description,
-      ["SYSADMIN", "business-owner"]
+      ["PLATFORM-ADMIN", "BUSINESS-OWNER"]
     )
       .mergeMap(roles => {
-        return TransactionDA.getTransactionsByIds$(args.page, args.count, args.ids, roles.SYSADMIN ? undefined:authToken.businessId)
+        return TransactionDA.getTransactionsByIds$(args.page, args.count, args.ids, roles.PLATFORM-ADMIN ? undefined:authToken.businessId)
       })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
       .catch(err => this.handleError$(err));
@@ -153,13 +153,13 @@ class Clearing {
       "getTransactionsByAccumulatedTransactionId$()",
       PERMISSION_DENIED_ERROR_CODE.code,
       PERMISSION_DENIED_ERROR_CODE.description,
-      ["SYSADMIN", "business-owner"]
+      ["PLATFORM-ADMIN", "BUSINESS-OWNER"]
     )
       .mergeMap(roles => AccumulatedTransactionDA.getAccumulatedTransaction$(args.accumulatedTransactionId).map(accumulatedTx  => [roles, accumulatedTx]))
       .mergeMap(([roles, accumulatedTransaction]) => {
         const transactionIds = Object.keys(accumulatedTransaction.transactionIds)
         .reduce((acc, key) => acc.concat(accumulatedTransaction.transactionIds[key]), [])
-        return TransactionDA.getTransactionsByIds$(args.page, args.count, transactionIds, roles.SYSADMIN ? undefined:authToken.businessId)
+        return TransactionDA.getTransactionsByIds$(args.page, args.count, transactionIds, roles.PLATFORM-ADMIN ? undefined:authToken.businessId)
       })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
       .catch(err => this.handleError$(err));

@@ -59,7 +59,7 @@ module.exports = {
               "getACSSBusiness",
               PERMISSION_DENIED_ERROR_CODE,
               "Permission denied",
-              ["SYSADMIN", "business-owner"]
+              ["PLATFORM-ADMIN", "BUSINESS-OWNER"]
             )
               .mergeMap(response => {
                 return broker.forwardAndGetReply$(
@@ -80,7 +80,7 @@ module.exports = {
               "getACSSBusinesses",
               PERMISSION_DENIED_ERROR_CODE,
               "Permission denied",
-              ["SYSADMIN", "business-owner"]
+              ["PLATFORM-ADMIN", "BUSINESS-OWNER"]
             )
               .mergeMap(response => {
                 return broker.forwardAndGetReply$(
@@ -101,7 +101,7 @@ module.exports = {
             "getBusinessById",
             PERMISSION_DENIED_ERROR_CODE,
             "Permission denied",
-            ["SYSADMIN", "business-owner"]
+            ["PLATFORM-ADMIN", "BUSINESS-OWNER"]
           )
             .mergeMap(response => {
               return broker.forwardAndGetReply$(
@@ -122,7 +122,7 @@ module.exports = {
               "getAllClearingsFromBusiness",
               PERMISSION_DENIED_ERROR_CODE,
               "Permission denied",
-              ["SYSADMIN", "business-owner"]
+              ["PLATFORM-ADMIN", "BUSINESS-OWNER"]
             ).mergeMap(response => {
                 return broker.forwardAndGetReply$(
                   "Clearing",
@@ -142,7 +142,7 @@ module.exports = {
               "getClearingById",
               PERMISSION_DENIED_ERROR_CODE,
               "Permission denied",
-              ["SYSADMIN", "business-owner"]
+              ["PLATFORM-ADMIN", "BUSINESS-OWNER"]
             ).mergeMap(response => {
                 return broker.forwardAndGetReply$(
                   "Clearing",
@@ -162,7 +162,7 @@ module.exports = {
               "getAccumulatedTransactionsByIds",
               PERMISSION_DENIED_ERROR_CODE,
               "Permission denied",
-              ["SYSADMIN", "business-owner"]
+              ["PLATFORM-ADMIN", "BUSINESS-OWNER"]
             ).mergeMap(response => {
                 return broker.forwardAndGetReply$(
                   "Clearing",
@@ -182,7 +182,7 @@ module.exports = {
             "getAccumulatedTransactionsByClearingId",
             PERMISSION_DENIED_ERROR_CODE,
             "Permission denied",
-            ["SYSADMIN", "business-owner"]
+            ["PLATFORM-ADMIN", "BUSINESS-OWNER"]
           ).mergeMap(response => {
               return broker.forwardAndGetReply$(
                 "Clearing",
@@ -202,7 +202,7 @@ module.exports = {
               "getTransactionsByIds",
               PERMISSION_DENIED_ERROR_CODE,
               "Permission denied",
-              ["SYSADMIN", "business-owner"]
+              ["PLATFORM-ADMIN", "BUSINESS-OWNER"]
             ).mergeMap(response => {
                 return broker.forwardAndGetReply$(
                   "Clearing",
@@ -222,7 +222,7 @@ module.exports = {
             "getTransactionsByAccumulatedTransactionId",
             PERMISSION_DENIED_ERROR_CODE,
             "Permission denied",
-            ["SYSADMIN", "business-owner"]
+            ["PLATFORM-ADMIN", "BUSINESS-OWNER"]
           ).mergeMap(response => {
               return broker.forwardAndGetReply$(
                 "Clearing",
@@ -242,7 +242,7 @@ module.exports = {
               "getSettlementsByClearingId",
               PERMISSION_DENIED_ERROR_CODE,
               "Permission denied",
-              ["SYSADMIN", "business-owner"]
+              ["PLATFORM-ADMIN", "BUSINESS-OWNER"]
             ).mergeMap(response => {
                 return broker.forwardAndGetReply$(
                   "Settlement",
@@ -262,7 +262,7 @@ module.exports = {
               "getSettlementsCountByClearingId",
               PERMISSION_DENIED_ERROR_CODE,
               "Permission denied",
-              ["SYSADMIN", "business-owner"]
+              ["PLATFORM-ADMIN", "BUSINESS-OWNER"]
             ).mergeMap(response => {
                 return broker.forwardAndGetReply$(
                   "Settlement",
@@ -282,7 +282,7 @@ module.exports = {
               "getSettlementsByBusinessId",
               PERMISSION_DENIED_ERROR_CODE,
               "Permission denied",
-              ["SYSADMIN", "business-owner"]
+              ["PLATFORM-ADMIN", "BUSINESS-OWNER"]
             ).mergeMap(response => {
                 return broker.forwardAndGetReply$(
                   "Settlement",
@@ -302,7 +302,7 @@ module.exports = {
               "getSettlementsCountByBusinessId",
               PERMISSION_DENIED_ERROR_CODE,
               "Permission denied",
-              ["SYSADMIN", "business-owner"]
+              ["PLATFORM-ADMIN", "BUSINESS-OWNER"]
             ).mergeMap(response => {
                 return broker.forwardAndGetReply$(
                   "Settlement",
@@ -322,7 +322,7 @@ module.exports = {
             "getAccumulatedTransactionErrors",
             PERMISSION_DENIED_ERROR_CODE,
             "Permission denied",
-            ["SYSADMIN"]
+            ["PLATFORM-ADMIN"]
           ).mergeMap(response => {
               return broker.forwardAndGetReply$(
                 "LogError",
@@ -342,7 +342,7 @@ module.exports = {
           "getAccumulatedTransactionErrorsCount",
           PERMISSION_DENIED_ERROR_CODE,
           "Permission denied",
-          ["SYSADMIN"]
+          ["PLATFORM-ADMIN"]
         ).mergeMap(response => {
             return broker.forwardAndGetReply$(
               "LogError",
@@ -362,7 +362,7 @@ module.exports = {
               "getClearingErrors",
               PERMISSION_DENIED_ERROR_CODE,
               "Permission denied",
-              ["SYSADMIN"]
+              ["PLATFORM-ADMIN"]
             ).mergeMap(response => {
                 return broker.forwardAndGetReply$(
                   "LogError",
@@ -382,7 +382,7 @@ module.exports = {
             "getClearingErrorsCount",
             PERMISSION_DENIED_ERROR_CODE,
             "Permission denied",
-            ["SYSADMIN"]
+            ["PLATFORM-ADMIN"]
           ).mergeMap(response => {
               return broker.forwardAndGetReply$(
                 "LogError",
@@ -402,7 +402,7 @@ module.exports = {
           "getSettlementErrors",
           PERMISSION_DENIED_ERROR_CODE,
           "Permission denied",
-          ["SYSADMIN"]
+          ["PLATFORM-ADMIN"]
         ).mergeMap(response => {
             return broker.forwardAndGetReply$(
               "LogError",
@@ -422,7 +422,7 @@ module.exports = {
           "getSettlementErrorsCount",
           PERMISSION_DENIED_ERROR_CODE,
           "Permission denied",
-          ["SYSADMIN"]
+          ["PLATFORM-ADMIN"]
         ).mergeMap(response => {
             return broker.forwardAndGetReply$(
               "LogError",
@@ -446,7 +446,7 @@ module.exports = {
           "changeSettlementState",
           PERMISSION_DENIED_ERROR_CODE,
           "Permission denied",
-          ["business-owner"]
+          ["BUSINESS-OWNER"]
         )
           .mergeMap(roles => {
             return context.broker.forwardAndGetReply$(

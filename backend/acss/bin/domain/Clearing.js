@@ -41,7 +41,7 @@ class Clearing {
       ["PLATFORM-ADMIN", "BUSINESS-OWNER"]
     )
       .mergeMap(roles =>{
-        args.businessId = roles.PLATFORM-ADMIN ? args.businessId: null;
+        args.businessId = roles['PLATFORM-ADMIN'] ? args.businessId: null;
         return ClearingDA.getAllClearingsFromBusiness$(args.page, args.count, args.businessId ? args.businessId : authToken.businessId);
       })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
@@ -66,7 +66,7 @@ class Clearing {
       ["PLATFORM-ADMIN", "BUSINESS-OWNER"]
     )
       .mergeMap(role => {
-        return ClearingDA.getClearingByClearingId$(args.id, role.PLATFORM-ADMIN ? undefined: authToken.businessId);
+        return ClearingDA.getClearingByClearingId$(args.id, role['PLATFORM-ADMIN'] ? undefined: authToken.businessId);
       })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
       .catch(err => this.handleError$(err));
@@ -88,7 +88,7 @@ class Clearing {
       ["PLATFORM-ADMIN", "BUSINESS-OWNER"]
     )
       .mergeMap(role => {
-        return AccumulatedTransactionDA.getAccumulatedTransactionsByIds$(args.page, args.count, args.ids, role.PLATFORM-ADMIN ? undefined: authToken.businessId)
+        return AccumulatedTransactionDA.getAccumulatedTransactionsByIds$(args.page, args.count, args.ids, role['PLATFORM-ADMIN'] ? undefined: authToken.businessId)
       })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
       .catch(err => this.handleError$(err));
@@ -111,7 +111,7 @@ class Clearing {
     )
       .mergeMap(roles => ClearingDA.getClearingByClearingId$(args.clearingId).map(clearing  => [roles, clearing]))
       .mergeMap(([role, clearing]) => {
-        return AccumulatedTransactionDA.getAccumulatedTransactionsByIds$(args.page, args.count, clearing.accumulatedTransactionIds, role.PLATFORM-ADMIN ? undefined: authToken.businessId)
+        return AccumulatedTransactionDA.getAccumulatedTransactionsByIds$(args.page, args.count, clearing.accumulatedTransactionIds, role['PLATFORM-ADMIN']? undefined: authToken.businessId)
       })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
       .catch(err => this.handleError$(err));

@@ -73,6 +73,7 @@ module.exports = {
               .mergeMap(response => getResponseFromBackEnd$(response))
               .toPromise();
         },
+        
         getACSSBusinesses(root, args, context) {
             return RoleValidator.checkPermissions$(
               context.authToken.realm_access.roles,

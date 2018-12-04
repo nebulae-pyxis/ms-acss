@@ -133,7 +133,7 @@ class Clearing {
       ["PLATFORM-ADMIN", "BUSINESS-OWNER"]
     )
       .mergeMap(roles => {
-        return TransactionDA.getTransactionsByIds$(args.page, args.count, args.ids, roles.PLATFORM-ADMIN ? undefined:authToken.businessId)
+        return TransactionDA.getTransactionsByIds$(args.page, args.count, args.ids, roles["PLATFORM-ADMIN"] ? undefined:authToken.businessId)
       })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
       .catch(err => this.handleError$(err));
@@ -159,7 +159,7 @@ class Clearing {
       .mergeMap(([roles, accumulatedTransaction]) => {
         const transactionIds = Object.keys(accumulatedTransaction.transactionIds)
         .reduce((acc, key) => acc.concat(accumulatedTransaction.transactionIds[key]), [])
-        return TransactionDA.getTransactionsByIds$(args.page, args.count, transactionIds, roles.PLATFORM-ADMIN ? undefined:authToken.businessId)
+        return TransactionDA.getTransactionsByIds$(args.page, args.count, transactionIds, roles["PLATFORM-ADMIN"] ? undefined:authToken.businessId)
       })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
       .catch(err => this.handleError$(err));

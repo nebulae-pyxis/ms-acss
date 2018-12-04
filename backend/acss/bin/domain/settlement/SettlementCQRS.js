@@ -43,7 +43,7 @@ class SettlementCQRS {
       ["PLATFORM-ADMIN", "BUSINESS-OWNER"]
     )
       .mergeMap(roles => {
-        return SettlementDA.getSettlementsByClearingId$(args.page, args.count, args.clearingId, roles.PLATFORM-ADMIN ? undefined:authToken.businessId)
+        return SettlementDA.getSettlementsByClearingId$(args.page, args.count, args.clearingId, roles["PLATFORM-ADMIN"] ? undefined:authToken.businessId)
       })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
       .catch(err => {
@@ -67,7 +67,7 @@ class SettlementCQRS {
       ["PLATFORM-ADMIN", "BUSINESS-OWNER"]
     )
       .mergeMap(roles => {
-        return SettlementDA.getSettlementsCountByClearingId$(args.clearingId, roles.PLATFORM-ADMIN ? undefined:authToken.businessId)
+        return SettlementDA.getSettlementsCountByClearingId$(args.clearingId, roles["PLATFORM-ADMIN"] ? undefined:authToken.businessId)
       })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
       .catch(err => {
@@ -91,7 +91,7 @@ class SettlementCQRS {
       ["PLATFORM-ADMIN", "BUSINESS-OWNER"]
     )
       .mergeMap(roles =>{
-        args.businessId = roles.PLATFORM-ADMIN ? args.businessId: null;
+        args.businessId = roles["PLATFORM-ADMIN"] ? args.businessId: null;
         return SettlementDA.getSettlementsByBusinessId$(args.page, args.count, args.businessId ? args.businessId : authToken.businessId);
       })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
@@ -116,7 +116,7 @@ class SettlementCQRS {
       ["PLATFORM-ADMIN", "BUSINESS-OWNER"]
     )
       .mergeMap(roles => {
-        args.businessId = roles.PLATFORM-ADMIN ? args.businessId: null;
+        args.businessId = roles["PLATFORM-ADMIN"] ? args.businessId: null;
         return SettlementDA.getSettlementsCountByBusinessId$(args.businessId ? args.businessId : authToken.businessId)
       })
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))

@@ -256,41 +256,73 @@ describe("E2E - Simple transaction", function() {
 
 });
 
-  // describe("Associate child business to other (RENE  CASE)", function () {
+  describe("Associate child business to other (RENE  CASE)", function () {
 
-  //   it("Send BusinessAttributesUpdated event", function (done) {
-  //     this.timeout(7000);
-  //     broker.send$('Events', '', {
-  //       et: "BusinessAttributesUpdated",
-  //       etv: 1,
-  //       at: "Business",
-  //       aid: "123456789_Rene",
-  //       data: {
-  //         attributes: [
-  //           { key: 'AFCC_CHANNEL_PERCENTAGE', value: '0.38' },
-  //           { key: 'CHILDREN_BUIDS', value: '123456789_NebulaE_POS, 123456789_Gana' },
-  //         ]
-  //       },
-  //       user: "esteban.zapata",
-  //       timestamp: Date.now(),
-  //       av: 164
-  //     })
-  //       .delay(3000)
-  //       .subscribe(
-  //         result => { },
-  //         error => {
-  //           console.error(`sent message failded ${error}`);
-  //           return done(error);
-  //         },
-  //         () => {
-  //           console.log("!!!!!!!!!!!!!!!!!!!Stream finished!!!!!!!!!!!!!");
-  //           return done();
-  //         }
-  //       )
+    it("Send BusinessAttributesUpdated event", function (done) {
+      this.timeout(7000);
+      broker.send$('Events', '', {
+        et: "BusinessAttributesUpdated",
+        etv: 1,
+        at: "Business",
+        aid: "123456789_Rene",
+        data: {
+          attributes: [
+            { key: 'AFCC_CHANNEL_PERCENTAGE', value: '0.38' },
+            { key: 'CHILDREN_BUIDS', value: '123456789_NebulaE_POS, 123456789_Gana' },
+          ]
+        },
+        user: "esteban.zapata",
+        timestamp: Date.now(),
+        av: 164
+      })
+        .delay(3000)
+        .subscribe(
+          result => { },
+          error => {
+            console.error(`sent message failded ${error}`);
+            return done(error);
+          },
+          () => {
+            console.log("!!!!!!!!!!!!!!!!!!!Stream finished!!!!!!!!!!!!!");
+            return done();
+          }
+        )
 
-  //   });
+    });
 
-  // });
+    it("Send BusinessAttributesUpdated event with wrong keys to remove the children buids relation", function(done) {
+      this.timeout(7000);
+      Rx.Observable.of();
+      broker
+        .send$("Events", "", {
+          et: "BusinessAttributesUpdated",
+          etv: 1,
+          at: "Business",
+          aid: "123456789_Rene",
+          data: {
+            attributes: [
+              { key: "AFFCC_CHANNEL_PERCENTAGE", value: "0.38" },
+              {
+                key: "CHILDREN_BUIDS",
+                value: "123456789_NebulaE_POS, 123456789_Gana"
+              }
+            ]
+          },
+          user: "esteban.zapata",
+          timestamp: Date.now(),
+          av: 164
+        })
+        .delay(3000)
+        .subscribe(result => {}, error => {
+            console.error(`sent message failded ${error}`);
+            return done(error);
+          }, () => {
+            console.log("!!!!!!!!!!!!!!!!!!!Stream finished!!!!!!!!!!!!!");
+            return done();
+          });
+    });
+
+  });
 
 
   /*
@@ -647,7 +679,7 @@ describe("E2E - Simple transaction", function() {
       .mergeMap(transactions => Rx.Observable.from(Object.keys(transactionsExpected))
         .map(buId => { 
           const index = transactions.findIndex(t => t.toBu == buId);
-          console.log("################", transactions[index] );
+          // console.log("################", transactions[index] );
           return { match: transactions[index].amount == transactionsExpected[buId], amount: transactions[index].amount }
         })
         .toArray()

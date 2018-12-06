@@ -188,7 +188,7 @@ class ClearingDA {
    * @param {*} collectionVsOperationAndCommand array of Mongo operations
    */
   static executeOperations$(collectionVsOperationAndCommand) {
-    console.log('collectionVsOperationAndCommand => ', JSON.stringify(collectionVsOperationAndCommand));
+    // console.log('collectionVsOperationAndCommand => ', JSON.stringify(collectionVsOperationAndCommand));
     return mongoDB.applyAll$(collectionVsOperationAndCommand);
   }
 

@@ -642,7 +642,7 @@ describe("Associate child business to other (RENE  CASE)", function () {
       .mergeMap(closedClearings => Rx.Observable.from(Object.keys(transactionsExpected))
         .do( buId => {
           const index =  closedClearings.findIndex(i => i.businessId == buId);
-          console.log(closedClearings[index]);
+          // console.log(closedClearings[index]);
           expect(closedClearings[index].input['123456789_Pasarela'].amount).to.be.equal(transactionsExpected[buId], "Checking the input in actors")
           expect(closedClearings[index].open).to.be.equal(false);
         })

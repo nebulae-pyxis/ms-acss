@@ -14,8 +14,8 @@ const NumberDecimal = require('mongodb').Decimal128;
 let mongoDB = undefined;
 let broker = undefined;
 
-// const dbName = `test-${uuidv4().toString().slice(0, 5)}-acss`;
-const dbName = `acss`;
+const dbName = `test-${uuidv4().toString().slice(0, 5)}-acss`;
+// const dbName = `acss`;
 
 
 const environment = {

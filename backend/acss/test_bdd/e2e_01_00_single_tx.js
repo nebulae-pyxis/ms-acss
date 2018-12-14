@@ -274,11 +274,15 @@ describe("E2E - Simple transaction", function() {
                   percentage: 0.2
                 },
                 {
-                  fromBu: "123456789_Pasarela",
+                  fromBu: "123456789_inversiones",
                   buId: "123456789_Cloud",
                   percentage: 0.1
                 }
-              ]
+              ],
+              bonusCollector: {
+                fromBu: "123456789_inversiones",
+                buId: "123456789_Comisiones"
+              }
             }
           },
           user: "juan.santa",
@@ -718,11 +722,15 @@ describe("E2E - Simple transaction", function() {
             }))
             .toArray()
         )
+        .do(transactions => {
+          expect(transactions).to.be.lengthOf(4);
+        })
         .mergeMap(transactions =>
           Rx.Observable.from(Object.keys(transactionsExpected))
             .map(buId => {
               const index = transactions.findIndex(t => t.toBu == buId);
-              console.log(buId, index);
+              console.log("##########", buId, index);
+              console.log(transactions);
               return {
                 match: transactions[index].amount == transactionsExpected[buId],
                 amount: transactions[index].amount

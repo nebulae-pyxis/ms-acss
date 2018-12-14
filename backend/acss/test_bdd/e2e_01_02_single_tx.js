@@ -1,3 +1,9 @@
+/**
+ * ITS GONNA TEST  SALES USING DIFFERENTS POCKETS MAIN, BONUS AND CREDIT POCKET
+ * GENERATING BONUS FOR POS   ==>   YES
+ * POW_OWNER HAVE POS MANAGER ==>   YES
+ */
+
 // TEST LIBS
 const assert = require("assert");
 const Rx = require("rxjs");
@@ -37,7 +43,7 @@ const environment = {
     "mongodb://localhost:27017,localhost:27018,localhost:27019?replicaSet=rs0",
   EVENT_STORE_STORE_AGGREGATES_DB_NAME: "Aggregates",
   EVENT_STORE_STORE_EVENTSTORE_DB_NAME: "EventStore",
-  CHANNEL_TRANSACTION_TYPES_CONCEPTS : '{"SALE": ["RECARGA_CIVICA"]}'
+  CHANNEL_TRANSACTION_TYPES_CONCEPTS: '{"SALE": ["RECARGA_CIVICA"]}'
 };
 
 /*
@@ -74,7 +80,6 @@ describe("E2E - Simple transaction", function() {
       const TransactionsDA = require("../bin/data/TransactionsDA");
       const LogErrorDA = require("../bin/data/LogErrorDA");
       const AccumulatedTransactionDA = require("../bin/data/AccumulatedTransactionDA");
-      // const graphQlService = require('../bin//services/emi-gateway/GraphQlService')();
 
       Rx.Observable.concat(
         eventSourcing.eventStore.start$(),
@@ -113,8 +118,6 @@ describe("E2E - Simple transaction", function() {
       const TransactionsDA = require("../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload/bin/data/TransactionsDA");
       const TransactionsErrorsDA = require("../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload/bin/data/TransactionsErrorsDA");
       const BusinessDA = require("../../../../ms-acss-channel-afcc-reload/backend/acss-channel-afcc-reload/bin/data/businessUnitDA");
-
-      // const graphQlService = require('./services/emi-gateway/GraphQlService')();
       const Rx = require("rxjs");
 
       Rx.Observable.concat(
@@ -128,7 +131,7 @@ describe("E2E - Simple transaction", function() {
           TransactionsErrorsDA.start$(),
           BusinessDA.start$()
         )
-      ).subscribe( evt => {}, error => done(error), () => done() );
+      ).subscribe(evt => {}, error => done(error), () => done());
     });
 
     it("start MQTT broker", function(done) {
@@ -173,7 +176,7 @@ describe("E2E - Simple transaction", function() {
         )
         .toArray()
         .delay(1000)
-        .subscribe( evt => {}, error => done(error), () => done() );
+        .subscribe(evt => {}, error => done(error), () => done());
     });
   });
 
@@ -195,29 +198,91 @@ describe("E2E - Simple transaction", function() {
             lastEdition: Date.now(),
             salesWithMainPocket: {
               actors: [
-                { fromBu: "123456789_Pasarela", buId: "123456789_Metro_med", percentage: 98.5 },
-                { fromBu: "123456789_Pasarela", buId: "123456789_PlaceToPay", percentage: 0.2 },
-                { fromBu: "123456789_Pasarela", buId: "123456789_NebulaE", percentage: 0.2 },
-                { fromBu: "123456789_Pasarela", buId: "123456789_Cloud", percentage: 0.1 }
+                {
+                  fromBu: "123456789_Pasarela",
+                  buId: "123456789_Metro_med",
+                  percentage: 98.5
+                },
+                {
+                  fromBu: "123456789_Pasarela",
+                  buId: "123456789_PlaceToPay",
+                  percentage: 0.2
+                },
+                {
+                  fromBu: "123456789_Pasarela",
+                  buId: "123456789_NebulaE",
+                  percentage: 0.2
+                },
+                {
+                  fromBu: "123456789_Pasarela",
+                  buId: "123456789_Cloud",
+                  percentage: 0.1
+                }
               ],
-              surplusCollector: { fromBu: "123456789_Pasarela", buId: "123456789_surplus" },
-              bonusCollector: { fromBu: "123456789_Pasarela", buId: "123456789_Comisiones" }
+              surplusCollector: {
+                fromBu: "123456789_Pasarela",
+                buId: "123456789_surplus"
+              },
+              bonusCollector: {
+                fromBu: "123456789_Pasarela",
+                buId: "123456789_Comisiones"
+              }
             },
             salesWithBonusPocket: {
               actors: [
-                { fromBu: "123456789_Comisiones", buId: "123456789_Metro_med", percentage: 98.5 },
-                { fromBu: "123456789_Comisiones", buId: "123456789_PlaceToPay", percentage: 0.2 },
-                { fromBu: "123456789_Comisiones", buId: "123456789_NebulaE", percentage: 0.2 },
-                { fromBu: "123456789_Pasarela", buId: "123456789_Cloud", percentage: 0.1 }
+                {
+                  fromBu: "123456789_Comisiones",
+                  buId: "123456789_Metro_med",
+                  percentage: 98.5
+                },
+                {
+                  fromBu: "123456789_Comisiones",
+                  buId: "123456789_PlaceToPay",
+                  percentage: 0.2
+                },
+                {
+                  fromBu: "123456789_Comisiones",
+                  buId: "123456789_NebulaE",
+                  percentage: 0.2
+                },
+                {
+                  fromBu: "123456789_Pasarela",
+                  buId: "123456789_Cloud",
+                  percentage: 0.1
+                }
               ],
-              investmentCollector: { fromBu: "123456789_Comisiones", buId: "123456789_inversiones" }
+              investmentCollector: {
+                fromBu: "123456789_Comisiones",
+                buId: "123456789_inversiones"
+              }
             },
             salesWithCreditPocket: {
               actors: [
-                { fromBu: "123456789_inversiones", buId: "123456789_Metro_med", percentage: 98.5 },
-                { fromBu: "123456789_inversiones", buId: "123456789_PlaceToPay", percentage: 0.25 },
-                { fromBu: "123456789_inversiones", buId: "123456789_NebulaE", percentage: 0.25 }
-              ]
+                {
+                  fromBu: "123456789_inversiones",
+                  buId: "123456789_Metro_med",
+                  percentage: 98.5
+                },
+                {
+                  fromBu: "123456789_inversiones",
+                  buId: "123456789_PlaceToPay",
+                  percentage: 0.2
+                },
+                {
+                  fromBu: "123456789_inversiones",
+                  buId: "123456789_NebulaE",
+                  percentage: 0.2
+                },
+                {
+                  fromBu: "123456789_inversiones",
+                  buId: "123456789_Cloud",
+                  percentage: 0.1
+                }
+              ],
+              bonusCollector: {
+                fromBu: "123456789_inversiones",
+                buId: "123456789_Comisiones"
+              }
             }
           },
           user: "juan.santa",
@@ -225,44 +290,43 @@ describe("E2E - Simple transaction", function() {
           av: 0
         })
         .delay(3000)
-        .subscribe( result => {}, error => done(error), () => done() );
+        .subscribe(result => {}, error => done(error), () => done());
     });
   });
 
-  // describe("Associate child business to other (RENE  CASE)", function() {
-  //   it("Send BusinessAttributesUpdated event", function(done) {
-  //     this.timeout(7000);
-  //     broker
-  //       .send$("Events", "", {
-  //         et: "BusinessAttributesUpdated",
-  //         etv: 1,
-  //         at: "Business",
-  //         aid: "123456789_Rene",
-  //         data: {
-  //           attributes: [
-  //             { key: "AFCC_CHANNEL_PERCENTAGE", value: "0.38" },
-  //             {
-  //               key: "CHILDREN_BUIDS",
-  //               value: "123456789_NebulaE_POS, 123456789_Gana"
-  //             }
-  //           ]
-  //         },
-  //         user: "esteban.zapata",
-  //         timestamp: Date.now(),
-  //         av: 164
-  //       })
-  //       .delay(3000)
-  //       .subscribe( result => {}, error => done(error), () => done() );
-  //   });
-  // });
+  describe("Associate child business to other (RENE  CASE)", function() {
+    it("Send BusinessAttributesUpdated event", function(done) {
+      this.timeout(7000);
+      broker
+        .send$("Events", "", {
+          et: "BusinessAttributesUpdated",
+          etv: 1,
+          at: "Business",
+          aid: "123456789_Rene",
+          data: {
+            attributes: [
+              { key: "AFCC_CHANNEL_PERCENTAGE", value: "0.25" },
+              {
+                key: "CHILDREN_BUIDS",
+                value: "123456789_NebulaE_POS"
+              }
+            ]
+          },
+          user: "esteban.zapata",
+          timestamp: Date.now(),
+          av: 164
+        })
+        .delay(3000)
+        .subscribe(result => {}, error => done(error), () => done());
+    });
+  });
 
   /*
    * CREATE 1 RELOAD WITHOUT BONUS
    */
 
   describe("Create AFCC reload and check its transactions", () => {
-
-    it("Create single AFCC reload without bonus", done => {
+    it("Create single AFCC reload with MAIN pocket", done => {
       this.timeout(1000);
       const cardId = uuidv4();
       broker
@@ -280,8 +344,23 @@ describe("E2E - Simple transaction", function() {
               {
                 id: uuidv4(),
                 pocket: "MAIN",
-                value: -11000,
                 pocketAlias: "MAIN",
+                value: -13250,
+                user: "juan.vendedor",
+                location: {},
+                notes: "notas de la recarga de 11000",
+                terminal: {
+                  id: uuidv4(),
+                  userId: "juan.user_de_terminal",
+                  username: "JUAN.SANTA",
+                  associatedTransactionIds: []
+                }
+              },
+              {
+                id: uuidv4(),
+                pocket: "MAIN",
+                pocketAlias: "MAIN",
+                value: 132.5,
                 user: "juan.vendedor",
                 location: {},
                 notes: "notas de la recarga de 11000",
@@ -304,16 +383,20 @@ describe("E2E - Simple transaction", function() {
     it("Chek all transactions amounts", done => {
       this.timeout(4000);
       const transactionsExpected = {
-        "123456789_Metro_med": 10835,
-        "123456789_PlaceToPay": 22,
-        "123456789_NebulaE": 22,
-        "123456789_Cloud": 11,
-        "123456789_surplus": 110
+        "123456789_Metro_med": 7436.75,
+        "123456789_Rene": 6.25,
+        "123456789_Comisiones": 18.75,
+        "123456789_PlaceToPay": 5,
+        "123456789_NebulaE": 5,
+        "123456789_Cloud": 2.5,
+        "123456789_surplus": 0.01
       };
       Rx.Observable.of({})
         .delay(1000)
         .mapTo(mongoDB.client.db(dbName).collection("Transactions"))
-        .mergeMap(collection => Rx.Observable.defer(() => collection.find().toArray()) )
+        .mergeMap(collection =>
+          Rx.Observable.defer(() => collection.find().toArray())
+        )
         .mergeMap(transactions =>
           Rx.Observable.from(transactions)
             .map(tx => ({
@@ -325,8 +408,240 @@ describe("E2E - Simple transaction", function() {
         .mergeMap(transactions =>
           Rx.Observable.from(Object.keys(transactionsExpected))
             .map(buId => {
-              console.log(buId);
               const index = transactions.findIndex(t => t.toBu == buId);
+              return {
+                match: transactions[index].amount == transactionsExpected[buId],
+                amount: transactions[index].amount
+              };
+            })
+            .toArray()
+        )
+        .do(results => {
+          expect(results).to.be.lengthOf(7);
+          expect(results).to.be.deep.equals(
+            [...Array(7)].map((e, i) => ({
+              match: true,
+              amount: transactionsExpected[Object.keys(transactionsExpected)[i]]
+            }))
+          );
+        })
+        .subscribe(() => {}, e => done(e), () => done());
+    });
+  });
+
+  /**
+   * Drop transactions and reloads documents
+   */
+  describe("drop transactions tables", () => {
+    it("drop tables", done => {
+      this.timeout(5000);
+
+      Rx.Observable.of({
+        transactionsCollection: mongoDB.client
+          .db(dbName)
+          .collection("Transactions"),
+        reloadsCollection: mongoDB.client
+          .db(dbName)
+          .collection("AfccReloadEvents")
+      })
+        .mergeMap(({ transactionsCollection, reloadsCollection }) =>
+          Rx.Observable.forkJoin(
+            Rx.Observable.defer(() => transactionsCollection.drop()),
+            Rx.Observable.defer(() => reloadsCollection.drop())
+          )
+        )
+        .subscribe(ok => {}, error => console.log(error), () => done());
+    });
+  });
+
+  /**
+   * Send events with no allowed transaction type, concepts.
+   */
+  describe("Send Executeed transactions not allowed", () => {
+    //   // No allowed transaction type
+    it("Send Transaction executed without allowed transaction type", done => {
+      this.timeout(1000);
+      const cardId = uuidv4();
+      broker
+        .send$("Events", "", {
+          _id: uuidv4(),
+          et: "WalletTransactionExecuted",
+          etv: 1,
+          at: "Wallet",
+          aid: cardId,
+          data: {
+            businessId: "123456789_NebulaE_POS",
+            transactionType: "SALE_PLUS",
+            transactionConcept: "RECARGA_CIVICA",
+            transactions: [
+              {
+                id: uuidv4(),
+                pocket: "MAIN",
+                value: -11000,
+                user: "juan.vendedor",
+                location: {},
+                notes: "notas de la recarga de 11000",
+                terminal: {
+                  id: uuidv4(),
+                  userId: "juan.user_de_terminal",
+                  username: "JUAN.SANTA",
+                  associatedTransactionIds: []
+                }
+              }
+            ]
+          },
+          user: "juan.santa",
+          timestamp: Date.now(),
+          av: 1
+        })
+        .subscribe(
+          ok => {},
+          error => {
+            console.log(error);
+            return done(error);
+          },
+          () => {
+            console.log("Reload made finished");
+            return done();
+          }
+        );
+    });
+
+    // No allowed transaction concept
+    it("Send Transaction executed without allowed transaction concept", done => {
+      this.timeout(1000);
+      const cardId = uuidv4();
+      broker
+        .send$("Events", "", {
+          _id: uuidv4(),
+          et: "WalletTransactionExecuted",
+          etv: 1,
+          at: "Wallet",
+          aid: cardId,
+          data: {
+            businessId: "123456789_NebulaE_POS",
+            transactionType: "SALE",
+            transactionConcept: "RECARGA_CIVICA_COMERCIO",
+            transactions: [
+              {
+                id: uuidv4(),
+                pocket: "MAIN",
+                value: -11000,
+                user: "juan.vendedor",
+                location: {},
+                notes: "notas de la recarga de 11000",
+                terminal: {
+                  id: uuidv4(),
+                  userId: "juan.user_de_terminal",
+                  username: "JUAN.SANTA",
+                  associatedTransactionIds: []
+                }
+              }
+            ]
+          },
+          user: "juan.santa",
+          timestamp: Date.now(),
+          av: 1
+        })
+        .subscribe(
+          ok => {},
+          error => {
+            console.log(error);
+            return done(error);
+          },
+          () => {
+            console.log("Reload made finished");
+            return done();
+          }
+        );
+    });
+
+    it("CHECK THAT THERE AREN'T TRANSACTIONS", done => {
+      this.timeout(4000);
+      Rx.Observable.of({})
+        .delay(1000)
+        .mapTo(mongoDB.client.db(dbName).collection("Transactions"))
+        .mergeMap(collection =>
+          Rx.Observable.defer(() => collection.find().toArray())
+        )
+        .do(results => {
+          expect(results).to.be.lengthOf(0);
+        })
+        .subscribe(ok => {}, error => done(error), () => done());
+    });
+  });
+
+  describe("Make the reloads with bonus pocket", () => {
+    // SEND SALES MADE WITH BONUS POCKET
+    it("Send Transaction executed with only bonus pocket used", done => {
+      this.timeout(1000);
+      const cardId = uuidv4();
+      broker
+        .send$("Events", "", {
+          _id: uuidv4(),
+          et: "WalletTransactionExecuted",
+          etv: 1,
+          at: "Wallet",
+          aid: cardId,
+          data: {
+            businessId: "123456789_NebulaE_POS",
+            transactionType: "SALE",
+            transactionConcept: "RECARGA_CIVICA",
+            transactions: [
+              {
+                id: uuidv4(),
+                pocket: "BONUS",
+                pocketAlias: "BONUS",
+                value: -2550,
+                user: "juan.vendedor",
+                location: {},
+                notes: "notas de la recarga de 11000",
+                terminal: {
+                  id: uuidv4(),
+                  userId: "juan.user_de_terminal",
+                  username: "JUAN.SANTA",
+                  associatedTransactionIds: []
+                }
+              }
+            ]
+          },
+          user: "juan.santa",
+          timestamp: Date.now(),
+          av: 1
+        })
+        .subscribe(ok => {}, e => done(e), () => done());
+    });
+
+    it("Chek all transactions amounts", done => {
+      this.timeout(4000);
+
+      const transactionsExpected = {
+        "123456789_Metro_med": 2511.75,
+        "123456789_PlaceToPay": 5.1,
+        "123456789_NebulaE": 5.1,
+        "123456789_Cloud": 2.55,
+        "123456789_inversiones": 25.5
+      };
+
+      Rx.Observable.of({})
+        .delay(1000)
+        .mapTo(mongoDB.client.db(dbName).collection("Transactions"))
+        .mergeMap(collection =>
+          Rx.Observable.defer(() => collection.find().toArray())
+        )
+        .mergeMap(transactions =>
+          Rx.Observable.from(transactions)
+            .map(tx => ({
+              ...tx,
+              amount: parseFloat(new NumberDecimal(tx.amount.bytes).toString())
+            }))
+            .toArray()
+        )
+        .mergeMap(transactions =>
+          Rx.Observable.from(Object.keys(transactionsExpected))
+            .map(buId => {
+              const index = transactions.findIndex(t => t.toBu == buId);
+              console.log(buId, index);
               return {
                 match: transactions[index].amount == transactionsExpected[buId],
                 amount: transactions[index].amount
@@ -343,342 +658,147 @@ describe("E2E - Simple transaction", function() {
             }))
           );
         })
-        .subscribe( ok => {}, error => { console.log(error); return done(error); }, () => done() );
-    });
 
+        .subscribe(ok => {}, error => done(error), () => done());
+    });
   });
 
   /**
    * Drop transactions and reloads documents
    */
-  // describe("drop transactions tables", () => {
-  //   it("drop tables", done => {
-  //     this.timeout(5000);
+  describe("drop transactions tables", () => {
+    it("drop tables", done => {
+      this.timeout(5000);
+      Rx.Observable.of({
+        transactionsCollection: mongoDB.client
+          .db(dbName)
+          .collection("Transactions"),
+        reloadsCollection: mongoDB.client
+          .db(dbName)
+          .collection("AfccReloadEvents")
+      })
+        .mergeMap(({ transactionsCollection, reloadsCollection }) =>
+          Rx.Observable.forkJoin(
+            Rx.Observable.defer(() => transactionsCollection.drop()),
+            Rx.Observable.defer(() => reloadsCollection.drop())
+          )
+        )
+        .delay(1000)
+        .mapTo(mongoDB.client.db(dbName).collection("Transactions"))
+        .mergeMap(collection =>
+          Rx.Observable.defer(() => collection.find().toArray())
+        )
+        .do(results => {
+          expect(results).to.be.lengthOf(0);
+        })
+        .subscribe(ok => {}, error => console.log(error), () => done());
+    });
+  });
 
-  //     Rx.Observable.of({
-  //       transactionsCollection: mongoDB.client
-  //         .db(dbName)
-  //         .collection("Transactions"),
-  //       reloadsCollection: mongoDB.client
-  //         .db(dbName)
-  //         .collection("AfccReloadEvents")
-  //     })
-  //       .mergeMap(({ transactionsCollection, reloadsCollection }) =>
-  //         Rx.Observable.forkJoin(
-  //           Rx.Observable.defer(() => transactionsCollection.drop()),
-  //           Rx.Observable.defer(() => reloadsCollection.drop())
-  //         )
-  //       )
-  //       .subscribe(
-  //         ok => {},
-  //         error => console.log(error),
-  //         () => {
-  //           return done();
-  //         }
-  //       );
-  //   });
-  // });
+  describe("Make the reloads with credit pocket", () => {
+    // SEND SALES MADE WITH CREDIT POCKET
+    it("Send Transaction executed with only bonus pocket used", done => {
+      this.timeout(1000);
+      const cardId = uuidv4();
+      broker
+        .send$("Events", "", {
+          _id: uuidv4(),
+          et: "WalletTransactionExecuted",
+          etv: 1,
+          at: "Wallet",
+          aid: cardId,
+          data: {
+            businessId: "123456789_NebulaE_POS",
+            transactionType: "SALE",
+            transactionConcept: "RECARGA_CIVICA",
+            transactions: [
+              {
+                id: uuidv4(),
+                pocket: "MAIN",
+                pocketAlias: "CREDIT",
+                value: -4300,
+                user: "juan.vendedor",
+                location: {},
+                notes: "notas de la recarga de 11000",
+                terminal: {
+                  id: uuidv4(),
+                  userId: "juan.user_de_terminal",
+                  username: "JUAN.SANTA",
+                  associatedTransactionIds: []
+                }
+              },
+              {
+                id: uuidv4(),
+                pocket: "BONUS",
+                value: 32.25,
+                user: "juan.vendedor",
+                location: {},
+                notes: "notas de la recarga de 11000",
+                terminal: {
+                  id: uuidv4(),
+                  userId: "juan.user_de_terminal",
+                  username: "JUAN.SANTA",
+                  associatedTransactionIds: []
+                }
+              }
+            ]
+          },
+          user: "juan.santa",
+          timestamp: Date.now(),
+          av: 1
+        })
+        .subscribe(ok => {}, error => done(error), () => done());
+    });
 
-  /**
-   * Send events with no allowed transaction type, concepts.
-   */
-  // describe("Send Executeed transactions not allowed", () => {
-  //   //   // No allowed transaction type
-  //   it("Send Transaction executed without allowed transaction type", done => {
-  //     this.timeout(1000);
-  //     const cardId = uuidv4();
-  //     broker
-  //       .send$("Events", "", {
-  //         _id: uuidv4(),
-  //         et: "WalletTransactionExecuted",
-  //         etv: 1,
-  //         at: "Wallet",
-  //         aid: cardId,
-  //         data: {
-  //           businessId: "123456789_NebulaE_POS",
-  //           transactionType: "SALE_PLUS",
-  //           transactionConcept: "RECARGA_CIVICA",
-  //           transactions: [
-  //             {
-  //               id: uuidv4(),
-  //               pocket: "MAIN",
-  //               value: -11000,
-  //               user: "juan.vendedor",
-  //               location: {},
-  //               notes: "notas de la recarga de 11000",
-  //               terminal: {
-  //                 id: uuidv4(),
-  //                 userId: "juan.user_de_terminal",
-  //                 username: "JUAN.SANTA",
-  //                 associatedTransactionIds: []
-  //               }
-  //             }
-  //           ]
-  //         },
-  //         user: "juan.santa",
-  //         timestamp: Date.now(),
-  //         av: 1
-  //       })
-  //       .subscribe(
-  //         ok => {},
-  //         error => {
-  //           console.log(error);
-  //           return done(error);
-  //         },
-  //         () => {
-  //           console.log("Reload made finished");
-  //           return done();
-  //         }
-  //       );
-  //   });
+    it("Chek all transactions amounts", done => {
+      this.timeout(4000);
+      const transactionsExpected = {
+        "123456789_Metro_med": 4235.5,
+        "123456789_PlaceToPay": 8.6,
+        "123456789_NebulaE": 8.6,
+        "123456789_Cloud": 4.3,
+        "123456789_Comisiones": 32.25
+      };
 
-  //   //   // No allowed transaction concept
-  //   it("Send Transaction executed without allowed transaction concept", done => {
-  //     this.timeout(1000);
-  //     const cardId = uuidv4();
-  //     broker
-  //       .send$("Events", "", {
-  //         _id: uuidv4(),
-  //         et: "WalletTransactionExecuted",
-  //         etv: 1,
-  //         at: "Wallet",
-  //         aid: cardId,
-  //         data: {
-  //           businessId: "123456789_NebulaE_POS",
-  //           transactionType: "SALE",
-  //           transactionConcept: "RECARGA_CIVICA_COMERCIO",
-  //           transactions: [
-  //             {
-  //               id: uuidv4(),
-  //               pocket: "MAIN",
-  //               value: -11000,
-  //               user: "juan.vendedor",
-  //               location: {},
-  //               notes: "notas de la recarga de 11000",
-  //               terminal: {
-  //                 id: uuidv4(),
-  //                 userId: "juan.user_de_terminal",
-  //                 username: "JUAN.SANTA",
-  //                 associatedTransactionIds: []
-  //               }
-  //             }
-  //           ]
-  //         },
-  //         user: "juan.santa",
-  //         timestamp: Date.now(),
-  //         av: 1
-  //       })
-  //       .subscribe(
-  //         ok => {},
-  //         error => {
-  //           console.log(error);
-  //           return done(error);
-  //         },
-  //         () => {
-  //           console.log("Reload made finished");
-  //           return done();
-  //         }
-  //       );
-  //   });
+      Rx.Observable.of({})
+        .delay(1000)
+        .mapTo(mongoDB.client.db(dbName).collection("Transactions"))
+        .mergeMap(collection =>
+          Rx.Observable.defer(() => collection.find().toArray())
+        )
+        .mergeMap(transactions =>
+          Rx.Observable.from(transactions)
+            .map(tx => ({
+              ...tx,
+              amount: parseFloat(new NumberDecimal(tx.amount.bytes).toString())
+            }))
+            .toArray()
+        )
+        .mergeMap(transactions =>
+          Rx.Observable.from(Object.keys(transactionsExpected))
+            .map(buId => {
+              const index = transactions.findIndex(t => t.toBu == buId);
+              console.log(buId, index);
+              return {
+                match: transactions[index].amount == transactionsExpected[buId],
+                amount: transactions[index].amount
+              };
+            })
+            .toArray()
+        )
+        .do(results => {
+          expect(results).to.be.lengthOf(5);
+          expect(results).to.be.deep.equals(
+            [...Array(5)].map((e, i) => ({
+              match: true,
+              amount: transactionsExpected[Object.keys(transactionsExpected)[i]]
+            }))
+          );
+        })
 
-  //   //   // TransactionExecutted event with only bonus spendings
-  //   it("Send Transaction executed with only  bonus pocket used", done => {
-  //     this.timeout(1000);
-  //     const cardId = uuidv4();
-  //     broker
-  //       .send$("Events", "", {
-  //         _id: uuidv4(),
-  //         et: "WalletTransactionExecuted",
-  //         etv: 1,
-  //         at: "Wallet",
-  //         aid: cardId,
-  //         data: {
-  //           businessId: "123456789_NebulaE_POS",
-  //           transactionType: "SALE",
-  //           transactionConcept: "RECARGA_CIVICA",
-  //           transactions: [
-  //             {
-  //               id: uuidv4(),
-  //               pocket: "BONUS",
-  //               value: -11000,
-  //               user: "juan.vendedor",
-  //               location: {},
-  //               notes: "notas de la recarga de 11000",
-  //               terminal: {
-  //                 id: uuidv4(),
-  //                 userId: "juan.user_de_terminal",
-  //                 username: "JUAN.SANTA",
-  //                 associatedTransactionIds: []
-  //               }
-  //             }
-  //           ]
-  //         },
-  //         user: "juan.santa",
-  //         timestamp: Date.now(),
-  //         av: 1
-  //       })
-  //       .subscribe(
-  //         ok => {},
-  //         error => {
-  //           console.log(error);
-  //           return done(error);
-  //         },
-  //         () => {
-  //           console.log("Reload made finished");
-  //           return done();
-  //         }
-  //       );
-  //   });
-
-  //   it("Chek all transactions amounts", done => {
-  //     this.timeout(4000);
-  //     Rx.Observable.of({})
-  //       .delay(1000)
-  //       .mapTo(mongoDB.client.db(dbName).collection("Transactions"))
-  //       .mergeMap(collection =>
-  //         Rx.Observable.defer(() => collection.find().toArray())
-  //       )
-  //       .do(result => {
-  //         expect(result).to.be.lengthOf(2);
-  //       })
-  //       .subscribe(
-  //         ok => {},
-  //         error => {
-  //           console.log(error);
-  //           return done(error);
-  //         },
-  //         () => {
-  //           console.log("Reload made finished");
-  //           return done();
-  //         }
-  //       );
-  //   });
-  // });
-
-  /*
-   * CREATE 1 RELOAD WITH BONUS
-   */
-
-  // describe("Create AFCC reload with BONUS and check its transactions", () => {
-  //   it("Create single AFCC reload with bonus", done => {
-  //     this.timeout(1000);
-  //     const cardId = uuidv4();
-  //     broker
-  //       .send$("Events", "", {
-  //         _id: uuidv4(),
-  //         et: "WalletTransactionExecuted",
-  //         etv: 1,
-  //         at: "Wallet",
-  //         aid: cardId,
-  //         data: {
-  //           businessId: "123456789_NebulaE_POS",
-  //           transactionType: "SALE",
-  //           transactionConcept: "RECARGA_CIVICA",
-  //           transactions: [
-  //             {
-  //               id: uuidv4(),
-  //               pocket: "MAIN",
-  //               value: -11000,
-  //               user: "juan.vendedor",
-  //               location: {},
-  //               notes: "notas de la recarga de 11000",
-  //               terminal: {
-  //                 id: uuidv4(),
-  //                 userId: "juan.user_de_terminal",
-  //                 username: "JUAN.SANTA",
-  //                 associatedTransactionIds: []
-  //               }
-  //             },
-  //             {
-  //               id: uuidv4(),
-  //               pocket: "BONUS",
-  //               value: 93.5,
-  //               user: "juan.vendedor",
-  //               location: {},
-  //               notes: "bonus generado para  11000",
-  //               terminal: {
-  //                 id: uuidv4(),
-  //                 userId: "juan.user_de_terminal",
-  //                 username: "JUAN.SANTA",
-  //                 associatedTransactionIds: []
-  //               }
-  //             }
-  //           ]
-  //         },
-  //         user: "juan.santa",
-  //         timestamp: Date.now(),
-  //         av: 1
-  //       })
-  //       .subscribe(
-  //         ok => {},
-  //         error => {
-  //           console.log(error);
-  //           return done(error);
-  //         },
-  //         () => {
-  //           console.log("Reload made finished");
-  //           return done();
-  //         }
-  //       );
-  //   });
-
-  //   it("Chek all transactions amounts", done => {
-  //     this.timeout(4000);
-  //     const transactionsExpected = {
-  //       "123456789_Metro_med": 10835,
-  //       "123456789_Rene": 41.8,
-  //       "123456789_PlaceToPay": 13.51,
-  //       "123456789_NebulaE": 16.18,
-  //       "123456789_surplus": 0.01
-  //     };
-  //     Rx.Observable.of({})
-  //       .delay(1000)
-  //       .mapTo(mongoDB.client.db(dbName).collection("Transactions"))
-  //       .mergeMap(collection =>
-  //         Rx.Observable.defer(() => collection.find().toArray())
-  //       )
-  //       .mergeMap(transactions =>
-  //         Rx.Observable.from(transactions)
-  //           .map(tx => ({
-  //             ...tx,
-  //             amount: parseFloat(new NumberDecimal(tx.amount.bytes).toString())
-  //           }))
-  //           .toArray()
-  //       )
-  //       // .do(r => console.log("TRANSACTIONS WITH BONUS #########", JSON.stringify(r)))
-  //       .mergeMap(transactions =>
-  //         Rx.Observable.from(Object.keys(transactionsExpected))
-  //           .map(buId => {
-  //             const index = transactions.findIndex(t => t.toBu == buId);
-  //             return {
-  //               match: transactions[index].amount == transactionsExpected[buId],
-  //               amount: transactions[index].amount
-  //             };
-  //           })
-  //           .toArray()
-  //       )
-  //       .do(results => {
-  //         expect(results).to.be.lengthOf(5);
-  //         expect(results).to.be.deep.equals(
-  //           [...Array(5)].map((e, i) => ({
-  //             match: true,
-  //             amount: transactionsExpected[Object.keys(transactionsExpected)[i]]
-  //           }))
-  //         );
-  //       })
-  //       .subscribe(
-  //         ok => {},
-  //         error => {
-  //           console.log(error);
-  //           return done(error);
-  //         },
-  //         () => {
-  //           console.log("Reload made finished");
-  //           return done();
-  //         }
-  //       );
-  //   });
-  // });
+        .subscribe(ok => {}, error => done(error), () => done());
+    });
+  });
 
   /*
    * DE-PREAPARE
@@ -718,5 +838,4 @@ describe("E2E - Simple transaction", function() {
         );
     });
   });
-
 });

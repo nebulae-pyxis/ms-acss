@@ -274,11 +274,16 @@ describe("E2E - Simple transaction", function() {
                   percentage: 0.2
                 },
                 {
-                  fromBu: "123456789_Pasarela",
+                  fromBu: "123456789_inversiones",
                   buId: "123456789_Cloud",
                   percentage: 0.1
                 }
-              ]
+              ],
+              bonusCollector: {
+                fromBu: "123456789_inversiones",
+                buId: "123456789_Comisiones"
+              }
+
             }
           },
           user: "juan.santa",
@@ -354,7 +359,7 @@ describe("E2E - Simple transaction", function() {
       const transactionsExpected = {
         "123456789_Metro_med": 13051.25,
         "123456789_Comisiones": 132.5,
-        "123456789_PlaceToPay": 25.5,
+        "123456789_PlaceToPay": 26.5,
         "123456789_NebulaE": 26.5,
         "123456789_Cloud": 13.25
       };
@@ -590,7 +595,7 @@ describe("E2E - Simple transaction", function() {
 
       const transactionsExpected = {
         "123456789_Metro_med": 3743,
-        "123456789_PlaceToPay": 7.2,
+        "123456789_PlaceToPay": 7.6,
         "123456789_NebulaE": 7.6,
         "123456789_Cloud": 3.8,
         "123456789_inversiones": 38
@@ -672,7 +677,7 @@ describe("E2E - Simple transaction", function() {
 
   describe("Make the reloads with credit pocket", () => {
     // SEND SALES MADE WITH CREDIT POCKET
-    it("Send Transaction executed with only  bonus pocket used", done => {
+    it("Send Transaction executed with only bonus pocket used", done => {
       this.timeout(1000);
       const cardId = uuidv4();
       broker.send$("Events", "", {
@@ -730,7 +735,7 @@ describe("E2E - Simple transaction", function() {
         "123456789_Metro_med": 2462.5,
         "123456789_PlaceToPay": 5,
         "123456789_NebulaE": 5,
-        "123456789_Cloud": 0.5,
+        "123456789_Cloud": 2.5,
         "123456789_Comisiones": 18.75
       };
 

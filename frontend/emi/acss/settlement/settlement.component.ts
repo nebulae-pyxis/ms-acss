@@ -212,7 +212,6 @@ export class SettlementComponent implements OnInit, OnDestroy {
    * @param business  selected business
    */
   onChangeSettlementState(newState, settlement) {
-
     Rx.Observable.of({settlement, newState})
     .pipe(
       mergeMap(settlementData => this.acssService.changeSettlementState$(settlementData.settlement._id, settlementData.newState)),

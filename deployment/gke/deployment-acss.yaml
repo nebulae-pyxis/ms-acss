@@ -56,9 +56,9 @@ spec:
           value: PUBSUB
         # Microservice config
         - name: BALANCE_ADJUSTMENT_BUSINESS_ID
-          value: 1
+          value: '1'
         - name: BUSINESS_PLATFORM_ID
-          value: 2
+          value: '2'
         # RESET LOCK INITIALIZE BACKED
         - name: LOCKVERSION
           value: "0.0.1"        

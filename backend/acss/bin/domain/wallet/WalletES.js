@@ -51,7 +51,6 @@ class WalletES {
       };
     })
     .mergeMap(data => {
-      console.log('Data => ', data)
       return TransactionsDA.createTransaction$(data);
     });  
   }

@@ -68,7 +68,7 @@ type Clearing {
 
 "Money movement"
 type Movement {
-  "Business ID involved in the movement"
+  "Business ID involved in the movement."
   businessId: String!
   "Business name involved in the movement"
   businessName: String

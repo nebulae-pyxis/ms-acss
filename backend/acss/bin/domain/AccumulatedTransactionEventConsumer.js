@@ -8,6 +8,7 @@ const NumberDecimal = require('mongodb').Decimal128;
 
 let instance;
 
+
 class TransactionAccumulatedEventConsumer {
   constructor() {}
 

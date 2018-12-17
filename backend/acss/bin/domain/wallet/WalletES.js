@@ -35,7 +35,7 @@ class WalletES {
       return {          
         fromBu: isDeposit ? process.env.BALANCE_ADJUSTMENT_BUSINESS_ID: process.env.BUSINESS_PLATFORM_ID,
         toBu: isDeposit ? process.env.BUSINESS_PLATFORM_ID: process.env.BALANCE_ADJUSTMENT_BUSINESS_ID,
-        amount: transaction.value,
+        amount: isDeposit ? transaction.value: transaction.value*-1,
         // channel: {
         //   id: CHANNEL_ID,
         //   v: process.env.npm_package_version,

@@ -281,7 +281,8 @@
         <mat-header-cell *cdkHeaderCellDef>{{'ACSS.TX_TYPE' | translate}}</mat-header-cell>
         <mat-cell *cdkCellDef="let accumulatedTransaction">
           <div fxLayout="row" fxLayoutAlign="start center">
-            <mat-icon matTooltip="{{'ACSS.AFCC_RELOAD' | translate}}" matBadge="{{getTransactionTypeAmount(accumulatedTransaction, 'AFCC_RELOAD')}}" matBadgeColor="warn" matBadgeSize="large">card_membership</mat-icon>
+            <mat-icon class="mr-8" matTooltip="{{'ACSS.AFCC_RELOAD' | translate}}" matBadge="{{getTransactionTypeAmount(accumulatedTransaction, 'AFCC_RELOAD')}}" matBadgeColor="warn">card_membership</mat-icon>
+            <mat-icon matTooltip="{{'ACSS.MOVEMENT' | translate}}" matBadge="{{getTransactionTypeAmount(accumulatedTransaction, 'MOVEMENT')}}" matBadgeColor="warn">cached</mat-icon>
           </div>
 
         </mat-cell>

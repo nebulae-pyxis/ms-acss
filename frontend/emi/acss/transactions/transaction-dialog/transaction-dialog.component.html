@@ -1,5 +1,5 @@
 <div fxLayout="column" fxLayoutAlign="space-between start">
-<div fxLayout="column" class="p-12">
+<div fxLayout="column" class="p-12" *ngIf="transaction.channel">
   <div class="h2">{{'ACSS.CHANNEL' | translate}}</div>
 
   <div fxLayout="row">

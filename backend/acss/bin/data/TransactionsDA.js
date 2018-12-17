@@ -24,6 +24,18 @@ class TransactionsDA {
   }
 
   /**
+   * Create a transaction
+   * @param {*} transaction 
+   */
+  static createTransaction$(transaction){
+    const collection = mongoDB.db.collection(CollectionName);
+
+    return Rx.Observable.of(transaction)
+    .map(transaction => ({ ...transaction, amount: NumberDecimal.fromString( transaction.amount.toString() )}))
+    .mergeMap(data => Rx.Observable.defer(() => collection.insertOne(data)))
+  }
+
+  /**
    * returns a transaction stream of trasactions beggining with the cursor up to the limit timestamp
    * @param String cursor cursor describing where to start
    * @param  number timestampLimit timestamp limit to stop the stream

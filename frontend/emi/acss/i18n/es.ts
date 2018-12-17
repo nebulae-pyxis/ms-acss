@@ -51,7 +51,8 @@ export const locale = {
       PAID_OUT: 'Pagado',
       NONE: 'Ninguno',
       SELECT_ONE: 'Seleccione un estado',
-      null: ''
+      null: '',
+      MOVEMENT: 'Movimiento de saldo',
     },
     ERRORS: {
       17001: 'Error interno de servidor',

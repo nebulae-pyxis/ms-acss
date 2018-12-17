@@ -8,6 +8,7 @@ const clearing = require("../../domain/Clearing")();
 const settlement = require("../../domain/settlement/");
 const logError = require("../../domain/log-error/");
 const jwtPublicKey = process.env.JWT_PUBLIC_KEY.replace(/\\n/g, "\n");
+const {handleError$} = require('../../tools/GraphqlResponseTools');
 
 let instance;
 
@@ -96,7 +97,7 @@ class GraphQlService {
         Rx.Observable.of(message)
           .map(message => ({ authToken: jsonwebtoken.verify(message.data.jwt, jwtPublicKey), message, failedValidations: [] }))
           .catch(err =>
-            this.handleError$(err)
+            handleError$(err)
               .map(response => ({
                 errorResponse: { response, correlationId: message.id, replyTo: message.attributes.replyTo },
                 failedValidations: ['JWT']
@@ -104,21 +105,6 @@ class GraphQlService {
               ))
           )
       )
-  }
-
-  handleError$(err) {
-    return Rx.Observable.of(err).map(err => {
-      const exception = { data: null, result: {}};
-      const isCustomError = err instanceof CustomError;
-      if (!isCustomError) {
-        err = new DefaultError(err);
-      }
-      exception.result = {
-        code: err.code,
-        error: { ...err.getContent() }
-      };
-      return exception;
-    });
   }
 
   /**

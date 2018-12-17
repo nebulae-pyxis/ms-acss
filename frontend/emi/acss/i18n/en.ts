@@ -51,7 +51,8 @@ export const locale = {
       PAID_OUT: 'Paid out',
       NONE: 'None',
       SELECT_ONE: 'Select one',
-      null: ''
+      null: '',
+      MOVEMENT: 'Balance movement',
     },
     ERRORS: {
       17001: 'Internal server error',

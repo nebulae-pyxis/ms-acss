@@ -5,6 +5,7 @@ const businessEventConsumer = require("../../domain/BusinessEventConsumer")();
 const accumulatedTransactionEventConsumer = require("../../domain/AccumulatedTransactionEventConsumer")();
 const clearingJobTriggeredEventHandler = require("../../domain/ClearingJobTriggeredEventHandler")();
 const settlement = require("../../domain/settlement/");
+const wallet = require("../../domain/wallet/");
 
 /**
  * Singleton instance
@@ -139,6 +140,10 @@ class EventStoreService {
         fn: settlement.eventSourcing.handleSettlementJobTriggeredEvent$,
         obj: settlement.eventSourcing
       },
+      WalletTransactionExecuted: {
+        fn: wallet.eventSourcing.handleWalletTransactionExecuted$,
+        obj: wallet.eventSourcing
+      },
     };
   }
 
@@ -168,6 +173,10 @@ class EventStoreService {
       {
         aggregateType: "Cronjob",
         eventType: "SettlementJobTriggered"
+      },
+      {
+        aggregateType: "Wallet",
+        eventType: "WalletTransactionExecuted"
       }
 
     ]

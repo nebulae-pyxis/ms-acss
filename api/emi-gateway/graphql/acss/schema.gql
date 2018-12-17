@@ -111,7 +111,7 @@ type Transaction {
   "Transaction type"
   type: String!
   "Channel"
-  channel: Channel!
+  channel: Channel
   "Event"
   evt: Event!
 }

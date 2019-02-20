@@ -40,7 +40,7 @@ spec:
           ports:
             - containerPort: 27017
           volumeMounts:
-            - name: mongo-persistent-storage
+            - name: mongo-persistent-storage2
               mountPath: /data/db
           resources:
             limits:
@@ -50,10 +50,17 @@ spec:
               cpu: 50m
               memory: 100Mi
   volumeClaimTemplates:
+  #- metadata:
+  #    name: mongo-persistent-storage
+  #    annotations:
+  #      volume.beta.kubernetes.io/storage-class: "fast"
+  #  spec:
+  #    accessModes: [ "ReadWriteOnce" ]
+  #    resources:
+  #      requests:
+  #        storage: 32Gi
   - metadata:
-      name: mongo-persistent-storage
-      annotations:
-        volume.beta.kubernetes.io/storage-class: "fast"
+      name: mongo-persistent-storage2
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:

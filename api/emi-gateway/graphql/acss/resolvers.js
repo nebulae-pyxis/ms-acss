@@ -1,6 +1,5 @@
 const withFilter = require("graphql-subscriptions").withFilter;
 const { CustomError } = require("../../tools/customError");
-const RoleValidator  = require("../../tools/RoleValidator");
 const PubSub = require("graphql-subscriptions").PubSub;
 const pubsub = new PubSub();
 const broker = require("../../broker/BrokerFactory")();

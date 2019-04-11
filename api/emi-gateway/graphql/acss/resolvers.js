@@ -445,7 +445,7 @@ module.exports = {
       },
     },
 
-    //// MUTATIONS ///////
+    //// MUTATIONS //////
     Mutation: {
       changeSettlementState(root, args, context) {
         return RoleValidator.checkPermissions$(
